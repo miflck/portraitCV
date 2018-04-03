@@ -1,0 +1,18 @@
+<group>
+	<Min_area>1</Min_area>
+	<Max_area>255.49</Max_area>
+	<Threshold>117.3</Threshold>
+	<Holes>0</Holes>
+	<Simple>0</Simple>
+	<persistence>15</persistence>
+	<mincanny>66.05</mincanny>
+	<maxcanny>300</maxcanny>
+	<Min_area2>1</Min_area2>
+	<Max_area2>248.005</Max_area2>
+	<mincanny2>67</mincanny2>
+	<maxcanny2>248.7</maxcanny2>
+	<Holes2>1</Holes2>
+	<resample>1.585</resample>
+	<smooth>2.615</smooth>
+<group/>
+</group>

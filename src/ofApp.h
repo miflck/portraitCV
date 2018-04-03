@@ -26,6 +26,13 @@ class ofApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
+    
+    
+    
+    
+    void makeNewPortrait();
+    
+    
 		
     ofVideoGrabber cam;
     ofxCv::ContourFinder contourFinder;
@@ -45,6 +52,11 @@ class ofApp : public ofBaseApp{
     ofParameter<bool> holes2;
 
     ofParameter<float>          persistence;
+    ofParameter<float>          contrast;
+    ofParameter<float>          brightness;
+
+    ofParameter<float>          blur;
+
     ofParameter<bool> simply;
     
     ofParameter<float>          mincanny;
@@ -58,11 +70,25 @@ class ofApp : public ofBaseApp{
     
     ofParameter<float>          resample;
     ofParameter<float>          smooth;
+    
+    
+    ofParameter<float>          arclength1;
+    ofParameter<float>          arclength2;
+    ofParameter<float>          arclength3;
+    ofParameter<float>          arclength4;
+
+
+
+
 
 
 
     
     ofxCvGrayscaleImage     grayImage;
+    ofxCvGrayscaleImage     grayImageBlur;
+
+    
+    
     ofxCvGrayscaleImage     canny;
     ofxCvColorImage            colorImg;
 
@@ -76,6 +102,16 @@ class ofApp : public ofBaseApp{
     vector<ofPolyline> allContours;
     vector<ofPolyline> eyes;
     vector<ofPolyline> mouth;
+    
+    vector<ofPolyline> linesToDraw1;
+    vector<ofPolyline> linesToDraw2;
+    vector<ofPolyline> linesToDraw3;
 
+
+    
+
+    int drawcounter=0;
+    
+    bool continousDraw=false;
     
 };

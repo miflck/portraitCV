@@ -15,11 +15,7 @@
 	<resample>3</resample>
 	<smooth>3</smooth>
 <group/>
-<contrast>1</contrast>
-	<brightness>1</brightness>
+<contrast>0.475</contrast>
+	<brightness>0.65</brightness>
 	<blur>0</blur>
-<arclength1>2370</arclength1>
-	<arclength2>1950</arclength2>
-	<arclength3>60</arclength3>
-	<arclength4>0</arclength4>
 </group>

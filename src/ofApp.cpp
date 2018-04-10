@@ -31,8 +31,12 @@ void ofApp::setup(){
     cam.setup(1024,576);
     gui.setup();
     
+    gui.add(zoomfact.set("zoom", 1, 0, 2));
+
     gui.add(contrast.set("contrast", 1, 0, 1));
     gui.add(brightness.set("brightness", 1, 0, 1));
+    
+
 
     gui.add(blur.set("blur", 0, 0, 10));
 
@@ -43,7 +47,7 @@ void ofApp::setup(){
     gui.add(arclength4.set("arclength4", 30, 0, 3000));
 
     gui.add(minArea.set("Min area", 1, 1, 100));
-    gui.add(maxArea.set("Max area", 200, 1, 500));
+    gui.add(maxArea.set("Max area", 200, 1, 2000));
     gui.add(threshold.set("Threshold", 128, 0, 255));
     gui.add(holes.set("Holes", true));
     gui.add(simply.set("Simple", false));
@@ -98,22 +102,29 @@ static bool sortByArea(const ofPolyline &a, const ofPolyline &b){
 
 void ofApp::makeContours(){
     
-    canny.allocate(grayImage.getWidth(), grayImage.getHeight());
-    cvCanny(grayImage.getCvImage(), canny.getCvImage(), mincanny, maxcanny,3);
+    grayImage.contrastStretch();
+
+    zoom=grayImage;
+    zoom.transform(0, zoom.getWidth()/2, zoom.getHeight()/2, zoomfact, zoomfact, 0, 0);
+   // if(canny.getWidth()!=grayImage.getWidth()){
+        canny.allocate(grayImage.getWidth(), grayImage.getHeight());
+        canny2.allocate(grayImage.getWidth(), grayImage.getHeight());
+    //}
+    
+
+    cvCanny(zoom.getCvImage(), canny.getCvImage(), mincanny, maxcanny,3);
     canny.dilate();
     canny.erode();
-    canny.contrastStretch();
     canny.flagImageChanged();
     
-    canny2.allocate(grayImage.getWidth(), grayImage.getHeight());
-    cvCanny(grayImage.getCvImage(), canny2.getCvImage(), mincanny2, maxcanny2,3);
+    cvCanny(zoom.getCvImage(), canny2.getCvImage(), mincanny2, maxcanny2,3);
     canny2.dilate();
     canny2.erode();
     canny2.flagImageChanged();
     
     
     finder.setup("haarcascade_frontalface_default.xml");
-    finder.findHaarObjects(grayImage,200,200);
+    finder.findHaarObjects(zoom,200,200);
     
     
     if(finder.blobs.size()>0){
@@ -127,7 +138,19 @@ void ofApp::makeContours(){
         crop = cam_mat(crop_roi).clone();
         
         
-        
+       /* ofPoint sourcePoints[4];
+        sourcePoints[0] = ofPoint(    cur.x,     cur.y);
+        sourcePoints[1] = ofPoint(cur.x+cur.width, cur.y);
+        sourcePoints[2] = ofPoint(cur.x+cur.width, cur.y+cur.height);
+        sourcePoints[3] = ofPoint(    cur.x, cur.y+cur.height);
+        ofPoint destPoints[4];
+        destPoints[0]   = ofPoint(       0,        0);
+        destPoints[1]   = ofPoint(     cam.getWidth(),        0);
+        destPoints[2]   = ofPoint(     cam.getWidth(),      cam.getHeight());
+        destPoints[3]   = ofPoint(       0,      cam.getHeight());*/
+        //zoom.warpIntoMe(grayImage, sourcePoints, destPoints);
+      
+        //zoom.scale(2, 2);
         
         contourFinder.setMinAreaRadius(minArea);
         contourFinder.setMaxAreaRadius(maxArea);
@@ -201,13 +224,13 @@ void ofApp::makePolylines(){
         approxPolyDP(contourFinder.getContour(k),quad, 0.5 ,true);
         
         
-        if (contourFinder.getArcLength(k)>arclength4){
+        if (contourFinder.getArcLength(k)>arclength4&& contourFinder.getArcLength(k)<arclength3){
             approxPolyDP(contourFinder.getContour(k),quad, 3 ,true);
         }
-        if (contourFinder.getArcLength(k)>arclength3){
+        if (contourFinder.getArcLength(k)>arclength3 && contourFinder.getArcLength(k)<arclength3){
             approxPolyDP(contourFinder.getContour(k),quad, 8 ,true);
         }
-        if (contourFinder.getArcLength(k)>arclength2){
+        if (contourFinder.getArcLength(k)>arclength2 && contourFinder.getArcLength(k)<arclength1){
             approxPolyDP(contourFinder.getContour(k),quad, 10 ,true);
         }
         if (contourFinder.getArcLength(k)>arclength1){
@@ -276,13 +299,18 @@ void ofApp::draw(){
     // canny.draw(0,0);
     ofPopStyle();
     grayImage.draw(ofGetWidth()-grayImage.getWidth()/3,0,grayImage.getWidth()/3,grayImage.getHeight()/3);
+    
+    zoom.draw(ofGetWidth()-zoom.getWidth()/3,zoom.getHeight()/3*3,zoom.getWidth()/3,zoom.getHeight()/3);
+
+    
+    
     ofPushMatrix();
    // ofScale(2,2);
    //contourFinder.draw();
     ofPopMatrix();
     
     haarfinder.draw();
-
+  
     
     ofPushMatrix();
     //ofScale(0.7,0.7);
@@ -472,13 +500,17 @@ void ofApp::draw(){
 
 //--------------------------------------------------------------
 void ofApp::makeNewPortrait(){
+    if(colorImg.getWidth()!=cam.getWidth()){
     colorImg.allocate(cam.getWidth(),cam.getHeight());
-    colorImg.setFromPixels(cam.getPixels());
     grayImage.allocate(cam.getWidth(),cam.getHeight());
+    zoom.allocate(cam.getWidth(),cam.getHeight());
     grayImageBlur.allocate(cam.getWidth(),cam.getHeight());
+    }
+    
+    colorImg.setFromPixels(cam.getPixels());
+
     grayImage=colorImg;
     grayImageBlur=colorImg;
- //   grayImage.brightnessContrast(brightness, contrast);
     grayImage.blur(blur);
 
     grayImage.contrastStretch();

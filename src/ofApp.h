@@ -80,6 +80,7 @@ class ofApp : public ofBaseApp{
     ofParameter<float>          arclength4;
 
 
+    ofParameter<float>          zoomfact;
 
 
 
@@ -96,7 +97,8 @@ class ofApp : public ofBaseApp{
 
     ofxCvGrayscaleImage     canny2;
 
-    
+    ofxCvGrayscaleImage     zoom;
+
     
     ofMesh m_triangulation;
     vector<ofVec2f> m_points;

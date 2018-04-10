@@ -62,7 +62,6 @@ void ofApp::setup(){
     gui.add(smooth.set("smooth", 3, 1, 20));
     
     ofBackground(0);
-    
 }
 
 //--------------------------------------------------------------
@@ -74,107 +73,12 @@ void ofApp::update(){
     
     
     if(continousDraw){
-        
-        makeNewPortrait();
-
-        
+    makeNewPortrait();
     }
-    
-    /*  if(cam.isFrameNew()) {
-         colorImg.allocate(cam.getWidth(),cam.getHeight());
-
-         colorImg.setFromPixels(cam.getPixels());
-         grayImage.allocate(cam.getWidth(),cam.getHeight());
-         grayImage=colorImg;
-
-  /*   contourFinder.setMinAreaRadius(minArea);
-     contourFinder.setMaxAreaRadius(maxArea);
-     contourFinder.setThreshold(threshold);
-     contourFinder.findContours(cam);
-     contourFinder.setFindHoles(holes);*/
-  //  }
- //   grayImage=colorImg;
-
- //  grayImage.brightnessContrast(brightness, contrast);
    
+    makeContours();
 
-    canny.allocate(grayImage.getWidth(), grayImage.getHeight());
-    cvCanny(grayImage.getCvImage(), canny.getCvImage(), mincanny, maxcanny,3);
-    canny.dilate();
-    canny.erode();
 
-    canny.contrastStretch();
- 
-
-    canny.flagImageChanged();
-    
-    canny2.allocate(grayImage.getWidth(), grayImage.getHeight());
-    cvCanny(grayImage.getCvImage(), canny2.getCvImage(), mincanny2, maxcanny2,3);
-    canny2.dilate();
-    canny2.erode();
-    canny2.flagImageChanged();
-    
-    
-    finder.setup("haarcascade_frontalface_default.xml");
-
-    finder.findHaarObjects(grayImage,200,200);
-    
-    
-    if(finder.blobs.size()>0){
-
-    ofRectangle cur =finder.blobs[0].boundingRect;
-    ofDrawRectangle(cur);
-    canny.setROI(cur.x, cur.y-200, cur.width, cur.height+200);
- 
-    
-    cam_mat = toCv(canny);
-    //cv::Rect crop_roi = cv::Rect(cur.x, cur.y-100, cur.width, cur.height+150);
-        cv::Rect crop_roi = cv::Rect(cur.x, cur.y, cur.width, cur.height);
-
-    crop = cam_mat(crop_roi).clone();
-    
-        
-      
-    
-    contourFinder.setMinAreaRadius(minArea);
-    contourFinder.setMaxAreaRadius(maxArea);
-    contourFinder.setThreshold(threshold);
-    contourFinder.setSimplify(simply);
-    contourFinder.setFindHoles(holes);
-    contourFinder.findContours(crop);
-        
-        
-        int n = contourFinder.size();
-        allContours.clear();
-        for(int k=0;k<n;k++){
-        ofPolyline contour=contourFinder.getPolyline(k);
-            allContours.push_back(contour);
-        }
-        
-        
-        haarfinder.setup("haarcascade_mcs_eyepair_small.xml");
-        haarfinder.setPreset(ObjectFinder::Fast);
-        
-        haarfinder.update(colorImg);
-
-        
-        
-        
-        cam_mat = toCv(canny2);
-        cv::Rect crop_roi2 = cv::Rect(cur.x, cur.y-100, cur.width, cur.height+150);
-        crop = cam_mat(crop_roi).clone();
-        
-        contourFinder2.setMinAreaRadius(minArea2);
-        contourFinder2.setMaxAreaRadius(maxArea2);
-        contourFinder2.setThreshold(threshold);
-        contourFinder2.setSimplify(simply);
-        contourFinder2.setFindHoles(holes2);
-        contourFinder2.findContours(crop);
-        
-        
-       // contourFinder.findContours(canny);
-
-    }
     
 
 }
@@ -192,6 +96,174 @@ static bool sortByArea(const ofPolyline &a, const ofPolyline &b){
     return a.getPerimeter() > b.getPerimeter();
 }
 
+void ofApp::makeContours(){
+    
+    canny.allocate(grayImage.getWidth(), grayImage.getHeight());
+    cvCanny(grayImage.getCvImage(), canny.getCvImage(), mincanny, maxcanny,3);
+    canny.dilate();
+    canny.erode();
+    canny.contrastStretch();
+    canny.flagImageChanged();
+    
+    canny2.allocate(grayImage.getWidth(), grayImage.getHeight());
+    cvCanny(grayImage.getCvImage(), canny2.getCvImage(), mincanny2, maxcanny2,3);
+    canny2.dilate();
+    canny2.erode();
+    canny2.flagImageChanged();
+    
+    
+    finder.setup("haarcascade_frontalface_default.xml");
+    finder.findHaarObjects(grayImage,200,200);
+    
+    
+    if(finder.blobs.size()>0){
+        ofRectangle cur =finder.blobs[0].boundingRect;
+        ofDrawRectangle(cur);
+        canny.setROI(cur.x, cur.y-200, cur.width, cur.height+200);
+        cam_mat = toCv(canny);
+        //cv::Rect crop_roi = cv::Rect(cur.x, cur.y-100, cur.width, cur.height+150);
+        cv::Rect crop_roi = cv::Rect(cur.x, cur.y, cur.width, cur.height);
+        
+        crop = cam_mat(crop_roi).clone();
+        
+        
+        
+        
+        contourFinder.setMinAreaRadius(minArea);
+        contourFinder.setMaxAreaRadius(maxArea);
+        contourFinder.setThreshold(threshold);
+        contourFinder.setSimplify(simply);
+        contourFinder.setFindHoles(holes);
+        contourFinder.findContours(crop);
+        
+        
+        int n = contourFinder.size();
+        allContours.clear();
+        for(int k=0;k<n;k++){
+            ofPolyline contour=contourFinder.getPolyline(k);
+            allContours.push_back(contour);
+        }
+        
+        
+        haarfinder.setup("haarcascade_mcs_eyepair_small.xml");
+        haarfinder.setPreset(ObjectFinder::Fast);
+        
+        haarfinder.update(colorImg);
+        cam_mat = toCv(canny2);
+        cv::Rect crop_roi2 = cv::Rect(cur.x, cur.y-100, cur.width, cur.height+150);
+        crop = cam_mat(crop_roi).clone();
+        
+        contourFinder2.setMinAreaRadius(minArea2);
+        contourFinder2.setMaxAreaRadius(maxArea2);
+        contourFinder2.setThreshold(threshold);
+        contourFinder2.setSimplify(simply);
+        contourFinder2.setFindHoles(holes2);
+        contourFinder2.findContours(crop);
+    }
+    
+    makePolylines();
+    
+}
+
+
+
+void ofApp::makePolylines(){
+    vector<cv::Point> quad;
+    vector<cv::Point> quad2;
+    
+    
+    int n = contourFinder.size();
+    int n2 = contourFinder2.size();
+    
+    //ofPolyline polyline;
+    vector<ofPoint> points;
+    vector<ofPolyline> polylines;
+    
+    linesToDraw1.clear();
+    linesToDraw2.clear();
+    linesToDraw3.clear();
+    
+    
+    
+    for(int k=0;k<n;k++){
+        /*  if (contourFinder.getArcLength(k)>arclength1){
+         approxPolyDP(contourFinder.getContour(k),quad, 40 ,true);
+         }else if (contourFinder.getArcLength(k)>arclength2){
+         approxPolyDP(contourFinder.getContour(k),quad, 20 ,true);
+         }else if (contourFinder.getArcLength(k)>arclength3){
+         approxPolyDP(contourFinder.getContour(k),quad, 15 ,true);
+         }else if (contourFinder.getArcLength(k)<arclength4 && contourFinder.getArcLength(k)>arclength4){
+         approxPolyDP(contourFinder.getContour(k),quad, 5 ,true);
+         }else{
+         approxPolyDP(contourFinder.getContour(k),quad, 1 ,true);
+         }*/
+        
+        approxPolyDP(contourFinder.getContour(k),quad, 0.5 ,true);
+        
+        
+        if (contourFinder.getArcLength(k)>arclength4){
+            approxPolyDP(contourFinder.getContour(k),quad, 3 ,true);
+        }
+        if (contourFinder.getArcLength(k)>arclength3){
+            approxPolyDP(contourFinder.getContour(k),quad, 8 ,true);
+        }
+        if (contourFinder.getArcLength(k)>arclength2){
+            approxPolyDP(contourFinder.getContour(k),quad, 10 ,true);
+        }
+        if (contourFinder.getArcLength(k)>arclength1){
+            approxPolyDP(contourFinder.getContour(k),quad, 16 ,true);
+        }
+        ofSetColor(255);
+        
+        /* for(int i = 1; i < quad.size(); i++) {
+         points.push_back(ofPoint(quad[i].x, quad[i].y));
+         }*/
+        
+        ofPolyline polyline;
+        ofPolyline polyline2;
+        ofPolyline polyline3;
+        
+        for(int i = 0; i < quad.size(); i++) {
+            polyline.addVertex(quad[i].x, quad[i].y);
+        }
+        for(int i =  quad.size()/2; i < quad.size(); i++) {
+            polyline2.addVertex(quad[i].x, quad[i].y);
+        }
+        
+        for(int i = 0; i < quad.size(); i++) {
+            polyline3.addVertex(quad[i].x, quad[i].y);
+        }
+        
+        
+        
+        
+        polyline = polyline.getResampledBySpacing(resample);
+        // polyline = polyline.getSmoothed(smooth);
+        
+        polyline2 = polyline2.getResampledBySpacing(resample);
+        polyline2 = polyline2.getSmoothed(smooth);
+        
+        polyline3 = polyline3.getResampledBySpacing(resample);
+        polyline3 = polyline3.getSmoothed(smooth);
+        
+        
+        if(ABS(polyline3.getArea())>30){
+            linesToDraw3.push_back(polyline);
+        }
+        linesToDraw1.push_back(polyline);
+        linesToDraw2.push_back(polyline2);
+        //linesToDraw3.push_back(polyline3);
+        
+    }
+    
+    
+    ofSort(linesToDraw1, sortByArea);
+    if(record){
+        linesToAnimate=linesToDraw1;
+        record=false;
+    }
+    
+}
 
 
 //--------------------------------------------------------------
@@ -212,148 +284,62 @@ void ofApp::draw(){
     haarfinder.draw();
 
     
-    vector<cv::Point> quad;
-    vector<cv::Point> quad2;
-
-
-    int n = contourFinder.size();
-    int n2 = contourFinder2.size();
-
-    //ofPolyline polyline;
-    vector<ofPoint> points;
-    vector<ofPolyline> polylines;
-
-    linesToDraw1.clear();
-    linesToDraw2.clear();
-    linesToDraw3.clear();
-
-    
-    vector<ofPolyline> contourslines=contourFinder.getPolylines();
-
-  /*  for(int k=0;k<contourslines.size();k++){
-    
-    /*
-    if (contourslines[k].getPerimeter()>arclength1){
-        contourslines[k] = contourslines[k].getResampledBySpacing(200);
-    }else if (contourslines[k].getPerimeter()>arclength2){
-        contourslines[k] = contourslines[k].getResampledBySpacing(100);
-    }else if (contourslines[k].getPerimeter()<arclength2){
-        contourslines[k] = contourslines[k].getResampledBySpacing(50);
-    }else if (contourslines[k].getPerimeter()<arclength3 && contourslines[k].getPerimeter()>arclength4){
-        contourslines[k] = contourslines[k].getResampledBySpacing(3);
-    }else{
-        contourslines[k] = contourslines[k].getResampledBySpacing(0);
-    }*/
-        
-        
-   /*     contourslines[k] = contourslines[k].getResampledByCount(10);
-
-        if(contourslines[k].getPerimeter()>50){
-        linesToDraw1.push_back(contourslines[k]);
-        }
-      }*/
-    
-    
-    for(int k=0;k<n;k++){
-    /*  if (contourFinder.getArcLength(k)>arclength1){
-            approxPolyDP(contourFinder.getContour(k),quad, 40 ,true);
-        }else if (contourFinder.getArcLength(k)>arclength2){
-            approxPolyDP(contourFinder.getContour(k),quad, 20 ,true);
-        }else if (contourFinder.getArcLength(k)>arclength3){
-            approxPolyDP(contourFinder.getContour(k),quad, 15 ,true);
-        }else if (contourFinder.getArcLength(k)<arclength4 && contourFinder.getArcLength(k)>arclength4){
-            approxPolyDP(contourFinder.getContour(k),quad, 5 ,true);
-        }else{
-            approxPolyDP(contourFinder.getContour(k),quad, 1 ,true);
+    ofPushMatrix();
+    //ofScale(0.7,0.7);
+    ofTranslate(0, 0);
+    ofPushStyle();
+    for(int i = 0; i < linesToAnimate.size(); i++) {
+        //linesToAnimate[i].draw();
+       /* for (int p=0; p<100; p+=10) {
+            ofVec3f point =  linesToAnimate[i].getPointAtPercent(p/100.0);  // Returns a point at a percentage along the polyline
+            ofDrawCircle(point, 1);
         }*/
         
-        approxPolyDP(contourFinder.getContour(k),quad, 0.5 ,true);
-
+        //if(linesToAnimate[i].getPerimeter()>100){
+        /*vector<ofVec3f> vertices = linesToAnimate[i].getVertices();
+        float normalLength = 10;
+        for (int vertexIndex=0; vertexIndex<vertices.size(); vertexIndex++) {
+            ofVec3f vertex = vertices[vertexIndex];  // Get the vertex
+            ofVec3f normal = linesToAnimate[i].getNormalAtIndex(vertexIndex) * normalLength;  // Scale the normal
+            ofDrawLine(vertex-normal/2, vertex+normal/2);  // Center the scaled normal around the vertex
+        }*/
+            
+        //}
         
-        if (contourFinder.getArcLength(k)>arclength4){
-        approxPolyDP(contourFinder.getContour(k),quad, 3 ,true);
-        }
-        if (contourFinder.getArcLength(k)>arclength3){
-            approxPolyDP(contourFinder.getContour(k),quad, 8 ,true);
-        }
-        if (contourFinder.getArcLength(k)>arclength2){
-            approxPolyDP(contourFinder.getContour(k),quad, 10 ,true);
-        }
-        if (contourFinder.getArcLength(k)>arclength1){
-            approxPolyDP(contourFinder.getContour(k),quad, 16 ,true);
-        }
-        
-        
-        
-       // approxPolyDP(contourFinder.getContour(k),quad, 0.5 ,true);
-
-        
-        ofSetColor(255);
-        for(int i = 1; i < quad.size(); i++) {
-            //ofDrawLine(quad[i-1].x*2, quad[i-1].y*2, quad[i].x*2, quad[i].y*2);
-            points.push_back(ofPoint(quad[i].x, quad[i].y));
-        }
-        
-        ofPolyline polyline;
-        ofPolyline polyline2;
-        ofPolyline polyline3;
-
-
-        //ofSetColor(255,0,0);
-        
-       for(int i = 0; i < quad.size(); i++) {
-            polyline.addVertex(quad[i].x, quad[i].y);
-        }
-        for(int i =  quad.size()/2; i < quad.size(); i++) {
-            polyline2.addVertex(quad[i].x, quad[i].y);
-        }
-        
-        
-        for(int i = 0; i < quad.size(); i++) {
-            polyline3.addVertex(quad[i].x, quad[i].y);
-        }
-        
-        //cout<<polyline.getArea()<<" "<<polyline.getPerimeter()<<endl;
-  
-        
-        
-        
-        polyline = polyline.getResampledBySpacing(resample);
-       // polyline = polyline.getSmoothed(smooth);
-        
-        polyline2 = polyline2.getResampledBySpacing(resample);
-        polyline2 = polyline2.getSmoothed(smooth);
-        
-        polyline3 = polyline3.getResampledBySpacing(resample);
-        polyline3 = polyline3.getSmoothed(smooth);
-        
-       // polyline.simplify();
-        
-        //if(ABS(polyline.getArea())>30){
-            linesToDraw1.push_back(polyline);
-        
-    //}
-       // linesToDraw1.push_back(polyline);
-        linesToDraw2.push_back(polyline2);
-        linesToDraw3.push_back(polyline3);
-
     }
     
-    
-    ofSort(linesToDraw1, sortByArea);
+    if(linesToAnimate.size()>0){
+        linesToAnimate[animationPolylineIndex].simplify();
+        vector<ofVec3f> vertices = linesToAnimate[animationPolylineIndex].getVertices();
+        for (int vertexIndex=1; vertexIndex<animationVerexIndex; vertexIndex++) {
+            ofVec3f vertex = vertices[vertexIndex];  // Get the vertex
+            ofVec3f vertex2 = vertices[vertexIndex-1];  // Get the vertex
+            ofDrawLine(vertex, vertex2);  // Center the scaled normal around the vertex
 
+        }
+        animationVerexIndex++;
+        if(animationVerexIndex>vertices.size()-1){
+            animationVerexIndex=1;
+            animationPolylineIndex++;
+            if(animationPolylineIndex>linesToAnimate.size()-1){
+                animationPolylineIndex=0;
+            }
+        }
+    }
     
+    for(int i = 0; i < animationPolylineIndex; i++) {
+        linesToAnimate[i].draw();
+    }
+        
+ 
+   // for(int i = 0; i < linesToAnimate.size(); i++) {
     
-   // polyline = polyline.getResampledBySpacing(resample);
-
-    
-    //m_triangulation = ofxDelaunay2D::triangulate(m_points);
-
   
     
-    //ofSort(points, sortByCriteria);
-    //ofSort(polylines, sortByCriteriaX);
-
+    ofPopStyle();
+    ofPopMatrix();
+    
+   
     
     ofPushMatrix();
   //  ofScale(0.7,0.7);
@@ -365,8 +351,7 @@ void ofApp::draw(){
     if(drawcounter<linesToDraw1.size()){
         drawcounter++;
     }else{
-        drawcounter=1;
-        
+        drawcounter=0;
     }
     
 //linesToDraw1=linesToDraw1.reverse(linesToDraw1.begin(),linesToDraw1.end());
@@ -386,8 +371,7 @@ void ofApp::draw(){
     }
 
     ofSetColor(255,0,0);
-    linesToDraw1[drawcounter].draw();
-   
+  //  linesToDraw1[drawcounter].draw();
 
     ofPopStyle();
     ofPopMatrix();
@@ -425,7 +409,7 @@ void ofApp::draw(){
 
     ofPopMatrix();
     
-    ofPolyline polyline2;
+   /* ofPolyline polyline2;
 
     for(int i = 0; i < points.size(); i++) {
         polyline2.addVertex(points[i].x, points[i].y);
@@ -445,11 +429,11 @@ void ofApp::draw(){
     
     ofPopStyle();
     
-    ofPopMatrix();
+    ofPopMatrix();*/
     
 
     
-    for(int k=0;k<n2;k++){
+/*    for(int k=0;k<n2;k++){
         
   /*     if (contourFinder2.getArcLength(k)>400){
             approxPolyDP(contourFinder2.getContour(k),quad2, 16 ,true);
@@ -463,7 +447,7 @@ void ofApp::draw(){
             approxPolyDP(contourFinder2.getContour(k),quad2, 0.5 ,true);
         }
     */
-        approxPolyDP(contourFinder2.getContour(k),quad2, 0.05 ,true);
+/*        approxPolyDP(contourFinder2.getContour(k),quad2, 0.05 ,true);
 
         
         ofPolyline polyline;
@@ -481,8 +465,8 @@ void ofApp::draw(){
         polyline.simplify();
 
         polyline.draw();
-        
-    }
+ 
+    }*/
     gui.draw();
 }
 
@@ -523,6 +507,11 @@ void ofApp::keyPressed(int key){
         
     }
 
+    if(key=='r'){
+        
+        record=true;
+    }
+    
 }
 
 //--------------------------------------------------------------

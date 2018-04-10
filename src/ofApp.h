@@ -31,6 +31,8 @@ class ofApp : public ofBaseApp{
     
     
     void makeNewPortrait();
+    void makeContours();
+    void makePolylines();
     
     
 		
@@ -106,7 +108,13 @@ class ofApp : public ofBaseApp{
     vector<ofPolyline> linesToDraw1;
     vector<ofPolyline> linesToDraw2;
     vector<ofPolyline> linesToDraw3;
+    
+    
+    vector<ofPolyline> linesToAnimate;
+    int animationPolylineIndex=0;
+    int animationVerexIndex=1;
 
+    bool record=false;
 
     
 

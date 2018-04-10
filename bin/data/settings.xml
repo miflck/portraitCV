@@ -12,14 +12,14 @@
 	<mincanny2>80</mincanny2>
 	<maxcanny2>100</maxcanny2>
 	<Holes2>1</Holes2>
-	<resample>3</resample>
+	<resample>15.625</resample>
 	<smooth>3</smooth>
 <group/>
 <contrast>1</contrast>
 	<brightness>1</brightness>
 	<blur>0</blur>
-<arclength1>2370</arclength1>
-	<arclength2>1950</arclength2>
-	<arclength3>60</arclength3>
-	<arclength4>0</arclength4>
+<arclength1>400</arclength1>
+	<arclength2>200</arclength2>
+	<arclength3>50</arclength3>
+	<arclength4>30</arclength4>
 </group>

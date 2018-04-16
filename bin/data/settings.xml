@@ -18,8 +18,9 @@
 <contrast>1</contrast>
 	<brightness>1</brightness>
 	<blur>0</blur>
-<arclength1>2370</arclength1>
-	<arclength2>1950</arclength2>
-	<arclength3>60</arclength3>
+<arclength1>840</arclength1>
+	<arclength2>15</arclength2>
+	<arclength3>525</arclength3>
 	<arclength4>0</arclength4>
+<zoom>1</zoom>
 </group>

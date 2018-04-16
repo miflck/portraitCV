@@ -1,0 +1,26 @@
+<group>
+	<Min_area>1</Min_area>
+	<Max_area>200</Max_area>
+	<Threshold>128</Threshold>
+	<Holes>1</Holes>
+	<Simple>0</Simple>
+	<persistence>15</persistence>
+	<mincanny>80</mincanny>
+	<maxcanny>100</maxcanny>
+	<Min_area2>1</Min_area2>
+	<Max_area2>200</Max_area2>
+	<mincanny2>80</mincanny2>
+	<maxcanny2>100</maxcanny2>
+	<Holes2>1</Holes2>
+	<resample>15.625</resample>
+	<smooth>3</smooth>
+<group/>
+<contrast>1</contrast>
+	<brightness>1</brightness>
+	<blur>0</blur>
+<arclength1>400</arclength1>
+	<arclength2>200</arclength2>
+	<arclength3>50</arclength3>
+	<arclength4>30</arclength4>
+<zoom>1.33</zoom>
+</group>

@@ -106,3 +106,5 @@ Carthage/Build.rbenv-vars
 ####
 # rbenv
 .rbenv-vars
+/bin/portraitCvDebug.app/Contents/MacOS/portraitCvDebug
+/portraitCv.xcodeproj/project.xcworkspace/xcuserdata/fgm4.xcuserdatad/UserInterfaceState.xcuserstate

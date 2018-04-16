@@ -31,6 +31,8 @@ class ofApp : public ofBaseApp{
     
     
     void makeNewPortrait();
+    void makeContours();
+    void makePolylines();
     
     
 		
@@ -78,6 +80,7 @@ class ofApp : public ofBaseApp{
     ofParameter<float>          arclength4;
 
 
+    ofParameter<float>          zoomfact;
 
 
 
@@ -90,11 +93,16 @@ class ofApp : public ofBaseApp{
     
     
     ofxCvGrayscaleImage     canny;
+    ofxCvGrayscaleImage     meanCanny;
+
+    
+    
     ofxCvColorImage            colorImg;
 
     ofxCvGrayscaleImage     canny2;
 
-    
+    ofxCvGrayscaleImage     zoom;
+
     
     ofMesh m_triangulation;
     vector<ofVec2f> m_points;
@@ -106,7 +114,13 @@ class ofApp : public ofBaseApp{
     vector<ofPolyline> linesToDraw1;
     vector<ofPolyline> linesToDraw2;
     vector<ofPolyline> linesToDraw3;
+    
+    
+    vector<ofPolyline> linesToAnimate;
+    int animationPolylineIndex=0;
+    int animationVerexIndex=1;
 
+    bool record=false;
 
     
 

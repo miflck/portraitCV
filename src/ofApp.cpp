@@ -14,6 +14,8 @@ void ofApp::setup(){
     img.crop(0, 0, 1000, 788);
     colorImg.allocate(1000,788);
     grayImage.allocate(1000,788);
+    meanCanny.allocate(grayImage.getWidth(), grayImage.getHeight());
+
 
     colorImg.setFromPixels(img.getPixels());
     grayImage=colorImg;
@@ -33,8 +35,8 @@ void ofApp::setup(){
     
     gui.add(zoomfact.set("zoom", 1, 0, 2));
 
-    gui.add(contrast.set("contrast", 1, 0, 1));
-    gui.add(brightness.set("brightness", 1, 0, 1));
+    gui.add(contrast.set("contrast",0, -1, 1));
+    gui.add(brightness.set("brightness", 0, -1, 1));
     
 
 
@@ -70,21 +72,11 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
-    
-    
     cam.update();
-    
-    
-    
     if(continousDraw){
     makeNewPortrait();
     }
-   
     makeContours();
-
-
-    
-
 }
 
 
@@ -103,25 +95,39 @@ static bool sortByArea(const ofPolyline &a, const ofPolyline &b){
 void ofApp::makeContours(){
     
     grayImage.contrastStretch();
-
     zoom=grayImage;
+    
     zoom.transform(0, zoom.getWidth()/2, zoom.getHeight()/2, zoomfact, zoomfact, 0, 0);
    // if(canny.getWidth()!=grayImage.getWidth()){
         canny.allocate(grayImage.getWidth(), grayImage.getHeight());
         canny2.allocate(grayImage.getWidth(), grayImage.getHeight());
+    if(meanCanny.getWidth()!=grayImage.getWidth()){
+        meanCanny.allocate(grayImage.getWidth(), grayImage.getHeight());
+    }
     //}
     
+
 
     cvCanny(zoom.getCvImage(), canny.getCvImage(), mincanny, maxcanny,3);
     canny.dilate();
     canny.erode();
     canny.flagImageChanged();
     
+    //meanCanny+=canny;
+  //  meanCanny+=canny;
+  //  meanCanny.erode();
+   // meanCanny.erode();
+ //   meanCanny.erode();
+ //   meanCanny.erode();
+
+    
     cvCanny(zoom.getCvImage(), canny2.getCvImage(), mincanny2, maxcanny2,3);
     canny2.dilate();
     canny2.erode();
     canny2.flagImageChanged();
-    
+  //  meanCanny-=canny2;
+  //  meanCanny.absDiff(canny,canny2);
+
     
     finder.setup("haarcascade_frontalface_default.xml");
     finder.findHaarObjects(zoom,200,200);
@@ -168,13 +174,13 @@ void ofApp::makeContours(){
         }
         
         
-        haarfinder.setup("haarcascade_mcs_eyepair_small.xml");
-        haarfinder.setPreset(ObjectFinder::Fast);
+        //haarfinder.setup("haarcascade_mcs_eyepair_small.xml");
+        //haarfinder.setPreset(ObjectFinder::Fast);
+        //haarfinder.update(colorImg);
         
-        haarfinder.update(colorImg);
-        cam_mat = toCv(canny2);
-        cv::Rect crop_roi2 = cv::Rect(cur.x, cur.y-100, cur.width, cur.height+150);
-        crop = cam_mat(crop_roi).clone();
+        //cam_mat = toCv(canny2);
+       // cv::Rect crop_roi2 = cv::Rect(cur.x, cur.y-100, cur.width, cur.height+150);
+       // crop = cam_mat(crop_roi).clone();
         
         contourFinder2.setMinAreaRadius(minArea2);
         contourFinder2.setMaxAreaRadius(maxArea2);
@@ -221,8 +227,7 @@ void ofApp::makePolylines(){
          approxPolyDP(contourFinder.getContour(k),quad, 1 ,true);
          }*/
         
-        approxPolyDP(contourFinder.getContour(k),quad, 0.5 ,true);
-        
+        //approxPolyDP(contourFinder.getContour(k),quad, 0.5 ,true);
         
         if (contourFinder.getArcLength(k)>arclength4&& contourFinder.getArcLength(k)<arclength3){
             approxPolyDP(contourFinder.getContour(k),quad, 3 ,true);
@@ -273,7 +278,9 @@ void ofApp::makePolylines(){
         if(ABS(polyline3.getArea())>30){
             linesToDraw3.push_back(polyline);
         }
+        
         linesToDraw1.push_back(polyline);
+        
         linesToDraw2.push_back(polyline2);
         //linesToDraw3.push_back(polyline3);
         
@@ -295,18 +302,59 @@ void ofApp::draw(){
     ofPushStyle();
     ofSetColor(255);
    canny.draw(ofGetWidth()-canny.getWidth()/3, canny.getHeight()/3*2,canny.getWidth()/3,canny.getHeight()/3);
-    
+    canny2.draw(ofGetWidth()-canny.getWidth()/3, canny.getHeight()/3*3,canny.getWidth()/3,canny.getHeight()/3);
+    meanCanny.draw(ofGetWidth()-canny.getWidth()/3*2, canny.getHeight()/3*3,canny.getWidth()/3,canny.getHeight()/3);
+
     // canny.draw(0,0);
     ofPopStyle();
-    grayImage.draw(ofGetWidth()-grayImage.getWidth()/3,0,grayImage.getWidth()/3,grayImage.getHeight()/3);
+    zoom.draw(ofGetWidth()-grayImage.getWidth()/3,0,grayImage.getWidth()/3,grayImage.getHeight()/3);
     
-    zoom.draw(ofGetWidth()-zoom.getWidth()/3,zoom.getHeight()/3*3,zoom.getWidth()/3,zoom.getHeight()/3);
+    //zoom.draw(ofGetWidth()-zoom.getWidth()/3,zoom.getHeight()/3*3,zoom.getWidth()/3,zoom.getHeight()/3);
 
     
     
     ofPushMatrix();
    // ofScale(2,2);
    //contourFinder.draw();
+    
+    ofPushStyle();
+    ofNoFill();
+    for(int i = 0; i < (int)contourFinder.getPolylines().size(); i++) {
+         ofSetColor(255);
+        /*if (contourFinder.getArcLength(i)>arclength4&& contourFinder.getArcLength(i)<arclength3){
+            ofSetColor(0,0,255);
+        }
+        if (contourFinder.getArcLength(i)>arclength3 && contourFinder.getArcLength(i)<arclength3){
+            ofSetColor(0,255,255);
+        }
+        if (contourFinder.getArcLength(i)>arclength2 && contourFinder.getArcLength(i)<arclength1){
+            ofSetColor(0,255,0);
+        }
+        if (contourFinder.getArcLength(i)>arclength1){
+            ofSetColor(255,0,0);
+        }
+        */
+        
+        
+        if (contourFinder.getContourArea(i)>arclength4&& contourFinder.getContourArea(i)<arclength3){
+            ofSetColor(0,0,255);
+        }
+        if (contourFinder.getContourArea(i)>arclength3 && contourFinder.getContourArea(i)<arclength3){
+            ofSetColor(0,255,255);
+        }
+        if (contourFinder.getContourArea(i)>arclength2 && contourFinder.getContourArea(i)<arclength1){
+            ofSetColor(0,255,0);
+        }
+        if (contourFinder.getContourArea(i)>arclength1){
+            ofSetColor(255,0,0);
+        }
+        
+        
+        contourFinder.getPolylines()[i].draw();
+        ofDrawRectangle(toOf(contourFinder.getBoundingRect(i)));
+    }
+    ofPopStyle();
+    
     ofPopMatrix();
     
     haarfinder.draw();
@@ -389,6 +437,7 @@ void ofApp::draw(){
        linesToDraw1[i].draw();
     }
     
+    
     //cout<<linesToDraw1[drawcounter].getArea()<<" "<<linesToDraw1[drawcounter].getPerimeter()<<endl;
 
     
@@ -414,21 +463,16 @@ void ofApp::draw(){
     }
     
     ofTranslate(500, 0);
-
     ofSetColor(0, 255, 255);
-
     for(int i = 0; i < linesToDraw2.size(); i++) {
         linesToDraw2[i].draw();
-        
     }
     
     
     ofSetColor(255, 255, 0);
-
     ofTranslate(0, 500);
     for(int i = 0; i < linesToDraw3.size(); i++) {
         linesToDraw3[i].draw();
-        
     }
     
    // polyline.draw();
@@ -510,10 +554,11 @@ void ofApp::makeNewPortrait(){
     colorImg.setFromPixels(cam.getPixels());
 
     grayImage=colorImg;
+    grayImage.brightnessContrast(brightness, contrast);
     grayImageBlur=colorImg;
     grayImage.blur(blur);
 
-    grayImage.contrastStretch();
+   // grayImage.contrastStretch();
     grayImage.dilate();
     grayImage.erode();
     

@@ -93,6 +93,10 @@ class ofApp : public ofBaseApp{
     
     
     ofxCvGrayscaleImage     canny;
+    ofxCvGrayscaleImage     meanCanny;
+
+    
+    
     ofxCvColorImage            colorImg;
 
     ofxCvGrayscaleImage     canny2;

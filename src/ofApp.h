@@ -4,6 +4,8 @@
 #include "ofxCv.h"
 #include "ofxGui.h"
 #include "ofxOpenCv.h"
+#include "ofxSimpleSerial.h"
+
 
 using namespace ofxCv;
 using namespace cv;
@@ -35,6 +37,18 @@ class ofApp : public ofBaseApp{
     void makePolylines();
     
     
+    // Serial
+    ofxSimpleSerial    serial;
+    string        message;
+    bool        remember;
+    void        onNewMessage(string & message);
+    
+    void sendFeed();
+    void makeFeed();
+    vector<string> commands;
+    bool done=true;
+    bool bSendFeed=false;
+
 		
     ofVideoGrabber cam;
     ofxCv::ContourFinder contourFinder;
@@ -114,6 +128,9 @@ class ofApp : public ofBaseApp{
     vector<ofPolyline> linesToDraw1;
     vector<ofPolyline> linesToDraw2;
     vector<ofPolyline> linesToDraw3;
+    
+    vector<ofPolyline> linesToPrint;
+
     
     
     vector<ofPolyline> linesToAnimate;

@@ -7,8 +7,27 @@ using namespace cv;
 cv::Mat cam_mat;
 cv::Mat crop;
 
+
+int baud = 115200;
+
+char myByte = 0;
+string cmd;
+
 //--------------------------------------------------------------
 void ofApp::setup(){
+    
+  serial.listDevices();
+    vector <ofSerialDeviceInfo> deviceList = serial.getDeviceList();
+   serial.setup(0, baud); //open the first device
+    
+    serial.startContinuousRead(false);
+    ofAddListener(serial.NEW_MESSAGE,this,&ofApp::onNewMessage);
+    
+    
+    bool        bSendSerialMessage=false;            // a flag for sending serial
+    message = "";
+    remember = false;
+    
    // ofSetLogLevel(OF_LOG_VERBOSE);
     img.load("michaelflueckiger.jpeg");
     img.crop(0, 0, 1000, 788);
@@ -72,11 +91,23 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
+    
+    if(message != "" && remember == false)
+    {
+        cout << "sending message: " << message << "\n";
+        serial.writeString(message);
+        message = "";
+    }
+    
+    //if (done && bSendFeed)sendFeed();
+
+    
+    
     cam.update();
     if(continousDraw){
     makeNewPortrait();
     }
-    makeContours();
+   if(record) makeContours();
 }
 
 
@@ -89,7 +120,12 @@ static bool sortByCriteriaX(const ofPolyline &a, const ofPolyline &b){
 }
 
 static bool sortByArea(const ofPolyline &a, const ofPolyline &b){
-    return a.getPerimeter() > b.getPerimeter();
+    if(a.getPerimeter() > 100){
+        return a.getPerimeter() > b.getPerimeter();
+    }else{
+        return a.getBoundingBox().y < b.getBoundingBox().y;
+
+    }
 }
 
 void ofApp::makeContours(){
@@ -197,8 +233,7 @@ void ofApp::makeContours(){
 
 
 void ofApp::makePolylines(){
-    vector<cv::Point> quad;
-    vector<cv::Point> quad2;
+  
     
     
     int n = contourFinder.size();
@@ -215,6 +250,10 @@ void ofApp::makePolylines(){
     
     
     for(int k=0;k<n;k++){
+        
+        vector<cv::Point> quad;
+        vector<cv::Point> quad2;
+        
         /*  if (contourFinder.getArcLength(k)>arclength1){
          approxPolyDP(contourFinder.getContour(k),quad, 40 ,true);
          }else if (contourFinder.getArcLength(k)>arclength2){
@@ -229,18 +268,23 @@ void ofApp::makePolylines(){
         
         //approxPolyDP(contourFinder.getContour(k),quad, 0.5 ,true);
         
-        if (contourFinder.getArcLength(k)>arclength4&& contourFinder.getArcLength(k)<arclength3){
+       /* if (contourFinder.getArcLength(k)>arclength4&& contourFinder.getArcLength(k)<arclength3){
             approxPolyDP(contourFinder.getContour(k),quad, 3 ,true);
-        }
-        if (contourFinder.getArcLength(k)>arclength3 && contourFinder.getArcLength(k)<arclength3){
+        }*/
+        
+       /* if (contourFinder.getArcLength(k)>arclength3 && contourFinder.getArcLength(k)<arclength3){
             approxPolyDP(contourFinder.getContour(k),quad, 8 ,true);
-        }
-        if (contourFinder.getArcLength(k)>arclength2 && contourFinder.getArcLength(k)<arclength1){
+        }*/
+        /*if (contourFinder.getArcLength(k)>arclength2 && contourFinder.getArcLength(k)<arclength1){
             approxPolyDP(contourFinder.getContour(k),quad, 10 ,true);
-        }
+        }*/
         if (contourFinder.getArcLength(k)>arclength1){
-            approxPolyDP(contourFinder.getContour(k),quad, 16 ,true);
+       //     approxPolyDP(contourFinder.getContour(k),quad, 16 ,true);
         }
+        
+        
+        approxPolyDP(contourFinder.getContour(k),quad, 16 ,true);
+
         ofSetColor(255);
         
         /* for(int i = 1; i < quad.size(); i++) {
@@ -272,15 +316,28 @@ void ofApp::makePolylines(){
         polyline2 = polyline2.getSmoothed(smooth);
         
         polyline3 = polyline3.getResampledBySpacing(resample);
-        polyline3 = polyline3.getSmoothed(smooth);
+        polyline3.simplify();
+        //polyline3 = polyline3.getSmoothed(smooth);
         
         
-        if(ABS(polyline3.getArea())>30){
+        cout<<"n "<<k<<" quad.size() "<<quad.size()<<" area "<<polyline3.getPerimeter()<<endl;
+
+        
+        cout<<"n "<<k<<" arc length "<<contourFinder.getArcLength(k)<<endl;
+        if(ABS(polyline3.getPerimeter())>1){
+            
+            vector<ofVec3f> vertices = polyline3.getVertices();
+            for (int vertexIndex=0; vertexIndex<vertices.size(); vertexIndex++) {
+
+            cout<<vertices[vertexIndex]<<" ";
+            }
+            cout<<endl;
             linesToDraw3.push_back(polyline);
         }
         
+        if(ABS(polyline.getPerimeter())>1){
         linesToDraw1.push_back(polyline);
-        
+        }
         linesToDraw2.push_back(polyline2);
         //linesToDraw3.push_back(polyline3);
         
@@ -288,9 +345,14 @@ void ofApp::makePolylines(){
     
     
     ofSort(linesToDraw1, sortByArea);
+
     if(record){
+        ofSort(linesToDraw3, sortByArea);
+
         linesToAnimate=linesToDraw1;
+        linesToPrint=linesToDraw3;
         record=false;
+        makeFeed();
     }
     
 }
@@ -384,6 +446,7 @@ void ofApp::draw(){
         
     }
     
+    /*
     if(linesToAnimate.size()>0){
         linesToAnimate[animationPolylineIndex].simplify();
         vector<ofVec3f> vertices = linesToAnimate[animationPolylineIndex].getVertices();
@@ -407,7 +470,7 @@ void ofApp::draw(){
         linesToAnimate[i].draw();
     }
         
- 
+ */
    // for(int i = 0; i < linesToAnimate.size(); i++) {
     
   
@@ -572,6 +635,76 @@ void ofApp::makeNewPortrait(){
 }
 
 
+void ofApp::sendFeed(){
+    if (commands.size()>0) {
+        cout<<commands.size()<<" commands in buffer"<<endl;
+        string cmd = commands[0];
+        cout<<"command " <<cmd<<endl;
+        cmd+='\n';
+        //myPort.write(cmd);
+        commands.erase(commands.begin());
+        done=false;
+        
+        
+        message = cmd;
+        remember = false;
+        
+    }
+    
+}
+
+void ofApp::makeFeed(){
+    cout<<"Make Feed"<<linesToPrint.size()<<endl;
+    commands.clear();
+    for(int i = 0; i < linesToPrint.size(); i++) {
+        linesToPrint[i].simplify();
+        vector<ofVec3f> vertices = linesToPrint[i].getVertices();
+        cout<<"verts "<<vertices.size()<<endl;
+        
+        //pen Up
+        cmd = "M1 100d";
+        commands.push_back(cmd);
+
+        string cmd = "G1 X"+ofToString(int(grayImage.getWidth()/2-vertices[0].x))+" Y"+ofToString(int(grayImage.getHeight()-vertices[0].y));
+
+        commands.push_back(cmd);
+        
+        //pen Down
+        cmd = "M1 10d";
+        commands.push_back(cmd);
+
+
+        for (int vertexIndex=0; vertexIndex<vertices.size(); vertexIndex++) {
+            ofVec3f vertex = vertices[vertexIndex];  // Get the vertex
+            
+            
+         
+            
+            string cmd = "G1 X"+ofToString(int(grayImage.getWidth()/2-vertex.x))+" Y"+ofToString(int(grayImage.getHeight()-vertex.y));
+            commands.push_back(cmd);
+        }
+
+    }
+    cout<<commands.size()<<endl;
+    for (int i=0; i<commands.size(); i++) {
+        //cout<<commands[i]<<endl;
+    }
+    
+    bSendFeed=true;
+    done=true;
+    
+}
+
+
+void ofApp::onNewMessage(string & message)
+{
+    cout << "onNewMessage, message: " << message << "\n";
+    if(message=="OK"){
+         done=true;
+    }
+    
+}
+
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
     if(key == ' '){
@@ -587,6 +720,18 @@ void ofApp::keyPressed(int key){
     if(key=='r'){
         
         record=true;
+    }
+    
+    if(key=='u'){
+        message = "M1 100d\n";
+        remember = false;
+
+    }
+    
+    if(key=='d'){
+        message = "M1 60d\n";
+        remember = false;
+
     }
     
 }
@@ -613,7 +758,7 @@ void ofApp::mousePressed(int x, int y, int button){
 
 //--------------------------------------------------------------
 void ofApp::mouseReleased(int x, int y, int button){
-
+    
 }
 
 //--------------------------------------------------------------

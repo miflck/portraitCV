@@ -28,11 +28,11 @@ void ofApp::setup(){
     message = "";
     remember = false;
     
-   // ofSetLogLevel(OF_LOG_VERBOSE);
+    ofSetLogLevel(OF_LOG_VERBOSE);
     img.load("michaelflueckiger.jpeg");
-    img.crop(0, 0, 1000, 788);
-    colorImg.allocate(1000,788);
-    grayImage.allocate(1000,788);
+    //img.crop(0, 0, 1000, 788);
+    colorImg.allocate(img.getWidth(),img.getHeight());
+    grayImage.allocate(img.getWidth(),img.getHeight());
     meanCanny.allocate(grayImage.getWidth(), grayImage.getHeight());
 
 
@@ -47,7 +47,7 @@ void ofApp::setup(){
     
    
     cam.listDevices();
-    //cam.setDeviceID(1);
+    cam.setDeviceID(1);
 
     cam.setup(1024,576);
     gui.setup();
@@ -85,6 +85,10 @@ void ofApp::setup(){
 
     gui.add(resample.set("resample", 3, 1, 40));
     gui.add(smooth.set("smooth", 3, 1, 20));
+    gui.add(sortthreshold.set("sortthreshold", 100, 0, 1000));
+
+    
+    
     
     ofBackground(0);
 }
@@ -99,7 +103,7 @@ void ofApp::update(){
         message = "";
     }
     
-    //if (done && bSendFeed)sendFeed();
+    if (done && bSendFeed)sendFeed();
 
     
     
@@ -120,7 +124,7 @@ static bool sortByCriteriaX(const ofPolyline &a, const ofPolyline &b){
 }
 
 static bool sortByArea(const ofPolyline &a, const ofPolyline &b){
-    if(a.getPerimeter() > 100){
+    if(a.getPerimeter() > 20){
         return a.getPerimeter() > b.getPerimeter();
     }else{
         return a.getBoundingBox().y < b.getBoundingBox().y;
@@ -303,7 +307,7 @@ void ofApp::makePolylines(){
         }
         
         for(int i = 0; i < quad.size(); i++) {
-            polyline3.addVertex(quad[i].x, quad[i].y);
+            polyline3.addVertex(quad[i].x*1.3, quad[i].y*1.3);
         }
         
         
@@ -351,6 +355,9 @@ void ofApp::makePolylines(){
 
         linesToAnimate=linesToDraw1;
         linesToPrint=linesToDraw3;
+        
+      
+        
         record=false;
         makeFeed();
     }
@@ -360,6 +367,7 @@ void ofApp::makePolylines(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
+    img.draw(0,0);
     cam.draw(ofGetWidth()-cam.getWidth()/3, grayImage.getHeight()/3,cam.getWidth()/3,cam.getHeight()/3);
     ofPushStyle();
     ofSetColor(255);
@@ -665,7 +673,7 @@ void ofApp::makeFeed(){
         cmd = "M1 100d";
         commands.push_back(cmd);
 
-        string cmd = "G1 X"+ofToString(int(grayImage.getWidth()/2-vertices[0].x))+" Y"+ofToString(int(grayImage.getHeight()-vertices[0].y));
+        string cmd = "G1 X"+ofToString(int(grayImage.getWidth()/2*1.3-vertices[0].x))+" Y"+ofToString(int(grayImage.getHeight()*1.3-vertices[0].y));
 
         commands.push_back(cmd);
         
@@ -680,7 +688,7 @@ void ofApp::makeFeed(){
             
          
             
-            string cmd = "G1 X"+ofToString(int(grayImage.getWidth()/2-vertex.x))+" Y"+ofToString(int(grayImage.getHeight()-vertex.y));
+            string cmd = "G1 X"+ofToString(int(grayImage.getWidth()/2*1.3-vertex.x))+" Y"+ofToString(int(grayImage.getHeight()*1.3-vertex.y));
             commands.push_back(cmd);
         }
 

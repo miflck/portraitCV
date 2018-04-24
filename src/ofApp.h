@@ -98,6 +98,7 @@ class ofApp : public ofBaseApp{
 
 
 
+    ofParameter<float>          sortthreshold;
 
 
     

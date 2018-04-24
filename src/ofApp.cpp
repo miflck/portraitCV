@@ -29,6 +29,23 @@ void ofApp::setup(){
     remember = false;
     
     ofSetLogLevel(OF_LOG_VERBOSE);
+    
+    
+    img.load("michaelflueckiger.jpeg");
+    img.crop(0, 0, 1000, 788);
+    colorImg.allocate(1000,788);
+    grayImage.allocate(1000,788);
+    meanCanny.allocate(grayImage.getWidth(), grayImage.getHeight());
+    
+    
+    colorImg.setFromPixels(img.getPixels());
+    grayImage=colorImg;
+    //grayImage.threshold(200);
+    //grayImage.erode();
+    //grayImage.dilate();
+    
+    
+    /*
     img.load("michaelflueckiger.jpeg");
     //img.crop(0, 0, 1000, 788);
     colorImg.allocate(img.getWidth(),img.getHeight());
@@ -37,7 +54,7 @@ void ofApp::setup(){
 
 
     colorImg.setFromPixels(img.getPixels());
-    grayImage=colorImg;
+    grayImage=colorImg;*/
     //grayImage.threshold(200);
     //grayImage.erode();
     //grayImage.dilate();
@@ -86,11 +103,18 @@ void ofApp::setup(){
     gui.add(resample.set("resample", 3, 1, 40));
     gui.add(smooth.set("smooth", 3, 1, 20));
     gui.add(sortthreshold.set("sortthreshold", 100, 0, 1000));
+    
+    gui.add(penUpPos.set("penUpPos", 70, 0, 1000));
+    gui.add(penDownPos.set("penDownPos", 85, 0, 1000));
+
+
 
     
     
     
     ofBackground(0);
+    
+    makeContours();
 }
 
 //--------------------------------------------------------------
@@ -103,8 +127,11 @@ void ofApp::update(){
         message = "";
     }
     
-    if (done && bSendFeed)sendFeed();
-
+    if (done && bSendFeed &&!bGoHome)sendFeed();
+    if(done && bGoHome){
+        goHome();
+        bGoHome=false;
+    }
     
     
     cam.update();
@@ -175,6 +202,7 @@ void ofApp::makeContours(){
     
     if(finder.blobs.size()>0){
         ofRectangle cur =finder.blobs[0].boundingRect;
+        faceBoundingBox = finder.blobs[0].boundingRect;;
         ofDrawRectangle(cur);
         canny.setROI(cur.x, cur.y-200, cur.width, cur.height+200);
         cam_mat = toCv(canny);
@@ -381,7 +409,7 @@ void ofApp::draw(){
     
     //zoom.draw(ofGetWidth()-zoom.getWidth()/3,zoom.getHeight()/3*3,zoom.getWidth()/3,zoom.getHeight()/3);
 
-    
+    ofDrawRectangle(faceBoundingBox);
     
     ofPushMatrix();
    // ofScale(2,2);
@@ -661,6 +689,31 @@ void ofApp::sendFeed(){
     
 }
 
+
+
+void ofApp::penUp(){
+    string cmd;
+    cmd = "M1 "+ofToString(penUpPos)+"d";
+    commands.push_back(cmd);
+}
+
+void ofApp::penDown(){
+    string cmd;
+    cmd = "M1 "+ofToString(penDownPos)+"d";
+    commands.push_back(cmd);
+}
+
+void ofApp::goHome(){
+    commands.clear();
+    penUp();
+    string cmd = "G1 X"+ofToString(int(0))+" Y"+ofToString(int(0));
+    commands.push_back(cmd);
+    remember = false;
+    bSendFeed=true;
+    done=true;
+}
+
+
 void ofApp::makeFeed(){
     cout<<"Make Feed"<<linesToPrint.size()<<endl;
     commands.clear();
@@ -670,25 +723,24 @@ void ofApp::makeFeed(){
         cout<<"verts "<<vertices.size()<<endl;
         
         //pen Up
-        cmd = "M1 100d";
-        commands.push_back(cmd);
+        penUp();
 
-        string cmd = "G1 X"+ofToString(int(grayImage.getWidth()/2*1.3-vertices[0].x))+" Y"+ofToString(int(grayImage.getHeight()*1.3-vertices[0].y));
-
+        //string cmd = "G1 X"+ofToString(int(grayImage.getWidth()/2*drawZoomFact-vertices[0].x))+" Y"+ofToString(int(grayImage.getHeight()*drawZoomFact-vertices[0].y));
+        
+       //string cmd = "G1 X"+ofToString(int(faceBoundingBox.getWidth()/2-vertices[0].x))+" Y"+ofToString(int(faceBoundingBox.getHeight()-vertices[0].y));
+        cmd=formGString(vertices[0].x,vertices[0].y);
         commands.push_back(cmd);
         
         //pen Down
-        cmd = "M1 10d";
-        commands.push_back(cmd);
+        penDown();
 
 
         for (int vertexIndex=0; vertexIndex<vertices.size(); vertexIndex++) {
             ofVec3f vertex = vertices[vertexIndex];  // Get the vertex
-            
-            
-         
-            
-            string cmd = "G1 X"+ofToString(int(grayImage.getWidth()/2*1.3-vertex.x))+" Y"+ofToString(int(grayImage.getHeight()*1.3-vertex.y));
+           // string cmd = "G1 X"+ofToString(int(grayImage.getWidth()/2*drawZoomFact-vertex.x))+" Y"+ofToString(int(grayImage.getHeight()*drawZoomFact-vertex.y));
+          //  string cmd = "G1 X"+ofToString(int(faceBoundingBox.getWidth()/2-vertex.x))+" Y"+ofToString(int(grayImage.getHeight()-vertex.y));
+            cmd=formGString(vertex.x,vertex.y);
+
             commands.push_back(cmd);
         }
 
@@ -702,6 +754,53 @@ void ofApp::makeFeed(){
     done=true;
     
 }
+
+
+int ofApp::getTransX(float x){
+    int rX=int(drawScaleFact*(faceBoundingBox.getWidth()/2)-(x*drawScaleFact));
+    return rX;
+}
+
+
+int ofApp::getTransY(float y){
+    int rY=int(drawScaleFact*(faceBoundingBox.getHeight())-(y*drawScaleFact));
+    return rY;
+}
+
+string ofApp::formGString(float x, float y){
+     string s = "G1 X"+ofToString(getTransX(x))+" Y"+ofToString(getTransY(y));
+    return s;
+}
+
+void ofApp::makeBoundingRectFeed(){
+    cout<<"Make Bounding Rect Feed"<< faceBoundingBox.getPosition().x<<" "<<faceBoundingBox.getWidth()<<endl;
+    commands.clear();
+
+    penUp();
+
+    
+    string cmd = "G1 X"+ofToString(getTransX(0))+" Y"+ofToString(getTransY(0));
+    commands.push_back(cmd);
+    penDown();
+    
+    cmd = "G1 X"+ofToString(getTransX(faceBoundingBox.getWidth()))+" Y"+ofToString(getTransY(0));
+    commands.push_back(cmd);
+        
+    cmd = "G1 X"+ofToString(getTransX(faceBoundingBox.getWidth()))+" Y"+ofToString(getTransY(faceBoundingBox.getHeight()));
+    commands.push_back(cmd);
+    
+    cmd = "G1 X"+ofToString(getTransX(0))+" Y"+ofToString(getTransY(faceBoundingBox.getHeight()));
+    commands.push_back(cmd);
+    
+    cmd = "G1 X"+ofToString(getTransX(0))+" Y"+ofToString(getTransY(0));
+    commands.push_back(cmd);
+    
+    cout<<commands.size()<<endl;
+    bSendFeed=true;
+    done=true;
+}
+
+
 
 
 void ofApp::onNewMessage(string & message)
@@ -720,6 +819,12 @@ void ofApp::keyPressed(int key){
         
     }
     
+    
+    if(key == 'h'){
+        bGoHome=true;
+    
+    }
+    
     if(key == 'c'){
         continousDraw=!continousDraw;
         
@@ -731,15 +836,23 @@ void ofApp::keyPressed(int key){
     }
     
     if(key=='u'){
-        message = "M1 100d\n";
+        penUp();
         remember = false;
+        bSendFeed=true;
+        done=true;
 
     }
     
     if(key=='d'){
-        message = "M1 60d\n";
+        penDown();
         remember = false;
+        bSendFeed=true;
+        done=true;
 
+    }
+    
+    if(key=='b'){
+        makeBoundingRectFeed();
     }
     
 }

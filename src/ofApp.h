@@ -45,6 +45,15 @@ class ofApp : public ofBaseApp{
     
     void sendFeed();
     void makeFeed();
+    
+    void makeBoundingRectFeed();
+
+    
+    
+    void penUp();
+    void penDown();
+    void goHome();
+    bool bGoHome;
     vector<string> commands;
     bool done=true;
     bool bSendFeed=false;
@@ -99,6 +108,13 @@ class ofApp : public ofBaseApp{
 
 
     ofParameter<float>          sortthreshold;
+    
+    
+    
+    ofParameter<float>          penUpPos;
+    ofParameter<float>          penDownPos;
+
+
 
 
     
@@ -139,11 +155,20 @@ class ofApp : public ofBaseApp{
     int animationVerexIndex=1;
 
     bool record=false;
+    
+    ofRectangle faceBoundingBox;
 
     
 
     int drawcounter=0;
     
     bool continousDraw=false;
+    
+    float drawScaleFact=2;
+    
+    int getTransX(float x);
+    int getTransY(float y);
+    
+    string formGString(float x, float y);
     
 };

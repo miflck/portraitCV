@@ -102,11 +102,17 @@ void ofApp::setup(){
 
     gui.add(resample.set("resample", 3, 1, 40));
     gui.add(smooth.set("smooth", 3, 1, 20));
-    gui.add(sortthreshold.set("sortthreshold", 100, 0, 1000));
+    gui.add(sortthreshold.set("sortthreshold", 0.5, 0, 100));
     
-    gui.add(penUpPos.set("penUpPos", 70, 0, 1000));
-    gui.add(penDownPos.set("penDownPos", 85, 0, 1000));
+    gui.add(penUpPos.set("penUpPos", 70, 0, 180));
+    gui.add(penHighUpPos.set("penHighUpPos", 0, 0, 180));
+    gui.add(penHighDownPos.set("penHighDownPos", 30, 0, 180));
+    gui.add(penDownPos.set("penDownPos", 85, 0, 180));
 
+    gui.add(penIdlePos.set("penIdlePos", 180, 0, 180));
+    gui.add(penDrawPos.set("penDrawPos", 30, 0, 180));
+
+    
 
 
     
@@ -137,8 +143,14 @@ void ofApp::update(){
     cam.update();
     if(continousDraw){
     makeNewPortrait();
+        makeContours();
+
     }
-   if(record) makeContours();
+  if(record) makeContours();
+    if(bMakeContours)  {
+        makeContours();
+        bMakeContours=false;
+    }
 }
 
 
@@ -151,10 +163,10 @@ static bool sortByCriteriaX(const ofPolyline &a, const ofPolyline &b){
 }
 
 static bool sortByArea(const ofPolyline &a, const ofPolyline &b){
-    if(a.getPerimeter() > 20){
+    if(a.getPerimeter() > 50 || b.getPerimeter()>50){
         return a.getPerimeter() > b.getPerimeter();
     }else{
-        return a.getBoundingBox().y < b.getBoundingBox().y;
+        return a.getBoundingBox().x < b.getBoundingBox().x;
 
     }
 }
@@ -304,18 +316,18 @@ void ofApp::makePolylines(){
             approxPolyDP(contourFinder.getContour(k),quad, 3 ,true);
         }*/
         
-       /* if (contourFinder.getArcLength(k)>arclength3 && contourFinder.getArcLength(k)<arclength3){
-            approxPolyDP(contourFinder.getContour(k),quad, 8 ,true);
-        }*/
+        if (contourFinder.getArcLength(k)<arclength1){
+            approxPolyDP(contourFinder.getContour(k),quad, 4 ,true);
+        }
         /*if (contourFinder.getArcLength(k)>arclength2 && contourFinder.getArcLength(k)<arclength1){
             approxPolyDP(contourFinder.getContour(k),quad, 10 ,true);
         }*/
-        if (contourFinder.getArcLength(k)>arclength1){
-       //     approxPolyDP(contourFinder.getContour(k),quad, 16 ,true);
+       else if (contourFinder.getArcLength(k)>arclength1){
+            approxPolyDP(contourFinder.getContour(k),quad, 16 ,true);
         }
         
         
-        approxPolyDP(contourFinder.getContour(k),quad, 16 ,true);
+       // approxPolyDP(contourFinder.getContour(k),quad, 16 ,true);
 
         ofSetColor(255);
         
@@ -343,12 +355,16 @@ void ofApp::makePolylines(){
         
         polyline = polyline.getResampledBySpacing(resample);
         // polyline = polyline.getSmoothed(smooth);
+        polyline.simplify(sortthreshold);
+
         
         polyline2 = polyline2.getResampledBySpacing(resample);
-        polyline2 = polyline2.getSmoothed(smooth);
+        //polyline2 = polyline2.getSmoothed(smooth);
+        polyline2.simplify(sortthreshold);
+
         
         polyline3 = polyline3.getResampledBySpacing(resample);
-        polyline3.simplify();
+        polyline3.simplify(sortthreshold);
         //polyline3 = polyline3.getSmoothed(smooth);
         
         
@@ -377,9 +393,9 @@ void ofApp::makePolylines(){
     
     
     ofSort(linesToDraw1, sortByArea);
+    ofSort(linesToDraw3, sortByArea);
 
     if(record){
-        ofSort(linesToDraw3, sortByArea);
 
         linesToAnimate=linesToDraw1;
         linesToPrint=linesToDraw3;
@@ -395,7 +411,7 @@ void ofApp::makePolylines(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-    img.draw(0,0);
+   // img.draw(0,0);
     cam.draw(ofGetWidth()-cam.getWidth()/3, grayImage.getHeight()/3,cam.getWidth()/3,cam.getHeight()/3);
     ofPushStyle();
     ofSetColor(255);
@@ -689,6 +705,36 @@ void ofApp::sendFeed(){
     
 }
 
+void ofApp::waitPen(int mil){
+    string cmd = "M12 "+ofToString(mil)+"d";
+    commands.push_back(cmd);
+}
+
+void ofApp::turnPen(int ang){
+    string cmd = "M11 "+ofToString(ang)+"d";
+    commands.push_back(cmd);
+}
+
+void ofApp::turnIdle(){
+    penHighUp();
+    waitPen(200);
+    turnPen(penIdlePos);
+    waitPen(200);
+ 
+}
+
+void ofApp::turnDraw(){
+    penHighUp();
+    waitPen(200);
+    turnPen(penDrawPos);
+    penUp();
+}
+
+void ofApp::penHighUp(){
+    string cmd;
+    cmd = "M1 "+ofToString(penHighUpPos)+"d";
+    commands.push_back(cmd);
+}
 
 
 void ofApp::penUp(){
@@ -724,7 +770,6 @@ void ofApp::makeFeed(){
         
         //pen Up
         penUp();
-
         //string cmd = "G1 X"+ofToString(int(grayImage.getWidth()/2*drawZoomFact-vertices[0].x))+" Y"+ofToString(int(grayImage.getHeight()*drawZoomFact-vertices[0].y));
         
        //string cmd = "G1 X"+ofToString(int(faceBoundingBox.getWidth()/2-vertices[0].x))+" Y"+ofToString(int(faceBoundingBox.getHeight()-vertices[0].y));
@@ -733,7 +778,7 @@ void ofApp::makeFeed(){
         
         //pen Down
         penDown();
-
+       // waitPen(50);
 
         for (int vertexIndex=0; vertexIndex<vertices.size(); vertexIndex++) {
             ofVec3f vertex = vertices[vertexIndex];  // Get the vertex
@@ -825,7 +870,7 @@ void ofApp::keyPressed(int key){
     
     }
     
-    if(key == 'c'){
+    if(key == 'C'){
         continousDraw=!continousDraw;
         
     }
@@ -853,6 +898,24 @@ void ofApp::keyPressed(int key){
     
     if(key=='b'){
         makeBoundingRectFeed();
+    }
+    
+    if(key=='i'){
+        turnIdle();
+        remember = false;
+        bSendFeed=true;
+        done=true;
+    }
+    
+    if(key=='I'){
+        turnDraw();
+        remember = false;
+        bSendFeed=true;
+        done=true;
+    }
+    
+    if(key=='c'){
+        bMakeContours=true;
     }
     
 }

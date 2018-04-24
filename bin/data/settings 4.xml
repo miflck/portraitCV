@@ -1,33 +1,33 @@
 <group>
 	<Min_area>1</Min_area>
-	<Max_area>440.78</Max_area>
-	<Threshold>107.1</Threshold>
+	<Max_area>200</Max_area>
+	<Threshold>128</Threshold>
 	<Holes>1</Holes>
 	<Simple>0</Simple>
 	<persistence>15</persistence>
-	<mincanny>100.25</mincanny>
-	<maxcanny>300</maxcanny>
+	<mincanny>85.05</mincanny>
+	<maxcanny>173.175</maxcanny>
 	<Min_area2>1</Min_area2>
-	<Max_area2>200</Max_area2>
-	<mincanny2>80</mincanny2>
+	<Max_area2>160.68</Max_area2>
+	<mincanny2>72.7</mincanny2>
 	<maxcanny2>100</maxcanny2>
 	<Holes2>1</Holes2>
-	<resample>9.775</resample>
+	<resample>1</resample>
 	<smooth>3</smooth>
 <group/>
 <contrast>0</contrast>
 	<brightness>0</brightness>
-	<blur>0</blur>
-<arclength1>400</arclength1>
+	<blur>1</blur>
+<arclength1>285</arclength1>
 	<arclength2>200</arclength2>
 	<arclength3>50</arclength3>
 	<arclength4>30</arclength4>
 <zoom>1</zoom>
 <sortthreshold>0</sortthreshold>
 	<penUpPos>70</penUpPos>
-	<penDownPos>85</penDownPos>
+	<penDownPos>116</penDownPos>
 <penHighUpPos>0</penHighUpPos>
 	<penHighDownPos>30</penHighDownPos>
-	<penIdlePos>180</penIdlePos>
+	<penIdlePos>169</penIdlePos>
 	<penDrawPos>30</penDrawPos>
 </group>

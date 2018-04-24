@@ -63,7 +63,7 @@ class ofApp : public ofBaseApp{
     ofxCv::ContourFinder contourFinder;
     ofxCv::ContourFinder contourFinder2;
 
-    
+    bool bMakeContours;
     ofImage img;
     ofxCvHaarFinder finder;
     
@@ -111,8 +111,14 @@ class ofApp : public ofBaseApp{
     
     
     
-    ofParameter<float>          penUpPos;
-    ofParameter<float>          penDownPos;
+    ofParameter<int>          penUpPos;
+    ofParameter<int>          penDownPos;
+    ofParameter<int>          penHighUpPos;
+    ofParameter<int>          penHighDownPos;
+
+    ofParameter<int>          penIdlePos;
+
+    ofParameter<int>          penDrawPos;
 
 
 
@@ -170,5 +176,14 @@ class ofApp : public ofBaseApp{
     int getTransY(float y);
     
     string formGString(float x, float y);
+    
+    void turnIdle();
+    void turnDraw();
+
+    void penHighUp();
+    void waitPen(int mil);
+    void turnPen(int ang);
+
+
     
 };

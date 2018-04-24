@@ -1,33 +1,36 @@
 <group>
 	<Min_area>1</Min_area>
-	<Max_area>440.78</Max_area>
-	<Threshold>107.1</Threshold>
+	<Max_area>200</Max_area>
+	<Threshold>128</Threshold>
 	<Holes>1</Holes>
 	<Simple>0</Simple>
 	<persistence>15</persistence>
 	<mincanny>100.25</mincanny>
-	<maxcanny>300</maxcanny>
+	<maxcanny>96.225</maxcanny>
 	<Min_area2>1</Min_area2>
 	<Max_area2>200</Max_area2>
 	<mincanny2>80</mincanny2>
 	<maxcanny2>100</maxcanny2>
 	<Holes2>1</Holes2>
-	<resample>9.775</resample>
-	<smooth>3</smooth>
+	<resample>6.265</resample>
+	<smooth>1</smooth>
 <group/>
 <contrast>0</contrast>
 	<brightness>0</brightness>
-	<blur>0</blur>
+	<blur>5.75</blur>
 <arclength1>400</arclength1>
 	<arclength2>200</arclength2>
 	<arclength3>50</arclength3>
 	<arclength4>30</arclength4>
 <zoom>1</zoom>
-<sortthreshold>0</sortthreshold>
+<sortthreshold>1.275</sortthreshold>
 	<penUpPos>70</penUpPos>
 	<penDownPos>85</penDownPos>
 <penHighUpPos>0</penHighUpPos>
 	<penHighDownPos>30</penHighDownPos>
 	<penIdlePos>180</penIdlePos>
 	<penDrawPos>30</penDrawPos>
+<quadhard>14</quadhard>
+	<quadsmooth>3</quadsmooth>
+<dilateErode>0</dilateErode>
 </group>

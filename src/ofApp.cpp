@@ -64,7 +64,7 @@ void ofApp::setup(){
     
    
     cam.listDevices();
-    cam.setDeviceID(1);
+    cam.setDeviceID(0);
 
     cam.setup(1024,576);
     gui.setup();
@@ -77,12 +77,19 @@ void ofApp::setup(){
 
 
     gui.add(blur.set("blur", 0, 0, 10));
+    
+    gui.add(dilateErode.set("dilateErode", 5, 0, 100));
+
 
 
     gui.add(arclength1.set("arclength1", 400, 0, 3000));
     gui.add(arclength2.set("arclength2", 200, 0, 3000));
     gui.add(arclength3.set("arclength3", 50, 0, 3000));
     gui.add(arclength4.set("arclength4", 30, 0, 3000));
+    
+    gui.add(quadhard.set("quadhard", 16, 0, 30));
+    gui.add(quadsmooth.set("quadsmooth", 8, 0, 16));
+
 
     gui.add(minArea.set("Min area", 1, 1, 100));
     gui.add(maxArea.set("Max area", 200, 1, 2000));
@@ -102,7 +109,7 @@ void ofApp::setup(){
 
     gui.add(resample.set("resample", 3, 1, 40));
     gui.add(smooth.set("smooth", 3, 1, 20));
-    gui.add(sortthreshold.set("sortthreshold", 0.5, 0, 100));
+    gui.add(sortthreshold.set("sortthreshold", 0.5, 0, 5));
     
     gui.add(penUpPos.set("penUpPos", 70, 0, 180));
     gui.add(penHighUpPos.set("penHighUpPos", 0, 0, 180));
@@ -188,8 +195,33 @@ void ofApp::makeContours(){
 
 
     cvCanny(zoom.getCvImage(), canny.getCvImage(), mincanny, maxcanny,3);
+    
+
+    for(int i=0;i<dilateErode;i++){
+        canny.dilate();
+    }
+    
+    for(int i=0;i<dilateErode;i++){
+        canny.erode();
+    }
+
+
+
+
+  /*  canny.dilate();
+    canny.erode();
     canny.dilate();
     canny.erode();
+    canny.dilate();
+    canny.erode();
+    canny.dilate();
+    canny.dilate();
+
+    canny.erode();
+    canny.erode();
+   */
+
+    
     canny.flagImageChanged();
     
     //meanCanny+=canny;
@@ -214,12 +246,15 @@ void ofApp::makeContours(){
     
     if(finder.blobs.size()>0){
         ofRectangle cur =finder.blobs[0].boundingRect;
-        faceBoundingBox = finder.blobs[0].boundingRect;;
+        faceBoundingBox = finder.blobs[0].boundingRect;
+        faceBoundingBox.y-=200;
+        faceBoundingBox.height+=200;
+
         ofDrawRectangle(cur);
-        canny.setROI(cur.x, cur.y-200, cur.width, cur.height+200);
+        canny.setROI(cur.x-200, cur.y-400, cur.width+200, cur.height+400);
         cam_mat = toCv(canny);
         //cv::Rect crop_roi = cv::Rect(cur.x, cur.y-100, cur.width, cur.height+150);
-        cv::Rect crop_roi = cv::Rect(cur.x, cur.y, cur.width, cur.height);
+        cv::Rect crop_roi = cv::Rect(cur.x, cur.y-100, cur.width, cur.height+100);
         
         crop = cam_mat(crop_roi).clone();
         
@@ -317,13 +352,13 @@ void ofApp::makePolylines(){
         }*/
         
         if (contourFinder.getArcLength(k)<arclength1){
-            approxPolyDP(contourFinder.getContour(k),quad, 4 ,true);
+            approxPolyDP(contourFinder.getContour(k),quad, quadsmooth ,true);
         }
         /*if (contourFinder.getArcLength(k)>arclength2 && contourFinder.getArcLength(k)<arclength1){
             approxPolyDP(contourFinder.getContour(k),quad, 10 ,true);
         }*/
        else if (contourFinder.getArcLength(k)>arclength1){
-            approxPolyDP(contourFinder.getContour(k),quad, 16 ,true);
+            approxPolyDP(contourFinder.getContour(k),quad, quadhard ,true);
         }
         
         
@@ -416,8 +451,10 @@ void ofApp::draw(){
     ofPushStyle();
     ofSetColor(255);
    canny.draw(ofGetWidth()-canny.getWidth()/3, canny.getHeight()/3*2,canny.getWidth()/3,canny.getHeight()/3);
+    canny.draw(0,0);
+
     canny2.draw(ofGetWidth()-canny.getWidth()/3, canny.getHeight()/3*3,canny.getWidth()/3,canny.getHeight()/3);
-    meanCanny.draw(ofGetWidth()-canny.getWidth()/3*2, canny.getHeight()/3*3,canny.getWidth()/3,canny.getHeight()/3);
+    //meanCanny.draw(ofGetWidth()-canny.getWidth()/3*2, canny.getHeight()/3*3,canny.getWidth()/3,canny.getHeight()/3);
 
     // canny.draw(0,0);
     ofPopStyle();
@@ -425,7 +462,7 @@ void ofApp::draw(){
     
     //zoom.draw(ofGetWidth()-zoom.getWidth()/3,zoom.getHeight()/3*3,zoom.getWidth()/3,zoom.getHeight()/3);
 
-    ofDrawRectangle(faceBoundingBox);
+   // ofDrawRectangle(faceBoundingBox);
     
     ofPushMatrix();
    // ofScale(2,2);

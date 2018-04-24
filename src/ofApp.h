@@ -101,6 +101,9 @@ class ofApp : public ofBaseApp{
     ofParameter<float>          arclength2;
     ofParameter<float>          arclength3;
     ofParameter<float>          arclength4;
+    
+    ofParameter<int>          quadsmooth;
+    ofParameter<int>            quadhard;
 
 
     ofParameter<float>          zoomfact;
@@ -109,6 +112,9 @@ class ofApp : public ofBaseApp{
 
     ofParameter<float>          sortthreshold;
     
+    
+    ofParameter<int>            dilateErode;
+
     
     
     ofParameter<int>          penUpPos;

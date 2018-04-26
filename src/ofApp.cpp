@@ -9,19 +9,21 @@ cv::Mat crop;
 
 
 int baud = 115200;
-
 char myByte = 0;
 string cmd;
+
+bool bUseArduino=false;
 
 //--------------------------------------------------------------
 void ofApp::setup(){
     
   serial.listDevices();
-    vector <ofSerialDeviceInfo> deviceList = serial.getDeviceList();
-   serial.setup(0, baud); //open the first device
-    
-    serial.startContinuousRead(false);
-    ofAddListener(serial.NEW_MESSAGE,this,&ofApp::onNewMessage);
+    if(bUseArduino) {
+        vector <ofSerialDeviceInfo> deviceList = serial.getDeviceList();
+        serial.setup(0, baud); //open the first device
+        serial.startContinuousRead(false);
+        ofAddListener(serial.NEW_MESSAGE,this,&ofApp::onNewMessage);
+    }
     
     
     bool        bSendSerialMessage=false;            // a flag for sending serial
@@ -67,57 +69,77 @@ void ofApp::setup(){
     cam.setDeviceID(0);
 
     cam.setup(1024,576);
+    
     gui.setup();
-    
-    gui.add(zoomfact.set("zoom", 1, 0, 2));
 
-    gui.add(contrast.set("contrast",0, -1, 1));
-    gui.add(brightness.set("brightness", 0, -1, 1));
     
 
 
-    gui.add(blur.set("blur", 0, 0, 10));
+    display.setName("Dispaly");
+    display.add(bShowImage.set("bShowImage",false));
+    display.add(bShowCanny.set("bShowCanny",false));
+    gui.add(display);
+
+    imageparameters.setName("Image");
+    imageparameters.add(contrast.set("contrast",0, -1, 1));
+    imageparameters.add(brightness.set("brightness", 0, -1, 1));
+    imageparameters.add(blur.set("blur", 0, 0, 10));
+    imageparameters.add(zoomfact.set("zoom", 1, 0, 2));
+    gui.add(imageparameters);
+    gui.getGroup("Image").minimize();
+  
+    finder1.setName("Contourfinder 1");
+
+    finder1.add(dilateErode.set("dilateErode", 5, 0, 100));
+
+    finder1.add(arclength1.set("arclength1", 400, 0, 3000));
+    finder1.add(arclength2.set("arclength2", 200, 0, 3000));
+    finder1.add(arclength3.set("arclength3", 50, 0, 3000));
+    finder1.add(arclength4.set("arclength4", 30, 0, 3000));
+    finder1.add(mincanny.set("mincanny", 80, 10, 500));
+    finder1.add(maxcanny.set("maxcanny", 100, 15, 300));
+    finder1.add(cannyblur.set("cannyblur", 0, 0, 10));
+
+    finder1.add(quadhard.set("quadhard", 16, 0, 30));
+    finder1.add(quadsmooth.set("quadsmooth", 8, 0, 16));
+
+    finder1.add(minArea.set("Min area", 1, 1, 100));
+    finder1.add(maxArea.set("Max area", 200, 1, 2000));
+    finder1.add(threshold.set("Threshold", 128, 0, 255));
+    finder1.add(holes.set("Holes", true));
+    finder1.add(simply.set("Simple", false));
     
-    gui.add(dilateErode.set("dilateErode", 5, 0, 100));
+    finder1.add(resample.set("resample", 3, 1, 40));
+    finder1.add(smooth.set("smooth", 3, 1, 20));
+    finder1.add(sortthreshold.set("sortthreshold", 0.5, 0, 5));
 
+    gui.add(finder1);
 
-
-    gui.add(arclength1.set("arclength1", 400, 0, 3000));
-    gui.add(arclength2.set("arclength2", 200, 0, 3000));
-    gui.add(arclength3.set("arclength3", 50, 0, 3000));
-    gui.add(arclength4.set("arclength4", 30, 0, 3000));
     
-    gui.add(quadhard.set("quadhard", 16, 0, 30));
-    gui.add(quadsmooth.set("quadsmooth", 8, 0, 16));
-
-
-    gui.add(minArea.set("Min area", 1, 1, 100));
-    gui.add(maxArea.set("Max area", 200, 1, 2000));
-    gui.add(threshold.set("Threshold", 128, 0, 255));
-    gui.add(holes.set("Holes", true));
-    gui.add(simply.set("Simple", false));
-
-    gui.add(persistence.set("persistence", 15, 1, 100));
-    gui.add(mincanny.set("mincanny", 80, 10, 200));
-    gui.add(maxcanny.set("maxcanny", 100, 15, 300));
     
-    gui.add(minArea2.set("Min area2", 1, 1, 300));
-    gui.add(maxArea2.set("Max area2", 200, 1, 500));
-    gui.add(mincanny2.set("mincanny2", 80, 10, 200));
-    gui.add(maxcanny2.set("maxcanny2", 100, 15, 300));
-    gui.add(holes2.set("Holes2", true));
+    finder2.setName("Contourfinder 2");
 
-    gui.add(resample.set("resample", 3, 1, 40));
-    gui.add(smooth.set("smooth", 3, 1, 20));
-    gui.add(sortthreshold.set("sortthreshold", 0.5, 0, 5));
-    
-    gui.add(penUpPos.set("penUpPos", 70, 0, 180));
-    gui.add(penHighUpPos.set("penHighUpPos", 0, 0, 180));
-    gui.add(penHighDownPos.set("penHighDownPos", 30, 0, 180));
-    gui.add(penDownPos.set("penDownPos", 85, 0, 180));
 
-    gui.add(penIdlePos.set("penIdlePos", 180, 0, 180));
-    gui.add(penDrawPos.set("penDrawPos", 30, 0, 180));
+    finder2.add(minArea2.set("Min area2", 1, 1, 300));
+    finder2.add(maxArea2.set("Max area2", 200, 1, 500));
+    finder2.add(mincanny2.set("mincanny2", 80, 10, 200));
+    finder2.add(maxcanny2.set("maxcanny2", 100, 15, 300));
+    finder2.add(holes2.set("Holes2", true));
+    gui.add(finder2);
+    gui.getGroup("Contourfinder 2").minimize();
+
+    //gui.add(persistence.set("persistence", 15, 1, 100));
+
+    robot.setName("Robot");
+
+    robot.add(penUpPos.set("penUpPos", 70, 0, 180));
+    robot.add(penHighUpPos.set("penHighUpPos", 0, 0, 180));
+    robot.add(penHighDownPos.set("penHighDownPos", 30, 0, 180));
+    robot.add(penDownPos.set("penDownPos", 85, 0, 180));
+    robot.add(penIdlePos.set("penIdlePos", 180, 0, 180));
+    robot.add(penDrawPos.set("penDrawPos", 30, 0, 180));
+    gui.add(robot);
+    gui.getGroup("Robot").minimize();
 
     
 
@@ -133,7 +155,8 @@ void ofApp::setup(){
 //--------------------------------------------------------------
 void ofApp::update(){
     
-    if(message != "" && remember == false)
+    if(bUseArduino){
+        if(message != "" && remember == false)
     {
         cout << "sending message: " << message << "\n";
         serial.writeString(message);
@@ -144,6 +167,8 @@ void ofApp::update(){
     if(done && bGoHome){
         goHome();
         bGoHome=false;
+    }
+        
     }
     
     
@@ -196,16 +221,19 @@ void ofApp::makeContours(){
 
     cvCanny(zoom.getCvImage(), canny.getCvImage(), mincanny, maxcanny,3);
     
-
+    //cvCornerHarris(zoom.getCvImage(), canny.getCvImage(),10,10);
     for(int i=0;i<dilateErode;i++){
         canny.dilate();
     }
+    
+    //canny.blur(cannyblur);
     
     for(int i=0;i<dilateErode;i++){
         canny.erode();
     }
 
 
+   // cvCanny(canny.getCvImage(), canny.getCvImage(), mincanny, maxcanny,3);
 
 
   /*  canny.dilate();
@@ -247,14 +275,39 @@ void ofApp::makeContours(){
     if(finder.blobs.size()>0){
         ofRectangle cur =finder.blobs[0].boundingRect;
         faceBoundingBox = finder.blobs[0].boundingRect;
-        faceBoundingBox.y-=200;
-        faceBoundingBox.height+=200;
+       
 
         ofDrawRectangle(cur);
-        canny.setROI(cur.x-200, cur.y-400, cur.width+200, cur.height+400);
+        
+        int diffx,diffy,dx,dy,hy;
+        int offsetty=100;
+        
+        
+        diffx=cur.x+cur.width;
+        
+        diffy=cur.y-offsetty/2;
+       
+        if(cur.y-offsetty/2<=0){
+            dy=0;
+        }else{
+            dy=cur.y-offsetty/2;
+        }
+        
+        if(cur.y+cur.height+offsetty>=canny.getHeight()){
+            hy=canny.getHeight()-dy;
+        }else{
+            hy=cur.height+offsetty;
+        }
+        
+        faceBoundingBox.y-=dy;
+        faceBoundingBox.height+=hy;
+        
+       canny.setROI(cur.x-200, cur.y-400, cur.width+200, cur.height+400);
         cam_mat = toCv(canny);
         //cv::Rect crop_roi = cv::Rect(cur.x, cur.y-100, cur.width, cur.height+150);
-        cv::Rect crop_roi = cv::Rect(cur.x, cur.y-100, cur.width, cur.height+100);
+       // cv::Rect crop_roi = cv::Rect(cur.x, cur.y-dy, cur.width, cur.height+hy);
+        cv::Rect crop_roi = cv::Rect(cur.x, dy, cur.width, hy);
+
         
         crop = cam_mat(crop_roi).clone();
         
@@ -332,7 +385,10 @@ void ofApp::makePolylines(){
         
         vector<cv::Point> quad;
         vector<cv::Point> quad2;
-        
+        vector<cv::Point> quad3;
+        vector<cv::Point> quad4;
+
+
         /*  if (contourFinder.getArcLength(k)>arclength1){
          approxPolyDP(contourFinder.getContour(k),quad, 40 ,true);
          }else if (contourFinder.getArcLength(k)>arclength2){
@@ -351,15 +407,19 @@ void ofApp::makePolylines(){
             approxPolyDP(contourFinder.getContour(k),quad, 3 ,true);
         }*/
         
-        if (contourFinder.getArcLength(k)<arclength1){
+     /*   if (contourFinder.getArcLength(k)<arclength1){
             approxPolyDP(contourFinder.getContour(k),quad, quadsmooth ,true);
         }
-        /*if (contourFinder.getArcLength(k)>arclength2 && contourFinder.getArcLength(k)<arclength1){
-            approxPolyDP(contourFinder.getContour(k),quad, 10 ,true);
-        }*/
+        
        else if (contourFinder.getArcLength(k)>arclength1){
             approxPolyDP(contourFinder.getContour(k),quad, quadhard ,true);
-        }
+        }*/
+        
+        
+        approxPolyDP(contourFinder.getContour(k),quad, quadhard ,true);
+        approxPolyDP(contourFinder.getContour(k),quad2, quadsmooth ,true);
+        approxPolyDP(contourFinder.getContour(k),quad3, 0.5 ,true);
+
         
         
        // approxPolyDP(contourFinder.getContour(k),quad, 16 ,true);
@@ -389,39 +449,39 @@ void ofApp::makePolylines(){
         
         
         polyline = polyline.getResampledBySpacing(resample);
-        // polyline = polyline.getSmoothed(smooth);
+        polyline = polyline.getSmoothed(smooth);
         polyline.simplify(sortthreshold);
 
         
         polyline2 = polyline2.getResampledBySpacing(resample);
-        //polyline2 = polyline2.getSmoothed(smooth);
+        polyline2 = polyline2.getSmoothed(smooth);
         polyline2.simplify(sortthreshold);
 
         
         polyline3 = polyline3.getResampledBySpacing(resample);
         polyline3.simplify(sortthreshold);
-        //polyline3 = polyline3.getSmoothed(smooth);
+        polyline3 = polyline3.getSmoothed(smooth);
         
         
-        cout<<"n "<<k<<" quad.size() "<<quad.size()<<" area "<<polyline3.getPerimeter()<<endl;
+        //cout<<"n "<<k<<" quad.size() "<<quad.size()<<" area "<<polyline3.getPerimeter()<<endl;
 
         
-        cout<<"n "<<k<<" arc length "<<contourFinder.getArcLength(k)<<endl;
+        //cout<<"n "<<k<<" arc length "<<contourFinder.getArcLength(k)<<endl;
         if(ABS(polyline3.getPerimeter())>1){
             
-            vector<ofVec3f> vertices = polyline3.getVertices();
+           /* vector<ofVec3f> vertices = polyline3.getVertices();
             for (int vertexIndex=0; vertexIndex<vertices.size(); vertexIndex++) {
 
             cout<<vertices[vertexIndex]<<" ";
             }
-            cout<<endl;
+            cout<<endl;*/
             linesToDraw3.push_back(polyline);
         }
         
         if(ABS(polyline.getPerimeter())>1){
         linesToDraw1.push_back(polyline);
         }
-        linesToDraw2.push_back(polyline2);
+        linesToDraw2.push_back(polyline);
         //linesToDraw3.push_back(polyline3);
         
     }
@@ -446,19 +506,28 @@ void ofApp::makePolylines(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-   // img.draw(0,0);
+    
+    zoom.draw(ofGetWidth()-grayImage.getWidth()/3,0,grayImage.getWidth()/3,grayImage.getHeight()/3);
+
+    if(bShowImage){
+        img.draw(0,0);
+    }
     cam.draw(ofGetWidth()-cam.getWidth()/3, grayImage.getHeight()/3,cam.getWidth()/3,cam.getHeight()/3);
     ofPushStyle();
     ofSetColor(255);
-   canny.draw(ofGetWidth()-canny.getWidth()/3, canny.getHeight()/3*2,canny.getWidth()/3,canny.getHeight()/3);
-    canny.draw(0,0);
+    if(!bShowCanny){
+         canny.draw(ofGetWidth()-canny.getWidth()/3, canny.getHeight()/3*2,canny.getWidth()/3,canny.getHeight()/3);
+    }else{
+       canny.draw(0,0);
+    }
+   //
 
-    canny2.draw(ofGetWidth()-canny.getWidth()/3, canny.getHeight()/3*3,canny.getWidth()/3,canny.getHeight()/3);
+    //canny2.draw(ofGetWidth()-canny.getWidth()/3, canny.getHeight()/3*3,canny.getWidth()/3,canny.getHeight()/3);
     //meanCanny.draw(ofGetWidth()-canny.getWidth()/3*2, canny.getHeight()/3*3,canny.getWidth()/3,canny.getHeight()/3);
 
     // canny.draw(0,0);
     ofPopStyle();
-    zoom.draw(ofGetWidth()-grayImage.getWidth()/3,0,grayImage.getWidth()/3,grayImage.getHeight()/3);
+    //zoom.draw(ofGetWidth()-grayImage.getWidth()/3,0,grayImage.getWidth()/3,grayImage.getHeight()/3);
     
     //zoom.draw(ofGetWidth()-zoom.getWidth()/3,zoom.getHeight()/3*3,zoom.getWidth()/3,zoom.getHeight()/3);
 
@@ -467,9 +536,10 @@ void ofApp::draw(){
     ofPushMatrix();
    // ofScale(2,2);
    //contourFinder.draw();
-    
+    //ofTranslate(faceBoundingBox.getPosition().x,faceBoundingBox.getPosition().y);
     ofPushStyle();
     ofNoFill();
+    ofSetLineWidth(2);
     for(int i = 0; i < (int)contourFinder.getPolylines().size(); i++) {
          ofSetColor(255);
         /*if (contourFinder.getArcLength(i)>arclength4&& contourFinder.getArcLength(i)<arclength3){
@@ -490,7 +560,7 @@ void ofApp::draw(){
         if (contourFinder.getContourArea(i)>arclength4&& contourFinder.getContourArea(i)<arclength3){
             ofSetColor(0,0,255);
         }
-        if (contourFinder.getContourArea(i)>arclength3 && contourFinder.getContourArea(i)<arclength3){
+        if (contourFinder.getContourArea(i)>arclength3 && contourFinder.getContourArea(i)<arclength2){
             ofSetColor(0,255,255);
         }
         if (contourFinder.getContourArea(i)>arclength2 && contourFinder.getContourArea(i)<arclength1){
@@ -499,10 +569,10 @@ void ofApp::draw(){
         if (contourFinder.getContourArea(i)>arclength1){
             ofSetColor(255,0,0);
         }
-        
+       // ofSetLineWidth(3);
         
         contourFinder.getPolylines()[i].draw();
-        ofDrawRectangle(toOf(contourFinder.getBoundingRect(i)));
+        //ofDrawRectangle(toOf(contourFinder.getBoundingRect(i)));
     }
     ofPopStyle();
     

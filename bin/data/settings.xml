@@ -33,4 +33,49 @@
 <quadhard>14</quadhard>
 	<quadsmooth>3</quadsmooth>
 <dilateErode>0</dilateErode>
+<Dispaly>
+		<bShowCanny>1</bShowCanny>
+	<bShowImage>0</bShowImage>
+	</Dispaly>
+	<Image>
+		<contrast>0</contrast>
+		<brightness>0</brightness>
+		<blur>0</blur>
+		<zoom>1</zoom>
+	</Image>
+	<Contourfinder_1>
+		<dilateErode>2</dilateErode>
+		<arclength1>3000</arclength1>
+		<arclength2>275.51</arclength2>
+		<arclength3>1102.04</arclength3>
+		<arclength4>474.49</arclength4>
+		<mincanny>102.5</mincanny>
+		<maxcanny>65.8929</maxcanny>
+		<quadhard>8</quadhard>
+		<quadsmooth>2</quadsmooth>
+		<Min_area>1</Min_area>
+		<Max_area>200</Max_area>
+		<Threshold>128</Threshold>
+		<Holes>1</Holes>
+		<Simple>0</Simple>
+		<resample>1</resample>
+		<smooth>1</smooth>
+		<sortthreshold>0</sortthreshold>
+	<cannyblur>0</cannyblur>
+	</Contourfinder_1>
+	<Contourfinder_2>
+		<Min_area2>1</Min_area2>
+		<Max_area2>200</Max_area2>
+		<mincanny2>80</mincanny2>
+		<maxcanny2>100</maxcanny2>
+		<Holes2>1</Holes2>
+	</Contourfinder_2>
+	<Robot>
+		<penUpPos>70</penUpPos>
+		<penHighUpPos>0</penHighUpPos>
+		<penHighDownPos>30</penHighDownPos>
+		<penDownPos>85</penDownPos>
+		<penIdlePos>180</penIdlePos>
+		<penDrawPos>30</penDrawPos>
+	</Robot>
 </group>

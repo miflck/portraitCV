@@ -72,6 +72,22 @@ class ofApp : public ofBaseApp{
     
     
     ofxPanel gui;
+
+    
+    ofParameter<bool> bShowCanny;
+    ofParameter<bool> bShowImage;
+
+    ofParameterGroup imageparameters;
+    ofParameterGroup display;
+    
+    ofParameterGroup finder1;
+    ofParameterGroup finder2;
+    ofParameterGroup robot;
+
+
+
+
+    
     ofParameter<float> minArea, maxArea, threshold;
     ofParameter<bool> holes;
     ofParameter<bool> holes2;
@@ -86,6 +102,8 @@ class ofApp : public ofBaseApp{
     
     ofParameter<float>          mincanny;
     ofParameter<float>          maxcanny;
+    ofParameter<float>          cannyblur;
+
 
     ofParameter<float>          minArea2;
     ofParameter<float>          maxArea2;

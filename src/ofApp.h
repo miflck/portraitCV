@@ -4,6 +4,8 @@
 #include "ofxCv.h"
 #include "ofxGui.h"
 #include "ofxOpenCv.h"
+#include "ofxSimpleSerial.h"
+
 
 using namespace ofxCv;
 using namespace cv;
@@ -35,12 +37,33 @@ class ofApp : public ofBaseApp{
     void makePolylines();
     
     
+    // Serial
+    ofxSimpleSerial    serial;
+    string        message;
+    bool        remember;
+    void        onNewMessage(string & message);
+    
+    void sendFeed();
+    void makeFeed();
+    
+    void makeBoundingRectFeed();
+
+    
+    
+    void penUp();
+    void penDown();
+    void goHome();
+    bool bGoHome;
+    vector<string> commands;
+    bool done=true;
+    bool bSendFeed=false;
+
 		
     ofVideoGrabber cam;
     ofxCv::ContourFinder contourFinder;
     ofxCv::ContourFinder contourFinder2;
 
-    
+    bool bMakeContours;
     ofImage img;
     ofxCvHaarFinder finder;
     
@@ -49,6 +72,22 @@ class ofApp : public ofBaseApp{
     
     
     ofxPanel gui;
+
+    
+    ofParameter<bool> bShowCanny;
+    ofParameter<bool> bShowImage;
+
+    ofParameterGroup imageparameters;
+    ofParameterGroup display;
+    
+    ofParameterGroup finder1;
+    ofParameterGroup finder2;
+    ofParameterGroup robot;
+
+
+
+
+    
     ofParameter<float> minArea, maxArea, threshold;
     ofParameter<bool> holes;
     ofParameter<bool> holes2;
@@ -63,6 +102,8 @@ class ofApp : public ofBaseApp{
     
     ofParameter<float>          mincanny;
     ofParameter<float>          maxcanny;
+    ofParameter<float>          cannyblur;
+
 
     ofParameter<float>          minArea2;
     ofParameter<float>          maxArea2;
@@ -78,10 +119,30 @@ class ofApp : public ofBaseApp{
     ofParameter<float>          arclength2;
     ofParameter<float>          arclength3;
     ofParameter<float>          arclength4;
+    
+    ofParameter<int>          quadsmooth;
+    ofParameter<int>            quadhard;
 
 
     ofParameter<float>          zoomfact;
 
+
+
+    ofParameter<float>          sortthreshold;
+    
+    
+    ofParameter<int>            dilateErode;
+
+    
+    
+    ofParameter<int>          penUpPos;
+    ofParameter<int>          penDownPos;
+    ofParameter<int>          penHighUpPos;
+    ofParameter<int>          penHighDownPos;
+
+    ofParameter<int>          penIdlePos;
+
+    ofParameter<int>          penDrawPos;
 
 
 
@@ -115,17 +176,38 @@ class ofApp : public ofBaseApp{
     vector<ofPolyline> linesToDraw2;
     vector<ofPolyline> linesToDraw3;
     
+    vector<ofPolyline> linesToPrint;
+
+    
     
     vector<ofPolyline> linesToAnimate;
     int animationPolylineIndex=0;
     int animationVerexIndex=1;
 
     bool record=false;
+    
+    ofRectangle faceBoundingBox;
 
     
 
     int drawcounter=0;
     
     bool continousDraw=false;
+    
+    float drawScaleFact=2;
+    
+    int getTransX(float x);
+    int getTransY(float y);
+    
+    string formGString(float x, float y);
+    
+    void turnIdle();
+    void turnDraw();
+
+    void penHighUp();
+    void waitPen(int mil);
+    void turnPen(int ang);
+
+
     
 };

@@ -94,7 +94,7 @@ void ofApp::setup(){
   
     finder1.setName("Contourfinder 1");
 
-    finder1.add(dilateErode.set("dilateErode", 5, 0, 100));
+    finder1.add(dilateErode.set("dilateErode", 2, 0, 5));
 
     finder1.add(arclength1.set("arclength1", 400, 0, 3000));
     finder1.add(arclength2.set("arclength2", 200, 0, 3000));
@@ -114,17 +114,21 @@ void ofApp::setup(){
     finder1.add(simply.set("Simple", false));
     
     polyline1.setName("Polyline 1");
-    polyline1.add(quadhard.set("quadhard", 16, 0, 30));
+    polyline1.add(quadhard.set("quadhard", 30, 0, 50));
     polyline1.add(resample.set("resample", 3, 0, 80));
     polyline1.add(smooth.set("smooth", 0, 0, 20));
     polyline1.add(simplify.set("simplify", 0, 0, 20));
+    polyline1.add(area1min.set("area1 min", 3, 1, 100));
+    polyline1.add(area1max.set("area1 max", 3, 1, 4000));
     finder1.add(polyline1);
 
     polyline2.setName("Polyline 2");
-    polyline2.add(quadsmooth.set("quadsmooth", 8, 0, 16));
+    polyline2.add(quadsmooth.set("quadsmooth", 8, 0, 30));
     polyline2.add(resample2.set("resample2", 3, 0, 80));
     polyline2.add(smooth2.set("smooth2", 0, 0, 20));
     polyline2.add(simplify2.set("simplify2", 0, 0, 20));
+    polyline2.add(area2min.set("area2 min", 3, 1, 500));
+    polyline2.add(area2max.set("area2 max", 3, 1, 2000));
     finder1.add(polyline2);
 
     polyline3.setName("Polyline 3");
@@ -132,14 +136,19 @@ void ofApp::setup(){
     polyline3.add(resample3.set("resample3", 3, 0, 80));
     polyline3.add(smooth3.set("smooth3", 0, 0, 20));
     polyline3.add(simplify3.set("simplify3", 0, 0, 20));
+    polyline3.add(area3min.set("area3 min", 3, 1, 50));
+    polyline3.add(area3max.set("area3 max", 3, 1, 500));
     finder1.add(polyline3);
 
 
     finder1.add(sortthreshold.set("sortthreshold", 0.5, 0, 20));
 
-    finder1.add(area1.set("area1", 3, 1, 4000));
-    finder1.add(area2.set("area2", 3, 1, 8000));
-    finder1.add(area3.set("area3", 3, 1, 500));
+
+    
+
+
+
+
 
     finder1.add(poly.set("poly",false));
     finder1.add(poly2.set("poly2",false));
@@ -254,17 +263,17 @@ void ofApp::makeContours(){
 
 
     cvCanny(zoom.getCvImage(), canny.getCvImage(), mincanny, maxcanny,3);
+    canny.blur(cannyblur);
+    canny.threshold(threshold);
 
     //cvCornerHarris(zoom.getCvImage(), canny.getCvImage(),10,10);
     for(int i=0;i<dilateErode;i++){
         canny.dilate();
     }
-    
-    
+
     for(int i=0;i<dilateErode;i++){
         canny.erode();
     }
-    canny.blur(cannyblur);
     canny.brightnessContrast(cannybrightness,cannycontrast);
 
 
@@ -503,15 +512,15 @@ void ofApp::makePolylines(){
 
         
         //cout<<"n "<<k<<" arc length "<<contourFinder.getArcLength(k)<<endl;
-        if(ABS(polyline.getPerimeter())>1){
+        if(polyline.getPerimeter()>1&& polyline.getPerimeter()>area1min && ABS(polyline.getPerimeter())<area1max){
             linesToDraw1.push_back(polyline);
         }
         
-        if(ABS(polyline2.getPerimeter())>1&&ABS(polyline2.getPerimeter())<area2){
+        if(polyline2.getPerimeter()>1 && polyline2.getPerimeter()>area2min && ABS(polyline2.getPerimeter())<area2max){
             linesToDraw2.push_back(polyline2);
         }
         
-        if(ABS(polyline3.getPerimeter())>1&&ABS(polyline3.getPerimeter())<area3){
+        if(ABS(polyline3.getPerimeter())>1&& polyline3.getPerimeter()>area3min && ABS(polyline3.getPerimeter())<area3max){
         linesToDraw3.push_back(polyline3);
         }
         

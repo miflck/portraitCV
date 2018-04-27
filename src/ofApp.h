@@ -160,9 +160,14 @@ class ofApp : public ofBaseApp{
     
     ofParameter<int>            dilateErode;
 
-    ofParameter<int>            area1;
-    ofParameter<int>            area2;
-    ofParameter<int>            area3;
+    ofParameter<int>            area1min;
+    ofParameter<int>            area1max;
+
+    ofParameter<int>            area2min;
+    ofParameter<int>            area2max;
+
+    ofParameter<int>            area3min;
+    ofParameter<int>            area3max;
 
     
     

@@ -30,7 +30,7 @@ void ofApp::setup(){
     message = "";
     remember = false;
     
-    ofSetLogLevel(OF_LOG_VERBOSE);
+    //ofSetLogLevel(OF_LOG_VERBOSE);
     
     
     img.load("michaelflueckiger.jpeg");
@@ -73,6 +73,7 @@ void ofApp::setup(){
    
     
     gui.setup();
+    polylinesPanel.setup();
 
     
 
@@ -154,8 +155,8 @@ void ofApp::setup(){
     finder1.add(poly2.set("poly2",false));
     finder1.add(poly3.set("poly3",false));
 
-
-    gui.add(finder1);
+polylinesPanel.add(finder1);
+   // gui.add(finder1);
     gui.add(scaleScreen.set("scaleScreen",false));
 
     
@@ -773,6 +774,8 @@ void ofApp::draw(){
     
   
     gui.draw();
+    polylinesPanel.draw();
+
 }
 
 //--------------------------------------------------------------

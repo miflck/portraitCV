@@ -72,6 +72,7 @@ class ofApp : public ofBaseApp{
     
     
     ofxPanel gui;
+    ofxPanel polylinesPanel;
 
     
     ofParameter<bool> bShowCanny;

@@ -76,6 +76,8 @@ class ofApp : public ofBaseApp{
     
     ofParameter<bool> bShowCanny;
     ofParameter<bool> bShowImage;
+    ofParameter<bool> bShowDebug;
+
 
     ofParameterGroup imageparameters;
     ofParameterGroup display;
@@ -85,6 +87,9 @@ class ofApp : public ofBaseApp{
     ofParameterGroup robot;
 
 
+    ofParameterGroup polyline1;
+    ofParameterGroup polyline2;
+    ofParameterGroup polyline3;
 
 
     
@@ -103,6 +108,9 @@ class ofApp : public ofBaseApp{
     ofParameter<float>          mincanny;
     ofParameter<float>          maxcanny;
     ofParameter<float>          cannyblur;
+    ofParameter<float>          cannycontrast;
+    ofParameter<float>          cannybrightness;
+
 
 
     ofParameter<float>          minArea2;
@@ -111,8 +119,25 @@ class ofApp : public ofBaseApp{
     ofParameter<float>          mincanny2;
     ofParameter<float>          maxcanny2;
     
+    
+    ofParameter<bool> poly;
+    ofParameter<bool> poly2;
+    ofParameter<bool> poly3;
+
+    
+    
     ofParameter<float>          resample;
+    ofParameter<float>          resample2;
+    ofParameter<float>          resample3;
+
+    
     ofParameter<float>          smooth;
+    ofParameter<float>          smooth2;
+    ofParameter<float>          smooth3;
+
+    ofParameter<float>          simplify;
+    ofParameter<float>          simplify2;
+    ofParameter<float>          simplify3;
     
     
     ofParameter<float>          arclength1;
@@ -120,8 +145,10 @@ class ofApp : public ofBaseApp{
     ofParameter<float>          arclength3;
     ofParameter<float>          arclength4;
     
-    ofParameter<int>          quadsmooth;
+    ofParameter<int>            quadsmooth;
     ofParameter<int>            quadhard;
+    ofParameter<float>          quadfine;
+
 
 
     ofParameter<float>          zoomfact;
@@ -132,6 +159,10 @@ class ofApp : public ofBaseApp{
     
     
     ofParameter<int>            dilateErode;
+
+    ofParameter<int>            area1;
+    ofParameter<int>            area2;
+    ofParameter<int>            area3;
 
     
     
@@ -145,6 +176,7 @@ class ofApp : public ofBaseApp{
     ofParameter<int>          penDrawPos;
 
 
+    ofParameter<float>          scaleScreen;
 
 
     

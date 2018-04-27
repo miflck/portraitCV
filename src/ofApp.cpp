@@ -68,7 +68,9 @@ void ofApp::setup(){
     cam.listDevices();
     cam.setDeviceID(0);
 
-    cam.setup(1024,576);
+   // cam.setup(1920,1080);
+    cam.setup( 1600, 896);
+   
     
     gui.setup();
 
@@ -78,6 +80,8 @@ void ofApp::setup(){
     display.setName("Dispaly");
     display.add(bShowImage.set("bShowImage",false));
     display.add(bShowCanny.set("bShowCanny",false));
+    display.add(bShowDebug.set("bShowDebug",false));
+
     gui.add(display);
 
     imageparameters.setName("Image");
@@ -99,9 +103,9 @@ void ofApp::setup(){
     finder1.add(mincanny.set("mincanny", 80, 10, 500));
     finder1.add(maxcanny.set("maxcanny", 100, 15, 300));
     finder1.add(cannyblur.set("cannyblur", 0, 0, 10));
+    finder1.add(cannycontrast.set("cannycontrast", 0,-1, 1));
+    finder1.add(cannybrightness.set("brightness", 0, -1, 1));
 
-    finder1.add(quadhard.set("quadhard", 16, 0, 30));
-    finder1.add(quadsmooth.set("quadsmooth", 8, 0, 16));
 
     finder1.add(minArea.set("Min area", 1, 1, 100));
     finder1.add(maxArea.set("Max area", 200, 1, 2000));
@@ -109,11 +113,41 @@ void ofApp::setup(){
     finder1.add(holes.set("Holes", true));
     finder1.add(simply.set("Simple", false));
     
-    finder1.add(resample.set("resample", 3, 1, 40));
-    finder1.add(smooth.set("smooth", 3, 1, 20));
-    finder1.add(sortthreshold.set("sortthreshold", 0.5, 0, 5));
+    polyline1.setName("Polyline 1");
+    polyline1.add(quadhard.set("quadhard", 16, 0, 30));
+    polyline1.add(resample.set("resample", 3, 0, 80));
+    polyline1.add(smooth.set("smooth", 0, 0, 20));
+    polyline1.add(simplify.set("simplify", 0, 0, 20));
+    finder1.add(polyline1);
+
+    polyline2.setName("Polyline 2");
+    polyline2.add(quadsmooth.set("quadsmooth", 8, 0, 16));
+    polyline2.add(resample2.set("resample2", 3, 0, 80));
+    polyline2.add(smooth2.set("smooth2", 0, 0, 20));
+    polyline2.add(simplify2.set("simplify2", 0, 0, 20));
+    finder1.add(polyline2);
+
+    polyline3.setName("Polyline 3");
+    polyline3.add(quadfine.set("quadfine", 1, 0, 10));
+    polyline3.add(resample3.set("resample3", 3, 0, 80));
+    polyline3.add(smooth3.set("smooth3", 0, 0, 20));
+    polyline3.add(simplify3.set("simplify3", 0, 0, 20));
+    finder1.add(polyline3);
+
+
+    finder1.add(sortthreshold.set("sortthreshold", 0.5, 0, 20));
+
+    finder1.add(area1.set("area1", 3, 1, 4000));
+    finder1.add(area2.set("area2", 3, 1, 8000));
+    finder1.add(area3.set("area3", 3, 1, 500));
+
+    finder1.add(poly.set("poly",false));
+    finder1.add(poly2.set("poly2",false));
+    finder1.add(poly3.set("poly3",false));
+
 
     gui.add(finder1);
+    gui.add(scaleScreen.set("scaleScreen",false));
 
     
     
@@ -220,17 +254,19 @@ void ofApp::makeContours(){
 
 
     cvCanny(zoom.getCvImage(), canny.getCvImage(), mincanny, maxcanny,3);
-    
+
     //cvCornerHarris(zoom.getCvImage(), canny.getCvImage(),10,10);
     for(int i=0;i<dilateErode;i++){
         canny.dilate();
     }
     
-    //canny.blur(cannyblur);
     
     for(int i=0;i<dilateErode;i++){
         canny.erode();
     }
+    canny.blur(cannyblur);
+    canny.brightnessContrast(cannybrightness,cannycontrast);
+
 
 
    // cvCanny(canny.getCvImage(), canny.getCvImage(), mincanny, maxcanny,3);
@@ -418,7 +454,7 @@ void ofApp::makePolylines(){
         
         approxPolyDP(contourFinder.getContour(k),quad, quadhard ,true);
         approxPolyDP(contourFinder.getContour(k),quad2, quadsmooth ,true);
-        approxPolyDP(contourFinder.getContour(k),quad3, 0.5 ,true);
+        approxPolyDP(contourFinder.getContour(k),quad3, quadfine ,true);
 
         
         
@@ -437,12 +473,12 @@ void ofApp::makePolylines(){
         for(int i = 0; i < quad.size(); i++) {
             polyline.addVertex(quad[i].x, quad[i].y);
         }
-        for(int i =  quad.size()/2; i < quad.size(); i++) {
-            polyline2.addVertex(quad[i].x, quad[i].y);
+        for(int i = 0; i < quad2.size(); i++) {
+            polyline2.addVertex(quad2[i].x, quad2[i].y);
         }
         
-        for(int i = 0; i < quad.size(); i++) {
-            polyline3.addVertex(quad[i].x*1.3, quad[i].y*1.3);
+        for(int i = 0; i < quad3.size(); i++) {
+            polyline3.addVertex(quad3[i].x, quad3[i].y);
         }
         
         
@@ -450,44 +486,40 @@ void ofApp::makePolylines(){
         
         polyline = polyline.getResampledBySpacing(resample);
         polyline = polyline.getSmoothed(smooth);
-        polyline.simplify(sortthreshold);
+        polyline.simplify(simplify);
 
         
-        polyline2 = polyline2.getResampledBySpacing(resample);
-        polyline2 = polyline2.getSmoothed(smooth);
-        polyline2.simplify(sortthreshold);
+        polyline2 = polyline2.getResampledBySpacing(resample2);
+        polyline2 = polyline2.getSmoothed(smooth2);
+        polyline2.simplify(simplify2);
 
         
-        polyline3 = polyline3.getResampledBySpacing(resample);
-        polyline3.simplify(sortthreshold);
-        polyline3 = polyline3.getSmoothed(smooth);
-        
+        polyline3 = polyline3.getResampledBySpacing(resample3);
+        polyline3 = polyline3.getSmoothed(smooth3);
+        polyline3.simplify(simplify3);
+
         
         //cout<<"n "<<k<<" quad.size() "<<quad.size()<<" area "<<polyline3.getPerimeter()<<endl;
 
         
         //cout<<"n "<<k<<" arc length "<<contourFinder.getArcLength(k)<<endl;
-        if(ABS(polyline3.getPerimeter())>1){
-            
-           /* vector<ofVec3f> vertices = polyline3.getVertices();
-            for (int vertexIndex=0; vertexIndex<vertices.size(); vertexIndex++) {
-
-            cout<<vertices[vertexIndex]<<" ";
-            }
-            cout<<endl;*/
-            linesToDraw3.push_back(polyline);
+        if(ABS(polyline.getPerimeter())>1){
+            linesToDraw1.push_back(polyline);
         }
         
-        if(ABS(polyline.getPerimeter())>1){
-        linesToDraw1.push_back(polyline);
+        if(ABS(polyline2.getPerimeter())>1&&ABS(polyline2.getPerimeter())<area2){
+            linesToDraw2.push_back(polyline2);
         }
-        linesToDraw2.push_back(polyline);
-        //linesToDraw3.push_back(polyline3);
+        
+        if(ABS(polyline3.getPerimeter())>1&&ABS(polyline3.getPerimeter())<area3){
+        linesToDraw3.push_back(polyline3);
+        }
         
     }
     
     
     ofSort(linesToDraw1, sortByArea);
+    ofSort(linesToDraw2, sortByArea);
     ofSort(linesToDraw3, sortByArea);
 
     if(record){
@@ -507,10 +539,11 @@ void ofApp::makePolylines(){
 //--------------------------------------------------------------
 void ofApp::draw(){
     
+    if(bShowDebug){
     zoom.draw(ofGetWidth()-grayImage.getWidth()/3,0,grayImage.getWidth()/3,grayImage.getHeight()/3);
 
     if(bShowImage){
-        img.draw(0,0);
+        grayImage.draw(0,0);
     }
     cam.draw(ofGetWidth()-cam.getWidth()/3, grayImage.getHeight()/3,cam.getWidth()/3,cam.getHeight()/3);
     ofPushStyle();
@@ -520,6 +553,9 @@ void ofApp::draw(){
     }else{
        canny.draw(0,0);
     }
+    }
+        
+        
    //
 
     //canny2.draw(ofGetWidth()-canny.getWidth()/3, canny.getHeight()/3*3,canny.getWidth()/3,canny.getHeight()/3);
@@ -534,6 +570,8 @@ void ofApp::draw(){
    // ofDrawRectangle(faceBoundingBox);
     
     ofPushMatrix();
+    ofScale(scaleScreen,scaleScreen);
+
    // ofScale(2,2);
    //contourFinder.draw();
     //ofTranslate(faceBoundingBox.getPosition().x,faceBoundingBox.getPosition().y);
@@ -542,22 +580,8 @@ void ofApp::draw(){
     ofSetLineWidth(2);
     for(int i = 0; i < (int)contourFinder.getPolylines().size(); i++) {
          ofSetColor(255);
-        /*if (contourFinder.getArcLength(i)>arclength4&& contourFinder.getArcLength(i)<arclength3){
-            ofSetColor(0,0,255);
-        }
-        if (contourFinder.getArcLength(i)>arclength3 && contourFinder.getArcLength(i)<arclength3){
-            ofSetColor(0,255,255);
-        }
-        if (contourFinder.getArcLength(i)>arclength2 && contourFinder.getArcLength(i)<arclength1){
-            ofSetColor(0,255,0);
-        }
-        if (contourFinder.getArcLength(i)>arclength1){
-            ofSetColor(255,0,0);
-        }
-        */
         
-        
-        if (contourFinder.getContourArea(i)>arclength4&& contourFinder.getContourArea(i)<arclength3){
+       /* if (contourFinder.getContourArea(i)>arclength4&& contourFinder.getContourArea(i)<arclength3){
             ofSetColor(0,0,255);
         }
         if (contourFinder.getContourArea(i)>arclength3 && contourFinder.getContourArea(i)<arclength2){
@@ -569,16 +593,34 @@ void ofApp::draw(){
         if (contourFinder.getContourArea(i)>arclength1){
             ofSetColor(255,0,0);
         }
-       // ofSetLineWidth(3);
+        */
         
+        if (contourFinder.getContourArea(i)>30){
+            ofSetColor(255,0,0);
+        }
+        if (contourFinder.getContourArea(i)>80){
+            ofSetColor(0,255,0);
+        }
+        if (contourFinder.getContourArea(i)>100){
+            ofSetColor(0,0,255);
+        }
+        if (contourFinder.getContourArea(i)>300){
+            ofSetColor(255,255,0);
+        }
+        
+        if (contourFinder.getContourArea(i)>800){
+            ofSetColor(0,255,255);
+        }
+        
+        if (contourFinder.getContourArea(i)>5000){
+            ofSetColor(255,0,255);
+        }
         contourFinder.getPolylines()[i].draw();
-        //ofDrawRectangle(toOf(contourFinder.getBoundingRect(i)));
     }
     ofPopStyle();
-    
     ofPopMatrix();
     
-    haarfinder.draw();
+   // haarfinder.draw();
   
     
     ofPushMatrix();
@@ -632,135 +674,95 @@ void ofApp::draw(){
  */
    // for(int i = 0; i < linesToAnimate.size(); i++) {
     
-  
-    
     ofPopStyle();
     ofPopMatrix();
     
    
     
     ofPushMatrix();
-  //  ofScale(0.7,0.7);
-    ofTranslate(0, 500);
-    
+    ofTranslate(500, 0);
+    ofScale(scaleScreen,scaleScreen);
+
     ofPushStyle();
     ofSetColor(255, 0, 255);
-   // cout<<" lines "<<linesToDraw1.size()<<" "<<drawcounter<<endl;
     if(drawcounter<linesToDraw1.size()){
         drawcounter++;
     }else{
         drawcounter=0;
     }
-    
-//linesToDraw1=linesToDraw1.reverse(linesToDraw1.begin(),linesToDraw1.end());
 
-    for(int i = linesToDraw1.size()-1; i >= drawcounter; i--) {
-       // cout<<linesToDraw1[linesToDraw1.size()-1].getPerimeter()<<endl;
-       linesToDraw1[i].draw();
-    }
-    
-    
-    //cout<<linesToDraw1[drawcounter].getArea()<<" "<<linesToDraw1[drawcounter].getPerimeter()<<endl;
-
-    
-    ofTranslate(500, 0);
-
+    ofTranslate(0, 0);
     for(int i = 0; i < drawcounter; i++) {
         linesToDraw1[i].draw();
     }
-
-    ofSetColor(255,0,0);
-  //  linesToDraw1[drawcounter].draw();
-
     ofPopStyle();
     ofPopMatrix();
     
+    
+    
+    
+    
     ofPushMatrix();
-    ofTranslate(550, 0);
+    ofTranslate(0, 500);
+    ofPushMatrix();
+    ofScale(scaleScreen,scaleScreen);
     ofPushStyle();
     ofSetColor(255, 0, 255);
-    ofScale(1,1);
     for(int i = 0; i < linesToDraw1.size(); i++) {
-       linesToDraw1[i].draw();
+        linesToDraw1[i].draw();
     }
+    ofPopMatrix();
+
     
     ofTranslate(500, 0);
+    ofPushMatrix();
+    ofScale(scaleScreen,scaleScreen);
     ofSetColor(0, 255, 255);
     for(int i = 0; i < linesToDraw2.size(); i++) {
         linesToDraw2[i].draw();
     }
-    
+    ofPopMatrix();
     
     ofSetColor(255, 255, 0);
-    ofTranslate(0, 500);
+    ofTranslate(500, 0);
+    ofPushMatrix();
+    ofScale(scaleScreen,scaleScreen);
     for(int i = 0; i < linesToDraw3.size(); i++) {
         linesToDraw3[i].draw();
     }
-    
+    ofPopMatrix();
    // polyline.draw();
    // m_triangulation.drawWireframe();
     ofPopStyle();
-
     ofPopMatrix();
     
-   /* ofPolyline polyline2;
-
-    for(int i = 0; i < points.size(); i++) {
-        polyline2.addVertex(points[i].x, points[i].y);
-    }
     
     ofPushMatrix();
     ofPushStyle();
-    ofSetColor(0, 0, 255);
-    ofTranslate(500, 0);
-    ofPolyline p;
-    for(int i = 0; i < polylines.size()/2; i++) {
-        p.addVertices(polylines[i].getVertices());
-        //polylines[i].draw();
-        
+    ofSetColor(255, 255, 0);
+    ofTranslate(1000, 0);
+    ofScale(scaleScreen,scaleScreen);
+
+    if(poly){
+        for(int i = 0; i < linesToDraw1.size(); i++) {
+            linesToDraw1[i].draw();
+        }
     }
-  //  p.draw();
-    
+    if(poly2){
+        for(int i = 0; i < linesToDraw2.size(); i++) {
+            linesToDraw2[i].draw();
+        }
+    }
+    if(poly3){
+        for(int i = 0; i < linesToDraw3.size(); i++) {
+            linesToDraw3[i].draw();
+        }
+    }
     ofPopStyle();
-    
-    ofPopMatrix();*/
-    
+    ofPopMatrix();
 
     
-/*    for(int k=0;k<n2;k++){
-        
-  /*     if (contourFinder2.getArcLength(k)>400){
-            approxPolyDP(contourFinder2.getContour(k),quad2, 16 ,true);
-        }else if (contourFinder2.getArcLength(k)>200){
-            approxPolyDP(contourFinder2.getContour(k),quad2, 5 ,true);
-        }else if (contourFinder2.getArcLength(k)<200){
-            approxPolyDP(contourFinder2.getContour(k),quad2, 3 ,true);
-        }else if (contourFinder2.getArcLength(k)<50 && contourFinder.getArcLength(k)>30){
-            approxPolyDP(contourFinder2.getContour(k),quad2, 1 ,true);
-        }else{
-            approxPolyDP(contourFinder2.getContour(k),quad2, 0.5 ,true);
-        }
-    */
-/*        approxPolyDP(contourFinder2.getContour(k),quad2, 0.05 ,true);
-
-        
-        ofPolyline polyline;
-        ofSetColor(255);
-        ofFill();
-        
-        for(int i = 0; i < quad2.size(); i++) {
-            polyline.addVertex(quad2[i].x, quad2[i].y);
-        }
-        polyline.close();
-        
-        polyline = polyline.getResampledBySpacing(resample);
-        polyline = polyline.getSmoothed(smooth);
-        
-        polyline.simplify();
-
-        polyline.draw();
- 
-    }*/
+  
     gui.draw();
 }
 
@@ -778,11 +780,12 @@ void ofApp::makeNewPortrait(){
     grayImage=colorImg;
     grayImage.brightnessContrast(brightness, contrast);
     grayImageBlur=colorImg;
+    
     grayImage.blur(blur);
 
    // grayImage.contrastStretch();
-    grayImage.dilate();
-    grayImage.erode();
+   // grayImage.dilate();
+   // grayImage.erode();
     
     
     grayImageBlur.blur(blur);

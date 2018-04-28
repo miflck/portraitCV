@@ -12,7 +12,7 @@ int baud = 115200;
 char myByte = 0;
 string cmd;
 
-bool bUseArduino=false;
+bool bUseArduino=true;
 
 //--------------------------------------------------------------
 void ofApp::setup(){
@@ -30,7 +30,7 @@ void ofApp::setup(){
     message = "";
     remember = false;
     
-    //ofSetLogLevel(OF_LOG_VERBOSE);
+    //0ofSetLogLevel(OF_LOG_VERBOSE);
     
     
     img.load("michaelflueckiger.jpeg");
@@ -66,7 +66,7 @@ void ofApp::setup(){
     
    
     cam.listDevices();
-    cam.setDeviceID(0);
+    cam.setDeviceID(1);
 
    // cam.setup(1920,1080);
     cam.setup( 1600, 896);
@@ -109,7 +109,7 @@ void ofApp::setup(){
 
 
     finder1.add(minArea.set("Min area", 1, 1, 100));
-    finder1.add(maxArea.set("Max area", 200, 1, 2000));
+    finder1.add(maxArea.set("Max area", 200, 1, 8000));
     finder1.add(threshold.set("Threshold", 128, 0, 255));
     finder1.add(holes.set("Holes", true));
     finder1.add(simply.set("Simple", false));
@@ -120,7 +120,7 @@ void ofApp::setup(){
     polyline1.add(smooth.set("smooth", 0, 0, 20));
     polyline1.add(simplify.set("simplify", 0, 0, 20));
     polyline1.add(area1min.set("area1 min", 3, 1, 100));
-    polyline1.add(area1max.set("area1 max", 3, 1, 4000));
+    polyline1.add(area1max.set("area1 max", 3, 1, 8000));
     finder1.add(polyline1);
 
     polyline2.setName("Polyline 2");
@@ -176,17 +176,19 @@ polylinesPanel.add(finder1);
 
     robot.setName("Robot");
 
-    robot.add(penUpPos.set("penUpPos", 70, 0, 180));
-    robot.add(penHighUpPos.set("penHighUpPos", 0, 0, 180));
+    robot.add(penUpPos.set("penUpPos", 145, 0, 180));
+    robot.add(penHighUpPos.set("penHighUpPos", 147, 0, 180));
     robot.add(penHighDownPos.set("penHighDownPos", 30, 0, 180));
-    robot.add(penDownPos.set("penDownPos", 85, 0, 180));
-    robot.add(penIdlePos.set("penIdlePos", 180, 0, 180));
-    robot.add(penDrawPos.set("penDrawPos", 30, 0, 180));
+    robot.add(penDownPos.set("penDownPos", 162, 0, 180));
+    robot.add(penIdlePos.set("penIdlePos", 142, 0, 180));
+    robot.add(penDrawPos.set("penDrawPos", 118, 0, 180));
     gui.add(robot);
     gui.getGroup("Robot").minimize();
 
     
+    gui.loadFromFile("savesettings.xml");
 
+    polylinesPanel.loadFromFile("polylinessettings.xml");
 
     
     
@@ -239,12 +241,25 @@ static bool sortByCriteriaX(const ofPolyline &a, const ofPolyline &b){
 }
 
 static bool sortByArea(const ofPolyline &a, const ofPolyline &b){
-    if(a.getPerimeter() > 50 || b.getPerimeter()>50){
+  if(a.getPerimeter() > 50 || b.getPerimeter()>50){
         return a.getPerimeter() > b.getPerimeter();
     }else{
+        
         return a.getBoundingBox().x < b.getBoundingBox().x;
+        
+   }
+}
 
-    }
+static bool sortByDistance(const ofPolyline &a, const ofPolyline &b){
+ 
+    ofVec2f n=ofVec2f(0,0);
+    ofVec2f aV=a.getPointAtPercent(0);
+    ofVec2f bV=a.getPointAtPercent(0);
+    
+    float d1=ofDist(aV.x,aV.y,n.x, n.y);
+    float d2=ofDist(bV.x,bV.y,n.x, n.y);
+    return d1>d2;
+ 
 }
 
 void ofApp::makeContours(){
@@ -530,14 +545,40 @@ void ofApp::makePolylines(){
     
     ofSort(linesToDraw1, sortByArea);
     ofSort(linesToDraw2, sortByArea);
-    ofSort(linesToDraw3, sortByArea);
+    ofSort(linesToDraw3, sortByDistance);
+    
+    
+    linesToPrint=linesToDraw1;
+    for(int i=0;i<linesToDraw2.size();i++){
+        linesToPrint.push_back(linesToDraw2[i]);
+    }
+    for(int i=0;i<linesToDraw3.size();i++){
+        linesToPrint.push_back(linesToDraw3[i]);
+    }
+    
+  //  ofSort(linesToPrint, sortByArea);
+
 
     if(record){
 
         linesToAnimate=linesToDraw1;
-        linesToPrint=linesToDraw3;
         
-      
+        for(int i=0;i<linesToDraw2.size();i++){
+            linesToAnimate.push_back(linesToDraw2[i]);
+        }
+        for(int i=0;i<linesToDraw3.size();i++){
+            linesToAnimate.push_back(linesToDraw3[i]);
+        }
+        
+        
+        
+        linesToPrint=linesToDraw1;
+        for(int i=0;i<linesToDraw2.size();i++){
+            linesToPrint.push_back(linesToDraw2[i]);
+        }
+        for(int i=0;i<linesToDraw3.size();i++){
+            linesToPrint.push_back(linesToDraw3[i]);
+        }
         
         record=false;
         makeFeed();
@@ -694,8 +735,8 @@ void ofApp::draw(){
     ofScale(scaleScreen,scaleScreen);
 
     ofPushStyle();
-    ofSetColor(255, 0, 255);
-    if(drawcounter<linesToDraw1.size()){
+    ofSetColor(255, 255, 255);
+    if(drawcounter<linesToPrint.size()){
         drawcounter++;
     }else{
         drawcounter=0;
@@ -703,7 +744,7 @@ void ofApp::draw(){
 
     ofTranslate(0, 0);
     for(int i = 0; i < drawcounter; i++) {
-        linesToDraw1[i].draw();
+        linesToPrint[i].draw();
     }
     ofPopStyle();
     ofPopMatrix();
@@ -849,6 +890,7 @@ void ofApp::turnDraw(){
     penHighUp();
     waitPen(200);
     turnPen(penDrawPos);
+    waitPen(200);
     penUp();
 }
 
@@ -872,7 +914,6 @@ void ofApp::penDown(){
 }
 
 void ofApp::goHome(){
-    commands.clear();
     penUp();
     string cmd = "G1 X"+ofToString(int(0))+" Y"+ofToString(int(0));
     commands.push_back(cmd);
@@ -885,33 +926,23 @@ void ofApp::goHome(){
 void ofApp::makeFeed(){
     cout<<"Make Feed"<<linesToPrint.size()<<endl;
     commands.clear();
+    turnDraw();
+    
     for(int i = 0; i < linesToPrint.size(); i++) {
         linesToPrint[i].simplify();
         vector<ofVec3f> vertices = linesToPrint[i].getVertices();
-        cout<<"verts "<<vertices.size()<<endl;
-        
-        //pen Up
         penUp();
-        //string cmd = "G1 X"+ofToString(int(grayImage.getWidth()/2*drawZoomFact-vertices[0].x))+" Y"+ofToString(int(grayImage.getHeight()*drawZoomFact-vertices[0].y));
-        
-       //string cmd = "G1 X"+ofToString(int(faceBoundingBox.getWidth()/2-vertices[0].x))+" Y"+ofToString(int(faceBoundingBox.getHeight()-vertices[0].y));
         cmd=formGString(vertices[0].x,vertices[0].y);
         commands.push_back(cmd);
-        
-        //pen Down
         penDown();
-       // waitPen(50);
-
         for (int vertexIndex=0; vertexIndex<vertices.size(); vertexIndex++) {
             ofVec3f vertex = vertices[vertexIndex];  // Get the vertex
-           // string cmd = "G1 X"+ofToString(int(grayImage.getWidth()/2*drawZoomFact-vertex.x))+" Y"+ofToString(int(grayImage.getHeight()*drawZoomFact-vertex.y));
-          //  string cmd = "G1 X"+ofToString(int(faceBoundingBox.getWidth()/2-vertex.x))+" Y"+ofToString(int(grayImage.getHeight()-vertex.y));
             cmd=formGString(vertex.x,vertex.y);
-
             commands.push_back(cmd);
         }
-
     }
+    goHome();
+    turnIdle();
     cout<<commands.size()<<endl;
     for (int i=0; i<commands.size(); i++) {
         //cout<<commands[i]<<endl;
@@ -988,6 +1019,7 @@ void ofApp::keyPressed(int key){
     
     
     if(key == 'h'){
+        commands.clear();
         bGoHome=true;
     
     }
@@ -1039,6 +1071,22 @@ void ofApp::keyPressed(int key){
     if(key=='c'){
         bMakeContours=true;
     }
+    
+    
+    if(key=='s'){
+        gui.saveToFile("savesettings.xml");
+        polylinesPanel.saveToFile("polylinessettings.xml");
+        
+    }
+    
+    if(key=='l'){
+        gui.loadFromFile("savesettings.xml");
+        polylinesPanel.loadFromFile("polylinessettings.xml");
+
+    }
+
+    
+ 
     
 }
 

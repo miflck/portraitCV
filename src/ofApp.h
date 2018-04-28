@@ -232,7 +232,7 @@ class ofApp : public ofBaseApp{
     
     bool continousDraw=false;
     
-    float drawScaleFact=2;
+    float drawScaleFact=1;
     
     int getTransX(float x);
     int getTransY(float y);

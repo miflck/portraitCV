@@ -254,7 +254,7 @@ static bool sortByDistance(const ofPolyline &a, const ofPolyline &b){
  
     ofVec2f n=ofVec2f(0,0);
     ofVec2f aV=a.getPointAtPercent(0);
-    ofVec2f bV=a.getPointAtPercent(0);
+    ofVec2f bV=b.getPointAtPercent(0);
     
     float d1=ofDist(aV.x,aV.y,n.x, n.y);
     float d2=ofDist(bV.x,bV.y,n.x, n.y);
@@ -529,23 +529,44 @@ void ofApp::makePolylines(){
         
         //cout<<"n "<<k<<" arc length "<<contourFinder.getArcLength(k)<<endl;
         if(polyline.getPerimeter()>1&& polyline.getPerimeter()>area1min && ABS(polyline.getPerimeter())<area1max){
+           /* if(linesToDraw1.size()>0){
+                ofPolyline p;
+                p.addVertex(linesToDraw1.back().getPointAtPercent(100));
+                p.addVertex(polyline.getPointAtPercent(0));
+                linesToDraw1.push_back(p);
+            }*/
             linesToDraw1.push_back(polyline);
         }
         
         if(polyline2.getPerimeter()>1 && polyline2.getPerimeter()>area2min && ABS(polyline2.getPerimeter())<area2max){
+            
+           /* if(linesToDraw2.size()>0){
+                ofPolyline p;
+                p.addVertex(linesToDraw2.back().getPointAtPercent(100));
+                p.addVertex(polyline2.getPointAtPercent(0));
+                linesToDraw2.push_back(p);
+            }*/
+            
             linesToDraw2.push_back(polyline2);
+
         }
         
         if(ABS(polyline3.getPerimeter())>1&& polyline3.getPerimeter()>area3min && ABS(polyline3.getPerimeter())<area3max){
+           /* if(linesToDraw3.size()>0){
+            ofPolyline p;
+            p.addVertex(linesToDraw3.back().getPointAtPercent(100));
+            p.addVertex(polyline3.getPointAtPercent(0));
+            linesToDraw3.push_back(p);
+            }*/
         linesToDraw3.push_back(polyline3);
         }
         
     }
     
     
-    ofSort(linesToDraw1, sortByArea);
-    ofSort(linesToDraw2, sortByArea);
-    ofSort(linesToDraw3, sortByDistance);
+  // ofSort(linesToDraw1, sortByArea);
+  //  ofSort(linesToDraw2, sortByArea);
+  //  ofSort(linesToDraw3, sortByDistance);
     
     
     linesToPrint=linesToDraw1;
@@ -556,7 +577,7 @@ void ofApp::makePolylines(){
         linesToPrint.push_back(linesToDraw3[i]);
     }
     
-  //  ofSort(linesToPrint, sortByArea);
+   // ofSort(linesToPrint, sortByDistance);
 
 
     if(record){

@@ -111,12 +111,14 @@
 		<Holes2>1</Holes2>
 	</Contourfinder_2>
 	<Robot>
-		<penUpPos>153</penUpPos>
-		<penHighUpPos>103</penHighUpPos>
+		<penUpPos>135</penUpPos>
+		<penHighUpPos>41</penHighUpPos>
 		<penHighDownPos>30</penHighDownPos>
-		<penDownPos>162</penDownPos>
+		<penDownPos>167</penDownPos>
 		<penIdlePos>11</penIdlePos>
-		<penDrawPos>117</penDrawPos>
+		<penDrawPos>180</penDrawPos>
+	<dipPosX>0</dipPosX>
+		<dipPosY>-125</dipPosY>
 	</Robot>
 <scaleScreen>0.675</scaleScreen>
 </group>

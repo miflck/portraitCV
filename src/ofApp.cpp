@@ -182,6 +182,11 @@ polylinesPanel.add(finder1);
     robot.add(penDownPos.set("penDownPos", 162, 0, 180));
     robot.add(penIdlePos.set("penIdlePos", 142, 0, 180));
     robot.add(penDrawPos.set("penDrawPos", 118, 0, 180));
+    
+    robot.add(dipPosX.set("dipPosX", 0, 0, -300));
+    robot.add(dipPosY.set("dipPosY", 0, 0, -300));
+
+    
     gui.add(robot);
     gui.getGroup("Robot").minimize();
 
@@ -241,7 +246,7 @@ static bool sortByCriteriaX(const ofPolyline &a, const ofPolyline &b){
 }
 
 static bool sortByArea(const ofPolyline &a, const ofPolyline &b){
-  if(a.getPerimeter() > 50 || b.getPerimeter()>50){
+  if(a.getPerimeter() > 150 || b.getPerimeter()>150){
         return a.getPerimeter() > b.getPerimeter();
     }else{
         
@@ -564,8 +569,8 @@ void ofApp::makePolylines(){
     }
     
     
-  // ofSort(linesToDraw1, sortByArea);
-  //  ofSort(linesToDraw2, sortByArea);
+   ofSort(linesToDraw1, sortByArea);
+   ofSort(linesToDraw2, sortByArea);
   //  ofSort(linesToDraw3, sortByDistance);
     
     
@@ -943,6 +948,30 @@ void ofApp::goHome(){
     done=true;
 }
 
+void ofApp::goDip(){
+    turnIdle();
+    string cmd = "G1 X"+ofToString(dipPosX)+" Y"+ofToString(dipPosY);
+    commands.push_back(cmd);
+    waitPen(3000);
+    cmd = "G1 X"+ofToString(dipPosX)+" Y"+ofToString(dipPosY+300);
+    commands.push_back(cmd);
+    waitPen(100);
+    turnDraw();
+    turnIdle();
+    cmd = "G1 X"+ofToString(dipPosX)+" Y"+ofToString(dipPosY);
+    commands.push_back(cmd);
+    waitPen(3000);
+    cmd = "G1 X"+ofToString(0)+" Y"+ofToString(0);
+    commands.push_back(cmd);
+    turnDraw();
+    turnIdle();
+    turnDraw();
+    goHome();
+    remember = false;
+    bSendFeed=true;
+    done=true;
+}
+
 
 void ofApp::makeFeed(){
     cout<<"Make Feed"<<linesToPrint.size()<<endl;
@@ -982,6 +1011,7 @@ int ofApp::getTransX(float x){
 
 
 int ofApp::getTransY(float y){
+    
     int rY=int(drawScaleFact*(faceBoundingBox.getHeight())-(y*drawScaleFact));
     return rY;
 }
@@ -1106,7 +1136,11 @@ void ofApp::keyPressed(int key){
 
     }
 
+
     
+    if(key=='m'){
+        goDip();
+    }
  
     
 }

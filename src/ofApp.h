@@ -180,6 +180,10 @@ class ofApp : public ofBaseApp{
     ofParameter<int>          penIdlePos;
 
     ofParameter<int>          penDrawPos;
+    
+    ofParameter<int>            dipPosX;
+    ofParameter<int>            dipPosY;
+
 
 
     ofParameter<float>          scaleScreen;
@@ -245,6 +249,9 @@ class ofApp : public ofBaseApp{
     void penHighUp();
     void waitPen(int mil);
     void turnPen(int ang);
+    
+    void goDip();
+
 
 
     

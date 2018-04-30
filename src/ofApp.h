@@ -37,6 +37,11 @@ class ofApp : public ofBaseApp{
     void makePolylines();
     
     
+    int timerduration=1000;
+    int inittime;
+    
+    
+    
     // Serial
     ofxSimpleSerial    serial;
     string        message;
@@ -255,6 +260,7 @@ class ofApp : public ofBaseApp{
     int xInMM=1000;
     int yInMM=1000;
     float scaleRatio;
+    
 
 
 

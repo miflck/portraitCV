@@ -201,6 +201,7 @@ polylinesPanel.add(finder1);
     ofBackground(0);
     
     makeContours();
+    inittime=ofGetElapsedTimeMillis();
 }
 
 //--------------------------------------------------------------
@@ -222,12 +223,13 @@ void ofApp::update(){
         
     }
     
-    
     cam.update();
     if(continousDraw){
-    makeNewPortrait();
+        if(ofGetElapsedTimeMillis()-inittime>timerduration){
+        makeNewPortrait();
         makeContours();
-
+        inittime=ofGetElapsedTimeMillis();
+        }
     }
   if(record) makeContours();
     if(bMakeContours)  {
@@ -527,7 +529,6 @@ void ofApp::makePolylines(){
         
         polyline3 = polyline3.getResampledBySpacing(resample3);
         polyline3.simplify(simplify3);
-
         polyline3 = polyline3.getSmoothed(smooth3);
 
         

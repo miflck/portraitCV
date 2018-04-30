@@ -39,10 +39,10 @@
 	<bShowDebug>1</bShowDebug>
 	</Dispaly>
 	<Image>
-		<contrast>0.326531</contrast>
-		<brightness>-0.510204</brightness>
+		<contrast>-0.0306122</contrast>
+		<brightness>0</brightness>
 		<blur>0</blur>
-		<zoom>1.14286</zoom>
+		<zoom>1.0102</zoom>
 	</Image>
 	<Contourfinder_1>
 		<dilateErode>1</dilateErode>

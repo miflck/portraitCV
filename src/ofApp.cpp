@@ -117,7 +117,7 @@ void ofApp::setup(){
     polyline1.setName("Polyline 1");
     polyline1.add(quadhard.set("quadhard", 30, 0, 50));
     polyline1.add(resample.set("resample", 3, 0, 80));
-    polyline1.add(smooth.set("smooth", 0, 0, 20));
+    polyline1.add(smooth.set("smooth", 0, 0, 5));
     polyline1.add(simplify.set("simplify", 0, 0, 20));
     polyline1.add(area1min.set("area1 min", 3, 1, 100));
     polyline1.add(area1max.set("area1 max", 3, 1, 8000));
@@ -126,7 +126,7 @@ void ofApp::setup(){
     polyline2.setName("Polyline 2");
     polyline2.add(quadsmooth.set("quadsmooth", 8, 0, 30));
     polyline2.add(resample2.set("resample2", 3, 0, 80));
-    polyline2.add(smooth2.set("smooth2", 0, 0, 20));
+    polyline2.add(smooth2.set("smooth2", 0, 0, 5));
     polyline2.add(simplify2.set("simplify2", 0, 0, 20));
     polyline2.add(area2min.set("area2 min", 3, 1, 500));
     polyline2.add(area2max.set("area2 max", 3, 1, 2000));
@@ -135,7 +135,7 @@ void ofApp::setup(){
     polyline3.setName("Polyline 3");
     polyline3.add(quadfine.set("quadfine", 1, 0, 10));
     polyline3.add(resample3.set("resample3", 3, 0, 80));
-    polyline3.add(smooth3.set("smooth3", 0, 0, 20));
+    polyline3.add(smooth3.set("smooth3", 0, 0, 5));
     polyline3.add(simplify3.set("simplify3", 0, 0, 20));
     polyline3.add(area3min.set("area3 min", 3, 1, 50));
     polyline3.add(area3max.set("area3 max", 3, 1, 500));
@@ -269,7 +269,7 @@ static bool sortByDistance(const ofPolyline &a, const ofPolyline &b){
 
 void ofApp::makeContours(){
     
-    grayImage.contrastStretch();
+    //grayImage.contrastStretch();
     zoom=grayImage;
     
     zoom.transform(0, zoom.getWidth()/2, zoom.getHeight()/2, zoomfact, zoomfact, 0, 0);
@@ -354,7 +354,7 @@ void ofApp::makeContours(){
         diffy=cur.y-offsetty/2;
        
         if(cur.y-offsetty/2<=0){
-            dy=0;
+            dy=cur.y;
         }else{
             dy=cur.y-offsetty/2;
         }
@@ -366,9 +366,10 @@ void ofApp::makeContours(){
         }
         
         faceBoundingBox.y-=dy;
-        faceBoundingBox.height+=hy;
+        cout<<"hy"<<hy<<endl;
+       faceBoundingBox.height=hy;
         
-       canny.setROI(cur.x-200, cur.y-400, cur.width+200, cur.height+400);
+      // canny.setROI(cur.x-200, cur.y-400, cur.width+200, cur.height+400);
         cam_mat = toCv(canny);
         //cv::Rect crop_roi = cv::Rect(cur.x, cur.y-100, cur.width, cur.height+150);
        // cv::Rect crop_roi = cv::Rect(cur.x, cur.y-dy, cur.width, cur.height+hy);
@@ -525,8 +526,9 @@ void ofApp::makePolylines(){
 
         
         polyline3 = polyline3.getResampledBySpacing(resample3);
-        polyline3 = polyline3.getSmoothed(smooth3);
         polyline3.simplify(simplify3);
+
+        polyline3 = polyline3.getSmoothed(smooth3);
 
         
         //cout<<"n "<<k<<" quad.size() "<<quad.size()<<" area "<<polyline3.getPerimeter()<<endl;
@@ -644,7 +646,6 @@ void ofApp::draw(){
     
     //zoom.draw(ofGetWidth()-zoom.getWidth()/3,zoom.getHeight()/3*3,zoom.getWidth()/3,zoom.getHeight()/3);
 
-   // ofDrawRectangle(faceBoundingBox);
     
     ofPushMatrix();
     ofScale(scaleScreen,scaleScreen);
@@ -772,6 +773,13 @@ void ofApp::draw(){
     for(int i = 0; i < drawcounter; i++) {
         linesToPrint[i].draw();
     }
+    
+    ofNoFill();
+    ofSetColor(255,0,0);
+
+    ofDrawRectangle(0,0,faceBoundingBox.getWidth(),faceBoundingBox.getHeight());
+
+    
     ofPopStyle();
     ofPopMatrix();
     
@@ -868,7 +876,7 @@ void ofApp::makeNewPortrait(){
     
     
     grayImageBlur.blur(blur);
-    grayImageBlur.contrastStretch();
+    //grayImageBlur.contrastStretch();
     grayImageBlur.dilate();
     grayImageBlur.erode();
     
@@ -975,6 +983,11 @@ void ofApp::goDip(){
 
 void ofApp::makeFeed(){
     cout<<"Make Feed"<<linesToPrint.size()<<endl;
+    
+    scaleRatio=yInMM/faceBoundingBox.getHeight();
+    drawScaleFact=scaleRatio;
+    cout<<"Scale "<<scaleRatio<<" face height "<<faceBoundingBox.getHeight()<<endl;
+
     commands.clear();
     turnDraw();
     
@@ -1011,7 +1024,6 @@ int ofApp::getTransX(float x){
 
 
 int ofApp::getTransY(float y){
-    
     int rY=int(drawScaleFact*(faceBoundingBox.getHeight())-(y*drawScaleFact));
     return rY;
 }
@@ -1102,6 +1114,9 @@ void ofApp::keyPressed(int key){
     }
     
     if(key=='b'){
+        scaleRatio=yInMM/faceBoundingBox.getHeight();
+        drawScaleFact=scaleRatio;
+        cout<<"Scale "<<faceBoundingBox.getHeight()<<" "<<scaleRatio<<endl;
         makeBoundingRectFeed();
     }
     

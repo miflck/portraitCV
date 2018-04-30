@@ -251,6 +251,10 @@ class ofApp : public ofBaseApp{
     void turnPen(int ang);
     
     void goDip();
+    
+    int xInMM=1000;
+    int yInMM=1000;
+    float scaleRatio;
 
 
 

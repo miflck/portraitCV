@@ -34,8 +34,9 @@
 	<quadsmooth>3</quadsmooth>
 <dilateErode>0</dilateErode>
 <Dispaly>
-		<bShowCanny>1</bShowCanny>
+		<bShowCanny>0</bShowCanny>
 	<bShowImage>0</bShowImage>
+	<bShowDebug>1</bShowDebug>
 	</Dispaly>
 	<Image>
 		<contrast>0</contrast>
@@ -45,23 +46,62 @@
 	</Image>
 	<Contourfinder_1>
 		<dilateErode>2</dilateErode>
-		<arclength1>3000</arclength1>
-		<arclength2>275.51</arclength2>
-		<arclength3>1102.04</arclength3>
-		<arclength4>474.49</arclength4>
-		<mincanny>102.5</mincanny>
-		<maxcanny>65.8929</maxcanny>
-		<quadhard>8</quadhard>
-		<quadsmooth>2</quadsmooth>
+		<arclength1>400</arclength1>
+		<arclength2>200</arclength2>
+		<arclength3>50</arclength3>
+		<arclength4>30</arclength4>
+		<mincanny>80</mincanny>
+		<maxcanny>100</maxcanny>
+		<quadhard>16</quadhard>
+		<quadsmooth>8</quadsmooth>
 		<Min_area>1</Min_area>
 		<Max_area>200</Max_area>
 		<Threshold>128</Threshold>
 		<Holes>1</Holes>
 		<Simple>0</Simple>
-		<resample>1</resample>
-		<smooth>1</smooth>
-		<sortthreshold>0</sortthreshold>
+		<resample>3</resample>
+		<smooth>0</smooth>
+		<sortthreshold>0.5</sortthreshold>
 	<cannyblur>0</cannyblur>
+	<quadfine>1</quadfine>
+		<area1>186</area1>
+		<area2>2449</area2>
+	<simplify>0</simplify>
+		<resample2>3</resample2>
+		<smooth2>0</smooth2>
+		<simplify3>0</simplify3>
+		<resample3>3</resample3>
+		<smooth3>0</smooth3>
+		<simplify2>0</simplify2>
+	<cannycontrast>0</cannycontrast>
+		<brightness>0</brightness>
+		<Polyline_1>
+			<quadhard>30</quadhard>
+			<resample>3</resample>
+			<smooth>0</smooth>
+			<simplify>0</simplify>
+			<area1_min>3</area1_min>
+			<area1_max>3</area1_max>
+		</Polyline_1>
+		<Polyline_2>
+			<quadsmooth>8</quadsmooth>
+			<resample2>3</resample2>
+			<smooth2>0</smooth2>
+			<simplify2>0</simplify2>
+			<area2_min>3</area2_min>
+			<area2_max>3</area2_max>
+		</Polyline_2>
+		<Polyline_3>
+			<quadfine>1</quadfine>
+			<resample3>3</resample3>
+			<smooth3>0</smooth3>
+			<simplify3>0</simplify3>
+			<area3_min>3</area3_min>
+			<area3_max>3</area3_max>
+		</Polyline_3>
+		<poly>1</poly>
+		<poly2>1</poly2>
+		<poly3>1</poly3>
 	</Contourfinder_1>
 	<Contourfinder_2>
 		<Min_area2>1</Min_area2>
@@ -71,11 +111,12 @@
 		<Holes2>1</Holes2>
 	</Contourfinder_2>
 	<Robot>
-		<penUpPos>70</penUpPos>
-		<penHighUpPos>0</penHighUpPos>
+		<penUpPos>145</penUpPos>
+		<penHighUpPos>147</penHighUpPos>
 		<penHighDownPos>30</penHighDownPos>
-		<penDownPos>85</penDownPos>
-		<penIdlePos>180</penIdlePos>
-		<penDrawPos>30</penDrawPos>
+		<penDownPos>162</penDownPos>
+		<penIdlePos>142</penIdlePos>
+		<penDrawPos>118</penDrawPos>
 	</Robot>
+<scaleScreen>0.675</scaleScreen>
 </group>

@@ -35,15 +35,15 @@
 <dilateErode>0</dilateErode>
 <Dispaly>
 		<bShowCanny>0</bShowCanny>
-	<bShowImage>0</bShowImage>
-	<bShowDebug>0</bShowDebug>
+	<bShowImage>1</bShowImage>
+	<bShowDebug>1</bShowDebug>
 	<bShowCanny2>0</bShowCanny2>
 	</Dispaly>
 	<Image>
-		<contrast>-0.234694</contrast>
-		<brightness>0.183674</brightness>
-		<blur>9.33673</blur>
-		<zoom>1.2551</zoom>
+		<contrast>0.326531</contrast>
+		<brightness>-0.510204</brightness>
+		<blur>0</blur>
+		<zoom>1.02041</zoom>
 	</Image>
 	<Contourfinder_1>
 		<dilateErode>1</dilateErode>
@@ -107,21 +107,15 @@
 	<Contourfinder_2>
 		<Min_area2>1</Min_area2>
 		<Max_area2>200</Max_area2>
-		<mincanny2>45.9184</mincanny2>
-		<maxcanny2>977.551</maxcanny2>
+		<mincanny2>80</mincanny2>
+		<maxcanny2>100</maxcanny2>
 		<Holes2>1</Holes2>
-	<eyeAreamin2>23</eyeAreamin2>
-		<eyeAreamax>390</eyeAreamax>
-		<eyeresample>8.84184</eyeresample>
-		<eyesmooth>3.43367</eyesmooth>
-		<eyesimplify>1</eyesimplify>
-		<eyequad>4</eyequad>
 	</Contourfinder_2>
 	<Robot>
 		<penUpPos>149</penUpPos>
 		<penHighUpPos>41</penHighUpPos>
 		<penHighDownPos>30</penHighDownPos>
-		<penDownPos>164</penDownPos>
+		<penDownPos>160</penDownPos>
 		<penIdlePos>11</penIdlePos>
 		<penDrawPos>180</penDrawPos>
 	<dipPosX>0</dipPosX>

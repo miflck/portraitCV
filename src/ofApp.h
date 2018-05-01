@@ -36,6 +36,7 @@ class ofApp : public ofBaseApp{
     void makeContours();
     void makePolylines();
     
+    void makeEyePolylines();
     
     int timerduration=1000;
     int inittime;
@@ -71,9 +72,14 @@ class ofApp : public ofBaseApp{
     bool bMakeContours;
     ofImage img;
     ofxCvHaarFinder finder;
+    ofxCvHaarFinder hfinder2;
+
     
     ofxCv::ObjectFinder haarfinder;
 
+    
+    
+  
     
     
     ofxPanel gui;
@@ -197,6 +203,19 @@ class ofApp : public ofBaseApp{
 
 
     
+    
+    ofParameter<int>            eyeAreamin;
+    ofParameter<int>            eyeAreamax;
+    ofParameter<float>          eyeresample;
+    ofParameter<float>          eyesmooth;
+    ofParameter<float>          eyesimplify;
+
+    ofParameter<float>          eyequad;
+
+    
+    
+    
+    
     ofxCvGrayscaleImage     grayImage;
     ofxCvGrayscaleImage     grayImageBlur;
 
@@ -229,6 +248,9 @@ class ofApp : public ofBaseApp{
 
     
     
+
+    
+    
     vector<ofPolyline> linesToAnimate;
     int animationPolylineIndex=0;
     int animationVerexIndex=1;
@@ -236,6 +258,10 @@ class ofApp : public ofBaseApp{
     bool record=false;
     
     ofRectangle faceBoundingBox;
+    ofRectangle faceBoundingBoxOriginal;
+
+    ofRectangle eyeBoundingBox;
+
 
     
 

@@ -7,6 +7,10 @@ using namespace cv;
 cv::Mat cam_mat;
 cv::Mat crop;
 
+cv::Mat cam_mat2;
+cv::Mat crop2;
+
+
 
 int baud = 115200;
 char myByte = 0;
@@ -170,6 +174,24 @@ polylinesPanel.add(finder1);
     finder2.add(mincanny2.set("mincanny2", 80, -100,1000));
     finder2.add(maxcanny2.set("maxcanny2", 100, -100, 1000));
     finder2.add(holes2.set("Holes2", true));
+    
+    finder2.add(eyeAreamin.set("eyeAreamin2", 1, 1, 300));
+    finder2.add(eyeAreamax.set("eyeAreamax", 200, 1, 500));
+    finder2.add(eyeresample.set("eyeresample", 0, 1, 30));
+    finder2.add(eyesmooth.set("eyesmooth", 0, 1, 10));
+    finder2.add(eyesimplify.set("eyesimplify", 0, 1, 10));
+
+    
+    finder2.add(eyequad.set("eyequad", 0, 0.1, 5));
+
+    
+    
+    
+    
+    
+    
+    
+    
     gui.add(finder2);
     gui.getGroup("Contourfinder 2").minimize();
 
@@ -266,13 +288,12 @@ static bool sortByDistance(const ofPolyline &a, const ofPolyline &b){
 }
 
 void ofApp::makeContours(){
-    
     grayImage.contrastStretch();
     zoom=grayImage;
-    
     zoom.transform(0, zoom.getWidth()/2, zoom.getHeight()/2, zoomfact, zoomfact, 0, 0);
-   // if(canny.getWidth()!=grayImage.getWidth()){
-        canny.allocate(grayImage.getWidth(), grayImage.getHeight());
+    if(canny.getWidth()!=grayImage.getWidth()){
+    canny.allocate(grayImage.getWidth(), grayImage.getHeight());
+    }
       //  canny2.allocate(grayImage.getWidth(), grayImage.getHeight());
    
     if(meanCanny.getWidth()!=grayImage.getWidth()){
@@ -340,6 +361,9 @@ void ofApp::makeContours(){
     canny2.erode();
     canny2.dilate();
     canny2.erode();
+    canny2.dilate();
+    canny2.erode();
+
     
     canny2.flagImageChanged();
 
@@ -348,19 +372,17 @@ void ofApp::makeContours(){
 
     
     finder.setup("haarcascade_frontalface_default.xml");
-    finder.findHaarObjects(zoom,200,200);
+    finder.findHaarObjects(zoom,100,100);
     
-    
+
     if(finder.blobs.size()>0){
         ofRectangle cur =finder.blobs[0].boundingRect;
         faceBoundingBox = finder.blobs[0].boundingRect;
         
+        faceBoundingBoxOriginal=finder.blobs[0].boundingRect;
         int diffx,diffy,dx,dy,hy;
         int offsetty=100;
-        
-        
         diffx=cur.x+cur.width;
-        
         diffy=cur.y-offsetty/2;
        
         if(cur.y-offsetty/2<=0){
@@ -378,10 +400,11 @@ void ofApp::makeContours(){
         faceBoundingBox.y-=dy;
         cout<<"hy"<<hy<<endl;
        faceBoundingBox.height=hy;
+        faceBoundingBoxOriginal.y+=dy   ;
         
        //canny.setROI(cur.x-200, cur.y-400, cur.width+200, cur.height+400);
 
-        cam_mat = toCv(canny2);
+        cam_mat = toCv(canny);
         cv::Rect crop_roi = cv::Rect(cur.x, dy, cur.width, hy);
         crop = cam_mat(crop_roi).clone();
         
@@ -395,38 +418,74 @@ void ofApp::makeContours(){
         
         
         int n = contourFinder.size();
-        allContours.clear();
-        for(int k=0;k<n;k++){
-            ofPolyline contour=contourFinder.getPolyline(k);
-            allContours.push_back(contour);
-        }
+        
+        cout<<"Contours1: "<<n<<endl;
         
         
-        haarfinder.setup("haarcascade_mcs_eyepair_small.xml");
-        haarfinder.setPreset(ObjectFinder::Fast);
-        //haarfinder.update(colorImg);
-        finder.findHaarObjects(zoom,200,200);
+        
+    
+    }
+    hfinder2.setup("haarcascade_mcs_eyepair_small.xml");
+    //finder.setPreset(ObjectFinder::Fast);
+    //haarfinder.update(colorImg);
+    hfinder2.findHaarObjects(zoom);
+    
+    cout<<"eyefinder: "<<hfinder2.blobs.size()<<endl;
 
+    
+    if(hfinder2.blobs.size()>0){
+        cout<<"eyes"<<hfinder2.blobs.size()<<endl;
+        ofRectangle cur =hfinder2.blobs[0].boundingRect;
+        eyeBoundingBox=cur;
         
-        cam_mat = toCv(canny2);
-        cv::Rect crop_roi2 = cv::Rect(cur.x, cur.y-100, cur.width, cur.height+150);
-        crop = cam_mat(crop_roi).clone();
+        cam_mat2 = toCv(canny);
+        cv::Rect crop_roi = cv::Rect(cur.x, cur.y, cur.width, cur.height);
+        crop2 = cam_mat2(crop_roi).clone();
         
         contourFinder2.setMinAreaRadius(minArea2);
         contourFinder2.setMaxAreaRadius(maxArea2);
         contourFinder2.setThreshold(threshold);
         contourFinder2.setSimplify(simply);
         contourFinder2.setFindHoles(holes2);
-        contourFinder2.findContours(crop);
-    }
-    
-    makePolylines();
-    
-   // canny2=canny;
-   // canny2.flagImageChanged();
+        contourFinder2.findContours(crop2);
+        
+        int n2 = contourFinder2.size();
+        cout<<"Contours2: "<<n2<<endl;
 
+    }
+    makePolylines();
+    makeEyePolylines();
 }
 
+
+
+void ofApp::makeEyePolylines(){
+    eyes.clear();
+    vector<ofPolyline> polylines;
+    int n = contourFinder2.size();
+    for(int k=0;k<n;k++){
+        vector<cv::Point> quad;
+        approxPolyDP(contourFinder2.getContour(k),quad, eyequad ,true);
+
+        ofPolyline polyline;
+        for(int i = 0; i < quad.size(); i++) {
+            polyline.addVertex(quad[i].x, quad[i].y);
+        }
+        
+        polyline = polyline.getResampledBySpacing(eyeresample);
+        polyline = polyline.getSmoothed(eyesmooth);
+        polyline.simplify(eyesimplify);
+        
+        //cout<<"n "<<k<<" arc length "<<contourFinder.getArcLength(k)<<endl;
+        if(polyline.getPerimeter()>1&& polyline.getPerimeter()>eyeAreamin && ABS(polyline.getPerimeter())<eyeAreamax){
+            eyes.push_back(polyline);
+        }
+        
+    }
+    cout<<"Eyes poly"<<eyes.size()<<endl;
+    
+    
+}
 
 
 void ofApp::makePolylines(){
@@ -594,6 +653,8 @@ void ofApp::draw(){
 
     if(bShowImage){
         grayImage.draw(0,0);
+        ofDrawRectangle(eyeBoundingBox.x,eyeBoundingBox.y,eyeBoundingBox.getWidth(),eyeBoundingBox.getHeight());
+
     }
     cam.draw(ofGetWidth()-cam.getWidth()/3, grayImage.getHeight()/3,cam.getWidth()/3,cam.getHeight()/3);
     ofPushStyle();
@@ -606,10 +667,11 @@ void ofApp::draw(){
     }
         
         if(!bShowCanny2){
-            canny2.draw(0,0);
-           // contourFinder2.draw();
-        }else{
             canny2.draw(ofGetWidth()-canny.getWidth()/3*2, canny.getHeight()/3*3,canny.getWidth()/3,canny.getHeight()/3);
+
+        }else{
+            canny2.draw(0,0);
+
         }
     }
         
@@ -758,6 +820,7 @@ void ofApp::draw(){
     ofSetColor(255,0,0);
 
     ofDrawRectangle(0,0,faceBoundingBox.getWidth(),faceBoundingBox.getHeight());
+    ofDrawRectangle(eyeBoundingBox.x-faceBoundingBoxOriginal.x,eyeBoundingBox.y-faceBoundingBoxOriginal.y,eyeBoundingBox.getWidth(),eyeBoundingBox.getHeight());
 
     
     ofPopStyle();
@@ -823,9 +886,35 @@ void ofApp::draw(){
             linesToDraw3[i].draw();
         }
     }
+    
+    
+    for(int i = 0; i < eyes.size(); i++) {
+        eyes[i].draw();
+    }
+    
     ofPopStyle();
     ofPopMatrix();
+    
+    
+    ofPushMatrix();
+    ofTranslate(0, 900);
 
+    
+    ofPushMatrix();
+    ofPushStyle();
+    ofSetColor(255, 255, 0);
+    ofTranslate(500, 0);
+    ofScale(scaleScreen,scaleScreen);
+    for(int i = 0; i < eyes.size(); i++) {
+        eyes[i].draw();
+    }
+    ofPopStyle();
+    ofPopMatrix();
+    
+    ofPushStyle();
+    contourFinder2.draw();
+    ofPopStyle();
+    ofPopMatrix();
     
   
     gui.draw();
@@ -848,7 +937,7 @@ void ofApp::makeNewPortrait(){
     grayImage.brightnessContrast(brightness, contrast);
     grayImageBlur=colorImg;
     
-    grayImage.blur(blur);
+   // grayImage.blur(blur);
 
    // grayImage.contrastStretch();
    // grayImage.dilate();

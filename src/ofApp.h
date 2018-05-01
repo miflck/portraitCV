@@ -81,6 +81,8 @@ class ofApp : public ofBaseApp{
 
     
     ofParameter<bool> bShowCanny;
+    ofParameter<bool> bShowCanny2;
+
     ofParameter<bool> bShowImage;
     ofParameter<bool> bShowDebug;
 

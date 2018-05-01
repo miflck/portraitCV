@@ -81,6 +81,7 @@ void ofApp::setup(){
     display.setName("Dispaly");
     display.add(bShowImage.set("bShowImage",false));
     display.add(bShowCanny.set("bShowCanny",false));
+    display.add(bShowCanny2.set("bShowCanny2",false));
     display.add(bShowDebug.set("bShowDebug",false));
 
     gui.add(display);
@@ -166,8 +167,8 @@ polylinesPanel.add(finder1);
 
     finder2.add(minArea2.set("Min area2", 1, 1, 300));
     finder2.add(maxArea2.set("Max area2", 200, 1, 500));
-    finder2.add(mincanny2.set("mincanny2", 80, 10, 200));
-    finder2.add(maxcanny2.set("maxcanny2", 100, 15, 300));
+    finder2.add(mincanny2.set("mincanny2", 80, -100,1000));
+    finder2.add(maxcanny2.set("maxcanny2", 100, -100, 1000));
     finder2.add(holes2.set("Holes2", true));
     gui.add(finder2);
     gui.getGroup("Contourfinder 2").minimize();
@@ -192,14 +193,9 @@ polylinesPanel.add(finder1);
 
     
     gui.loadFromFile("savesettings.xml");
-
     polylinesPanel.loadFromFile("polylinessettings.xml");
-
-    
-    
     
     ofBackground(0);
-    
     makeContours();
     inittime=ofGetElapsedTimeMillis();
 }
@@ -232,10 +228,12 @@ void ofApp::update(){
         }
     }
   if(record) makeContours();
+    
     if(bMakeContours)  {
         makeContours();
         bMakeContours=false;
     }
+    
 }
 
 
@@ -248,12 +246,10 @@ static bool sortByCriteriaX(const ofPolyline &a, const ofPolyline &b){
 }
 
 static bool sortByArea(const ofPolyline &a, const ofPolyline &b){
-  if(a.getPerimeter() > 150 || b.getPerimeter()>150){
+  if(a.getPerimeter() > 100 || b.getPerimeter()>100){
         return a.getPerimeter() > b.getPerimeter();
     }else{
-        
         return a.getBoundingBox().x < b.getBoundingBox().x;
-        
    }
 }
 
@@ -271,22 +267,28 @@ static bool sortByDistance(const ofPolyline &a, const ofPolyline &b){
 
 void ofApp::makeContours(){
     
-    //grayImage.contrastStretch();
+    grayImage.contrastStretch();
     zoom=grayImage;
     
     zoom.transform(0, zoom.getWidth()/2, zoom.getHeight()/2, zoomfact, zoomfact, 0, 0);
    // if(canny.getWidth()!=grayImage.getWidth()){
         canny.allocate(grayImage.getWidth(), grayImage.getHeight());
-        canny2.allocate(grayImage.getWidth(), grayImage.getHeight());
+      //  canny2.allocate(grayImage.getWidth(), grayImage.getHeight());
+   
     if(meanCanny.getWidth()!=grayImage.getWidth()){
         meanCanny.allocate(grayImage.getWidth(), grayImage.getHeight());
     }
+    
+    if(canny2.getWidth()!=grayImage.getWidth()){
+        canny2.allocate(grayImage.getWidth(), grayImage.getHeight());
+    }
+    
     //}
     
 
 
     cvCanny(zoom.getCvImage(), canny.getCvImage(), mincanny, maxcanny,3);
-    canny.blur(cannyblur);
+    //canny.blur(cannyblur);
     canny.threshold(threshold);
 
     //cvCornerHarris(zoom.getCvImage(), canny.getCvImage(),10,10);
@@ -301,7 +303,6 @@ void ofApp::makeContours(){
 
 
 
-   // cvCanny(canny.getCvImage(), canny.getCvImage(), mincanny, maxcanny,3);
 
 
   /*  canny.dilate();
@@ -320,20 +321,30 @@ void ofApp::makeContours(){
     
     canny.flagImageChanged();
     
-    //meanCanny+=canny;
+   // meanCanny-=canny;
   //  meanCanny+=canny;
   //  meanCanny.erode();
    // meanCanny.erode();
  //   meanCanny.erode();
  //   meanCanny.erode();
-
+    zoom.blur(blur);
+    cvCanny(zoom.getCvImage(), canny2.getCvImage(), mincanny2, maxcanny2,5);
     
-    cvCanny(zoom.getCvImage(), canny2.getCvImage(), mincanny2, maxcanny2,3);
+    //canny2.flagImageChanged();
+    //zoom.blur(blur);
+    //cvSobel(zoom.getCvImage(), canny2.getCvImage(),1,0,-1);
+
     canny2.dilate();
     canny2.erode();
+    canny2.dilate();
+    canny2.erode();
+    canny2.dilate();
+    canny2.erode();
+    
     canny2.flagImageChanged();
+
   //  meanCanny-=canny2;
-  //  meanCanny.absDiff(canny,canny2);
+   // meanCanny.absDiff(canny,canny2);
 
     
     finder.setup("haarcascade_frontalface_default.xml");
@@ -343,9 +354,6 @@ void ofApp::makeContours(){
     if(finder.blobs.size()>0){
         ofRectangle cur =finder.blobs[0].boundingRect;
         faceBoundingBox = finder.blobs[0].boundingRect;
-       
-
-        ofDrawRectangle(cur);
         
         int diffx,diffy,dx,dy,hy;
         int offsetty=100;
@@ -371,30 +379,13 @@ void ofApp::makeContours(){
         cout<<"hy"<<hy<<endl;
        faceBoundingBox.height=hy;
         
-      // canny.setROI(cur.x-200, cur.y-400, cur.width+200, cur.height+400);
-        cam_mat = toCv(canny);
-        //cv::Rect crop_roi = cv::Rect(cur.x, cur.y-100, cur.width, cur.height+150);
-       // cv::Rect crop_roi = cv::Rect(cur.x, cur.y-dy, cur.width, cur.height+hy);
-        cv::Rect crop_roi = cv::Rect(cur.x, dy, cur.width, hy);
+       //canny.setROI(cur.x-200, cur.y-400, cur.width+200, cur.height+400);
 
-        
+        cam_mat = toCv(canny2);
+        cv::Rect crop_roi = cv::Rect(cur.x, dy, cur.width, hy);
         crop = cam_mat(crop_roi).clone();
         
-        
-       /* ofPoint sourcePoints[4];
-        sourcePoints[0] = ofPoint(    cur.x,     cur.y);
-        sourcePoints[1] = ofPoint(cur.x+cur.width, cur.y);
-        sourcePoints[2] = ofPoint(cur.x+cur.width, cur.y+cur.height);
-        sourcePoints[3] = ofPoint(    cur.x, cur.y+cur.height);
-        ofPoint destPoints[4];
-        destPoints[0]   = ofPoint(       0,        0);
-        destPoints[1]   = ofPoint(     cam.getWidth(),        0);
-        destPoints[2]   = ofPoint(     cam.getWidth(),      cam.getHeight());
-        destPoints[3]   = ofPoint(       0,      cam.getHeight());*/
-        //zoom.warpIntoMe(grayImage, sourcePoints, destPoints);
-      
-        //zoom.scale(2, 2);
-        
+
         contourFinder.setMinAreaRadius(minArea);
         contourFinder.setMaxAreaRadius(maxArea);
         contourFinder.setThreshold(threshold);
@@ -411,13 +402,15 @@ void ofApp::makeContours(){
         }
         
         
-        //haarfinder.setup("haarcascade_mcs_eyepair_small.xml");
-        //haarfinder.setPreset(ObjectFinder::Fast);
+        haarfinder.setup("haarcascade_mcs_eyepair_small.xml");
+        haarfinder.setPreset(ObjectFinder::Fast);
         //haarfinder.update(colorImg);
+        finder.findHaarObjects(zoom,200,200);
+
         
-        //cam_mat = toCv(canny2);
-       // cv::Rect crop_roi2 = cv::Rect(cur.x, cur.y-100, cur.width, cur.height+150);
-       // crop = cam_mat(crop_roi).clone();
+        cam_mat = toCv(canny2);
+        cv::Rect crop_roi2 = cv::Rect(cur.x, cur.y-100, cur.width, cur.height+150);
+        crop = cam_mat(crop_roi).clone();
         
         contourFinder2.setMinAreaRadius(minArea2);
         contourFinder2.setMaxAreaRadius(maxArea2);
@@ -429,6 +422,9 @@ void ofApp::makeContours(){
     
     makePolylines();
     
+   // canny2=canny;
+   // canny2.flagImageChanged();
+
 }
 
 
@@ -455,49 +451,14 @@ void ofApp::makePolylines(){
         vector<cv::Point> quad;
         vector<cv::Point> quad2;
         vector<cv::Point> quad3;
-        vector<cv::Point> quad4;
 
-
-        /*  if (contourFinder.getArcLength(k)>arclength1){
-         approxPolyDP(contourFinder.getContour(k),quad, 40 ,true);
-         }else if (contourFinder.getArcLength(k)>arclength2){
-         approxPolyDP(contourFinder.getContour(k),quad, 20 ,true);
-         }else if (contourFinder.getArcLength(k)>arclength3){
-         approxPolyDP(contourFinder.getContour(k),quad, 15 ,true);
-         }else if (contourFinder.getArcLength(k)<arclength4 && contourFinder.getArcLength(k)>arclength4){
-         approxPolyDP(contourFinder.getContour(k),quad, 5 ,true);
-         }else{
-         approxPolyDP(contourFinder.getContour(k),quad, 1 ,true);
-         }*/
-        
-        //approxPolyDP(contourFinder.getContour(k),quad, 0.5 ,true);
-        
-       /* if (contourFinder.getArcLength(k)>arclength4&& contourFinder.getArcLength(k)<arclength3){
-            approxPolyDP(contourFinder.getContour(k),quad, 3 ,true);
-        }*/
-        
-     /*   if (contourFinder.getArcLength(k)<arclength1){
-            approxPolyDP(contourFinder.getContour(k),quad, quadsmooth ,true);
-        }
-        
-       else if (contourFinder.getArcLength(k)>arclength1){
-            approxPolyDP(contourFinder.getContour(k),quad, quadhard ,true);
-        }*/
-        
         
         approxPolyDP(contourFinder.getContour(k),quad, quadhard ,true);
         approxPolyDP(contourFinder.getContour(k),quad2, quadsmooth ,true);
         approxPolyDP(contourFinder.getContour(k),quad3, quadfine ,true);
 
         
-        
-       // approxPolyDP(contourFinder.getContour(k),quad, 16 ,true);
-
         ofSetColor(255);
-        
-        /* for(int i = 1; i < quad.size(); i++) {
-         points.push_back(ofPoint(quad[i].x, quad[i].y));
-         }*/
         
         ofPolyline polyline;
         ofPolyline polyline2;
@@ -574,10 +535,9 @@ void ofApp::makePolylines(){
     
    ofSort(linesToDraw1, sortByArea);
    ofSort(linesToDraw2, sortByArea);
-  //  ofSort(linesToDraw3, sortByDistance);
-    
     
     linesToPrint=linesToDraw1;
+    
     for(int i=0;i<linesToDraw2.size();i++){
         linesToPrint.push_back(linesToDraw2[i]);
     }
@@ -587,10 +547,20 @@ void ofApp::makePolylines(){
     
    // ofSort(linesToPrint, sortByDistance);
 
+    linesToAnimate=linesToDraw1;
+    
+    for(int i=0;i<linesToDraw2.size();i++){
+        linesToAnimate.push_back(linesToDraw2[i]);
+    }
+    for(int i=0;i<linesToDraw3.size();i++){
+        linesToAnimate.push_back(linesToDraw3[i]);
+    }
+    
+    
 
     if(record){
 
-        linesToAnimate=linesToDraw1;
+       /* linesToAnimate=linesToDraw1;
         
         for(int i=0;i<linesToDraw2.size();i++){
             linesToAnimate.push_back(linesToDraw2[i]);
@@ -598,7 +568,7 @@ void ofApp::makePolylines(){
         for(int i=0;i<linesToDraw3.size();i++){
             linesToAnimate.push_back(linesToDraw3[i]);
         }
-        
+        */
         
         
         linesToPrint=linesToDraw1;
@@ -628,18 +598,25 @@ void ofApp::draw(){
     cam.draw(ofGetWidth()-cam.getWidth()/3, grayImage.getHeight()/3,cam.getWidth()/3,cam.getHeight()/3);
     ofPushStyle();
     ofSetColor(255);
-    if(!bShowCanny){
+    
+        if(!bShowCanny){
          canny.draw(ofGetWidth()-canny.getWidth()/3, canny.getHeight()/3*2,canny.getWidth()/3,canny.getHeight()/3);
     }else{
        canny.draw(0,0);
     }
+        
+        if(!bShowCanny2){
+            canny2.draw(0,0);
+           // contourFinder2.draw();
+        }else{
+            canny2.draw(ofGetWidth()-canny.getWidth()/3*2, canny.getHeight()/3*3,canny.getWidth()/3,canny.getHeight()/3);
+        }
     }
         
         
    //
 
-    //canny2.draw(ofGetWidth()-canny.getWidth()/3, canny.getHeight()/3*3,canny.getWidth()/3,canny.getHeight()/3);
-    //meanCanny.draw(ofGetWidth()-canny.getWidth()/3*2, canny.getHeight()/3*3,canny.getWidth()/3,canny.getHeight()/3);
+   // meanCanny.draw(ofGetWidth()-canny.getWidth()/3, canny.getHeight()/3*3,canny.getWidth()/3,canny.getHeight()/3);
 
     // canny.draw(0,0);
     ofPopStyle();
@@ -704,25 +681,27 @@ void ofApp::draw(){
     
     ofPushMatrix();
     //ofScale(0.7,0.7);
-    ofTranslate(0, 0);
+    ofTranslate(1400, 0);
+    ofScale(scaleScreen,scaleScreen);
+
     ofPushStyle();
     for(int i = 0; i < linesToAnimate.size(); i++) {
-        //linesToAnimate[i].draw();
-       /* for (int p=0; p<100; p+=10) {
+     //   linesToAnimate[i].draw();
+        for (int p=0; p<100; p+=10) {
             ofVec3f point =  linesToAnimate[i].getPointAtPercent(p/100.0);  // Returns a point at a percentage along the polyline
-            ofDrawCircle(point, 1);
-        }*/
+            ofDrawCircle(point, 2);
+        }
         
-        //if(linesToAnimate[i].getPerimeter()>100){
-        /*vector<ofVec3f> vertices = linesToAnimate[i].getVertices();
+       /* if(linesToAnimate[i].getPerimeter()>100){
+        vector<ofVec3f> vertices = linesToAnimate[i].getVertices();
         float normalLength = 10;
         for (int vertexIndex=0; vertexIndex<vertices.size(); vertexIndex++) {
             ofVec3f vertex = vertices[vertexIndex];  // Get the vertex
             ofVec3f normal = linesToAnimate[i].getNormalAtIndex(vertexIndex) * normalLength;  // Scale the normal
             ofDrawLine(vertex-normal/2, vertex+normal/2);  // Center the scaled normal around the vertex
-        }*/
+        }
             
-        //}
+        }*/
         
     }
     
@@ -876,7 +855,7 @@ void ofApp::makeNewPortrait(){
    // grayImage.erode();
     
     
-    grayImageBlur.blur(blur);
+  //  grayImageBlur.blur(blur);
     //grayImageBlur.contrastStretch();
     grayImageBlur.dilate();
     grayImageBlur.erode();

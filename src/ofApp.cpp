@@ -76,20 +76,15 @@ void ofApp::setup(){
     cam.setup( 1600, 896);
    
     
-    gui.setup();
-    polylinesPanel.setup();
-
-    
-
+    gui.setup("General","general.xml",300,10);
+    polylinesPanel.setup("Polylines","polylines.xml",10,10);
+    cannyPanel.setup("Canny","canny.xml",10,10);
 
     display.setName("Dispaly");
     display.add(bShowImage.set("bShowImage",false));
     display.add(bShowCanny.set("bShowCanny",false));
     display.add(bShowCanny2.set("bShowCanny2",false));
     display.add(bShowDebug.set("bShowDebug",false));
-    display.add(bUseCanny1.set("bUseCanny1",false));
-
-
     gui.add(display);
 
     imageparameters.setName("Image");
@@ -100,24 +95,36 @@ void ofApp::setup(){
     gui.add(imageparameters);
     gui.getGroup("Image").minimize();
   
+    
+    
+    canny1.setName("Canny 1");
+    canny1.add(dilateErode.set("dilateErode", 2, 0, 5));
+    canny1.add(mincanny.set("mincanny", 80, 10, 500));
+    canny1.add(maxcanny.set("maxcanny", 100, 15, 300));
+    canny1.add(cannyblur.set("cannyblur", 0, 0, 10));
+    canny1.add(cannycontrast.set("cannycontrast", 0,-1, 1));
+    canny1.add(cannybrightness.set("brightness", 0, -1, 1));
+    canny1.add(threshold.set("Threshold", 128, 0, 255));
+
+    cannyPanel.add(canny1);
+    
+    canny2group.setName("Canny 2");
+    canny2group.add(dilateErode2.set("dilateErode2", 2, 0, 5));
+    canny2group.add(mincanny2.set("mincanny2", 80, -100,2000));
+    canny2group.add(maxcanny2.set("maxcanny2", 100, -100, 2000));
+    canny2group.add(cannyblur2.set("cannyblur2", 0, 0, 10));
+    canny2group.add(cannycontrast2.set("cannycontrast2", 0,-1, 1));
+    canny2group.add(cannybrightness2.set("brightness2", 0, -1, 1));
+    canny2group.add(threshold2.set("Threshold 2", 128, 0, 255));
+
+    cannyPanel.add(canny2group);
+    
+    cannyPanel.add(bUseCanny1.set("bUseCanny1",false));
+
+    
     finder1.setName("Contourfinder 1");
-
-    finder1.add(dilateErode.set("dilateErode", 2, 0, 5));
-
-    finder1.add(arclength1.set("arclength1", 400, 0, 3000));
-    finder1.add(arclength2.set("arclength2", 200, 0, 3000));
-    finder1.add(arclength3.set("arclength3", 50, 0, 3000));
-    finder1.add(arclength4.set("arclength4", 30, 0, 3000));
-    finder1.add(mincanny.set("mincanny", 80, 10, 500));
-    finder1.add(maxcanny.set("maxcanny", 100, 15, 300));
-    finder1.add(cannyblur.set("cannyblur", 0, 0, 10));
-    finder1.add(cannycontrast.set("cannycontrast", 0,-1, 1));
-    finder1.add(cannybrightness.set("brightness", 0, -1, 1));
-
-
     finder1.add(minArea.set("Min area", 1, 1, 100));
     finder1.add(maxArea.set("Max area", 200, 1, 8000));
-    finder1.add(threshold.set("Threshold", 128, 0, 255));
     finder1.add(holes.set("Holes", true));
     finder1.add(simply.set("Simple", false));
     
@@ -129,6 +136,15 @@ void ofApp::setup(){
     polyline1.add(area1min.set("area1 min", 3, 1, 100));
     polyline1.add(area1max.set("area1 max", 3, 1, 8000));
     finder1.add(polyline1);
+    
+    
+    polylinehalf.setName("Polyline Half");
+    polylinehalf.add(resample_half.set("resample_half", 3, 0, 80));
+    polylinehalf.add(polyhalf_percent.set("polyhalf_percent", 5, 1, 50));
+    polylinehalf.add(simplify_half.set("simplify_half", 0, 0, 20));
+    polylinehalf.add(area_half_min.set("area_half_min", 3, 1, 200));
+    polylinehalf.add(area1max.set("area_half_max", 3, 1, 8000));
+    finder1.add(polylinehalf);
 
     polyline2.setName("Polyline 2");
     polyline2.add(quadsmooth.set("quadsmooth", 8, 0, 30));
@@ -149,53 +165,40 @@ void ofApp::setup(){
     finder1.add(polyline3);
 
 
-    finder1.add(sortthreshold.set("sortthreshold", 0.5, 0, 20));
+    //finder1.add(sortthreshold.set("sortthreshold", 0.5, 0, 20));
 
 
     
-
-
-
-
-
     finder1.add(poly.set("poly",false));
     finder1.add(poly2.set("poly2",false));
     finder1.add(poly3.set("poly3",false));
+    finder1.add(polyhalf.set("polyhalf",false));
 
-polylinesPanel.add(finder1);
+    polylinesPanel.add(finder1);
    // gui.add(finder1);
     gui.add(scaleScreen.set("scaleScreen",false));
 
     
     
+
+    
     finder2.setName("Contourfinder 2");
-
-
     finder2.add(minArea2.set("Min area2", 1, 1, 300));
     finder2.add(maxArea2.set("Max area2", 200, 1, 500));
-    finder2.add(mincanny2.set("mincanny2", 80, -100,1000));
-    finder2.add(maxcanny2.set("maxcanny2", 100, -100, 1000));
+
     finder2.add(holes2.set("Holes2", true));
+    
+    
+    
     
     finder2.add(eyeAreamin.set("eyeAreamin2", 1, 1, 300));
     finder2.add(eyeAreamax.set("eyeAreamax", 200, 1, 500));
     finder2.add(eyeresample.set("eyeresample", 0, 1, 30));
     finder2.add(eyesmooth.set("eyesmooth", 0, 1, 10));
     finder2.add(eyesimplify.set("eyesimplify", 0, 1, 10));
-
-    
     finder2.add(eyequad.set("eyequad", 0, 0.1, 5));
-
-    
-    
-    
-    
-    
-    
-    
-    
     gui.add(finder2);
-    gui.getGroup("Contourfinder 2").minimize();
+    //gui.getGroup("Contourfinder 2").minimize();
 
     //gui.add(persistence.set("persistence", 15, 1, 100));
 
@@ -216,8 +219,9 @@ polylinesPanel.add(finder1);
     gui.getGroup("Robot").minimize();
 
     
-    gui.loadFromFile("savesettings.xml");
-    polylinesPanel.loadFromFile("polylinessettings.xml");
+    gui.loadFromFile("general.xml");
+    polylinesPanel.loadFromFile("polylines.xml");
+    cannyPanel.loadFromFile("canny.xml");
     
     ofBackground(0);
     makeContours();
@@ -308,8 +312,6 @@ void ofApp::makeContours(){
     
     //}
     
-
-
     cvCanny(zoom.getCvImage(), canny.getCvImage(), mincanny, maxcanny,3);
     canny.blur(cannyblur);
     canny.threshold(threshold);
@@ -341,7 +343,6 @@ void ofApp::makeContours(){
     canny.erode();
    */
 
-    
     canny.flagImageChanged();
     
    // meanCanny-=canny;
@@ -357,15 +358,29 @@ void ofApp::makeContours(){
     //zoom.blur(blur);
     //cvSobel(zoom.getCvImage(), canny2.getCvImage(),1,0,-1);
 
-    canny2.dilate();
+  /* canny2.dilate();
     canny2.erode();
     canny2.dilate();
     canny2.erode();
     canny2.dilate();
     canny2.erode();
     canny2.dilate();
-    canny2.erode();
+    canny2.erode();*/
+    
 
+  
+    //cvCornerHarris(zoom.getCvImage(), canny.getCvImage(),10,10);
+    for(int i=0;i<dilateErode2;i++){
+        canny2.dilate();
+    }
+    
+    for(int i=0;i<dilateErode2;i++){
+        canny2.erode();
+    }
+    
+     canny2.blur(cannyblur2);
+    canny2.brightnessContrast(cannybrightness2,cannycontrast2);
+     canny2.threshold(threshold2);
     
     canny2.flagImageChanged();
 
@@ -577,7 +592,7 @@ void ofApp::makePolylines(){
             polyline_half.addVertex(quad[i].x, quad[i].y);
         }*/
         
-        for (int p=0; p<50; p+=5) {
+        for (int p=0; p<50; p+=polyhalf_percent) {
             ofVec2f point =  polyline_line.getPointAtPercent(p/100.0);  // Returns a point at a percentage along the polyline
             polyline_half.addVertex(point);
         }
@@ -1031,6 +1046,7 @@ void ofApp::draw(){
   
     gui.draw();
     polylinesPanel.draw();
+    cannyPanel.draw();
 
 }
 
@@ -1321,15 +1337,19 @@ void ofApp::keyPressed(int key){
     
     
     if(key=='s'){
-        gui.saveToFile("savesettings.xml");
-        polylinesPanel.saveToFile("polylinessettings.xml");
+      //  gui.saveToFile("savesettings.xml");
+      //  polylinesPanel.saveToFile("polylinessettings.xml");
+        
+        gui.saveToFile("general.xml");
+        polylinesPanel.saveToFile("polylines.xml");
+        cannyPanel.saveToFile("canny.xml");
         
     }
     
     if(key=='l'){
-        gui.loadFromFile("savesettings.xml");
-        polylinesPanel.loadFromFile("polylinessettings.xml");
-
+        gui.loadFromFile("general.xml");
+        polylinesPanel.loadFromFile("polylines.xml");
+        cannyPanel.loadFromFile("canny.xml");
     }
 
 

@@ -38,7 +38,7 @@ class ofApp : public ofBaseApp{
     
     void makeEyePolylines();
     
-    int timerduration=1000;
+    int timerduration=10;
     int inittime;
     
     
@@ -84,132 +84,137 @@ class ofApp : public ofBaseApp{
     
     ofxPanel gui;
     ofxPanel polylinesPanel;
+    
+    ofxPanel cannyPanel;
+
 
     
     ofParameter<bool> bShowCanny;
     ofParameter<bool> bShowCanny2;
-
     ofParameter<bool> bShowImage;
     ofParameter<bool> bShowDebug;
+    
     
     ofParameter<bool> bUseCanny1;
 
 
 
     ofParameterGroup imageparameters;
-    ofParameterGroup display;
-    
-    ofParameterGroup finder1;
-    ofParameterGroup finder2;
-    ofParameterGroup robot;
-
-
-    ofParameterGroup polyline1;
-    ofParameterGroup polyline2;
-    ofParameterGroup polyline3;
-
-
-    
-    ofParameter<float> minArea, maxArea, threshold;
-    ofParameter<bool> holes;
-    ofParameter<bool> holes2;
-
-    ofParameter<float>          persistence;
     ofParameter<float>          contrast;
     ofParameter<float>          brightness;
-
     ofParameter<float>          blur;
+    ofParameter<float>          zoomfact;
 
-    ofParameter<bool> simply;
     
+    ofParameter<float>          scaleScreen;
+
+    
+    ofParameterGroup display;
+    
+    
+    ofParameter<float> minArea, maxArea;
+    ofParameter<bool> holes;
+    ofParameter<bool> simply;
+
+    
+    ofParameterGroup finder1;
+    
+    ofParameterGroup canny1;
+    ofParameterGroup canny2group;
+
+
     ofParameter<float>          mincanny;
     ofParameter<float>          maxcanny;
     ofParameter<float>          cannyblur;
     ofParameter<float>          cannycontrast;
     ofParameter<float>          cannybrightness;
+    ofParameter<int>            dilateErode;
+    ofParameter<float>          threshold;
 
-
-
+    
     ofParameter<float>          minArea2;
     ofParameter<float>          maxArea2;
-    
     ofParameter<float>          mincanny2;
     ofParameter<float>          maxcanny2;
+    ofParameter<float>          cannyblur2;
+    ofParameter<float>          cannycontrast2;
+    ofParameter<float>          cannybrightness2;
+    ofParameter<float>          threshold2;
+
+    ofParameter<int>            dilateErode2;
+    
+
+    ofParameterGroup polyline1;
+    ofParameterGroup polyline2;
+    ofParameterGroup polyline3;
+    ofParameterGroup polylinehalf;
+    
+    ofParameter<float>          resample;
+    ofParameter<float>          resample2;
+    ofParameter<float>          resample3;
+    
+    ofParameter<float>          smooth;
+    ofParameter<float>          smooth2;
+    ofParameter<float>          smooth3;
+    
+
+
+    ofParameter<float>          simplify;
+    ofParameter<float>          simplify2;
+    ofParameter<float>          simplify3;
+    
+    ofParameter<int>            area1min;
+    ofParameter<int>            area1max;
+    ofParameter<int>            area2min;
+    ofParameter<int>            area2max;
+    ofParameter<int>            area3min;
+    ofParameter<int>            area3max;
     
     
+    ofParameter<float>          polyhalf_percent;
+    ofParameter<float>          resample_half;
+    ofParameter<float>          smooth_half;
+    ofParameter<float>          simplify_half;
+    ofParameter<int>            area_half_min;
+    ofParameter<int>            area_half_max;
+    
+    
+    ofParameterGroup finder2;
+    ofParameter<bool> holes2;
+
+ 
+    
+    
+
     ofParameter<bool> poly;
     ofParameter<bool> poly2;
     ofParameter<bool> poly3;
     ofParameter<bool> polymedian;
     ofParameter<bool> polyhalf;
 
+    ofParameter<int>            quadsmooth;
+    ofParameter<int>            quadhard;
+    ofParameter<float>          quadfine;
 
-    
-    
-    ofParameter<float>          resample;
-    ofParameter<float>          resample2;
-    ofParameter<float>          resample3;
-
-    
-    ofParameter<float>          smooth;
-    ofParameter<float>          smooth2;
-    ofParameter<float>          smooth3;
-
-    ofParameter<float>          simplify;
-    ofParameter<float>          simplify2;
-    ofParameter<float>          simplify3;
-    
     
     ofParameter<float>          arclength1;
     ofParameter<float>          arclength2;
     ofParameter<float>          arclength3;
     ofParameter<float>          arclength4;
     
-    ofParameter<int>            quadsmooth;
-    ofParameter<int>            quadhard;
-    ofParameter<float>          quadfine;
-
-
-
-    ofParameter<float>          zoomfact;
-
-
-
+  
     ofParameter<float>          sortthreshold;
     
-    
-    ofParameter<int>            dilateErode;
-
-    ofParameter<int>            area1min;
-    ofParameter<int>            area1max;
-
-    ofParameter<int>            area2min;
-    ofParameter<int>            area2max;
-
-    ofParameter<int>            area3min;
-    ofParameter<int>            area3max;
-
-    
-    
+    ofParameterGroup robot;
     ofParameter<int>          penUpPos;
     ofParameter<int>          penDownPos;
     ofParameter<int>          penHighUpPos;
     ofParameter<int>          penHighDownPos;
-
     ofParameter<int>          penIdlePos;
-
     ofParameter<int>          penDrawPos;
-    
     ofParameter<int>            dipPosX;
     ofParameter<int>            dipPosY;
 
-
-
-    ofParameter<float>          scaleScreen;
-
-
-    
-    
     ofParameter<int>            eyeAreamin;
     ofParameter<int>            eyeAreamax;
     ofParameter<float>          eyeresample;

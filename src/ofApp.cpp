@@ -668,8 +668,8 @@ void ofApp::makePolylines(){
         }
     }
     
-   // ofSort(linesToPrint, sortByDistance);
-
+    ofSort(linesToPrint, sortByDistance);
+    
     linesToAnimate=linesToDraw1;
     
     for(int i=0;i<linesToDraw2.size();i++){
@@ -728,7 +728,7 @@ void ofApp::draw(){
 
         }
     }
-    finder.blobs[0].draw();
+    //finder.blobs[0].draw();
         
    //
 

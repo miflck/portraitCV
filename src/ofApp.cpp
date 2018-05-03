@@ -143,7 +143,7 @@ void ofApp::setup(){
     polylinehalf.add(polyhalf_percent.set("polyhalf_percent", 5, 1, 50));
     polylinehalf.add(simplify_half.set("simplify_half", 0, 0, 20));
     polylinehalf.add(area_half_min.set("area_half_min", 3, 1, 200));
-    polylinehalf.add(area1max.set("area_half_max", 3, 1, 8000));
+    polylinehalf.add(area_half_max.set("area_half_max", 3, 1, 8000));
     finder1.add(polylinehalf);
 
     polyline2.setName("Polyline 2");
@@ -327,49 +327,10 @@ void ofApp::makeContours(){
     canny.brightnessContrast(cannybrightness,cannycontrast);
 
 
-
-
-
-  /*  canny.dilate();
-    canny.erode();
-    canny.dilate();
-    canny.erode();
-    canny.dilate();
-    canny.erode();
-    canny.dilate();
-    canny.dilate();
-
-    canny.erode();
-    canny.erode();
-   */
-
     canny.flagImageChanged();
-    
-   // meanCanny-=canny;
-  //  meanCanny+=canny;
-  //  meanCanny.erode();
-   // meanCanny.erode();
- //   meanCanny.erode();
- //   meanCanny.erode();
     zoom.blur(blur);
+    
     cvCanny(zoom.getCvImage(), canny2.getCvImage(), mincanny2, maxcanny2,5);
-    
-    //canny2.flagImageChanged();
-    //zoom.blur(blur);
-    //cvSobel(zoom.getCvImage(), canny2.getCvImage(),1,0,-1);
-
-  /* canny2.dilate();
-    canny2.erode();
-    canny2.dilate();
-    canny2.erode();
-    canny2.dilate();
-    canny2.erode();
-    canny2.dilate();
-    canny2.erode();*/
-    
-
-  
-    //cvCornerHarris(zoom.getCvImage(), canny.getCvImage(),10,10);
     for(int i=0;i<dilateErode2;i++){
         canny2.dilate();
     }
@@ -437,7 +398,7 @@ void ofApp::makeContours(){
 
         contourFinder.setMinAreaRadius(minArea);
         contourFinder.setMaxAreaRadius(maxArea);
-        contourFinder.setThreshold(threshold);
+        //contourFinder.setThreshold(threshold);
         contourFinder.setSimplify(simply);
         contourFinder.setFindHoles(holes);
         contourFinder.findContours(crop);
@@ -522,15 +483,18 @@ void ofApp::makePolylines(){
     int n2 = contourFinder2.size();
     
     //ofPolyline polyline;
-    vector<ofPoint> points;
-    vector<ofPolyline> polylines;
+   // vector<ofPoint> points;
+   // vector<ofPolyline> polylines;
     
+    //clear all lines
     linesToDraw1.clear();
     linesToDraw2.clear();
     linesToDraw3.clear();
     
     medianlines.clear();
     half_linesToDraw1.clear();
+    linesToPrint.clear();
+    linesToAnimate.clear();
 
     
     for(int k=0;k<n;k++){
@@ -548,29 +512,27 @@ void ofApp::makePolylines(){
         ofSetColor(255);
         
         ofPolyline polyline;
-        ofPolyline polyline_half;
-
         ofPolyline polyline2;
         ofPolyline polyline3;
         
-        
+        ofPolyline polyline_half;
+
         ofPolyline polyline_line;
         ofPolyline polyline_median;
 
         vector <ofVec2f> points;
         
+        // get contour as polyline
         for(int i = 0; i < contourFinder.getContour(k).size(); i++) {
             polyline_line.addVertex(contourFinder.getContour(k)[i].x, contourFinder.getContour(k)[i].y);
         }
         
-        
         for (int p=0; p<100; p+=10) {
-            ofVec2f point =  polyline_line.getPointAtPercent(p/100.0);  // Returns a point at a percentage along the polyline
+            ofVec2f point =  polyline_line.getPointAtPercent(p/100.0);
             points.push_back(point);
         }
         
         vector <ofVec2f> middlepoints;
-
         for(int i = 0; i < points.size()/2; i++) {
            ofVec2f p= points[i]-points[points.size()-1];
             ofVec2f m= points[i]+p/2;
@@ -582,22 +544,13 @@ void ofApp::makePolylines(){
         }
         medianlines.push_back(polyline_median);
         
+        
+        
         for(int i = 0; i < quad.size(); i++) {
             polyline.addVertex(quad[i].x, quad[i].y);
         }
         
-        
-        
-       /* for(int i = 0; i < quad.size()/2; i++) {
-            polyline_half.addVertex(quad[i].x, quad[i].y);
-        }*/
-        
-        for (int p=0; p<50; p+=polyhalf_percent) {
-            ofVec2f point =  polyline_line.getPointAtPercent(p/100.0);  // Returns a point at a percentage along the polyline
-            polyline_half.addVertex(point);
-        }
-        
-        
+    
         
         for(int i = 0; i < quad2.size(); i++) {
             polyline2.addVertex(quad2[i].x, quad2[i].y);
@@ -607,34 +560,32 @@ void ofApp::makePolylines(){
             polyline3.addVertex(quad3[i].x, quad3[i].y);
         }
         
-        
+        for (int p=0; p<50; p+=polyhalf_percent) {
+            ofVec2f point =  polyline_line.getPointAtPercent(p/100.0);
+            polyline_half.addVertex(point);
+        }
         
         
         polyline = polyline.getResampledBySpacing(resample);
         polyline = polyline.getSmoothed(smooth);
         polyline.simplify(simplify);
         
-        
-        polyline_half = polyline_half.getResampledBySpacing(resample);
-        polyline_half = polyline_half.getSmoothed(smooth);
-        polyline_half.simplify(simplify);
-
-        
         polyline2 = polyline2.getResampledBySpacing(resample2);
         polyline2 = polyline2.getSmoothed(smooth2);
         polyline2.simplify(simplify2);
 
-        
         polyline3 = polyline3.getResampledBySpacing(resample3);
-        polyline3.simplify(simplify3);
         polyline3 = polyline3.getSmoothed(smooth3);
+        polyline3.simplify(simplify3);
 
-        
+        polyline_half = polyline_half.getResampledBySpacing(resample_half);
+        polyline_half = polyline_half.getSmoothed(smooth_half);
+        polyline_half.simplify(simplify_half);
         //cout<<"n "<<k<<" quad.size() "<<quad.size()<<" area "<<polyline3.getPerimeter()<<endl;
 
         
         //cout<<"n "<<k<<" arc length "<<contourFinder.getArcLength(k)<<endl;
-        if(poly){
+      
 
             if(polyline.getPerimeter()>1&& polyline.getPerimeter()>area1min && ABS(polyline.getPerimeter())<area1max){
            /* if(linesToDraw1.size()>0){
@@ -645,10 +596,9 @@ void ofApp::makePolylines(){
             }*/
                 linesToDraw1.push_back(polyline);
             }
-            
-        }
         
-        if(polyline_half.getPerimeter()>1&& polyline_half.getPerimeter()>area1min && ABS(polyline_half.getPerimeter())<area1max){
+        
+        if(polyline_half.getPerimeter()>1&& polyline_half.getPerimeter()>area_half_min && ABS(polyline_half.getPerimeter())<area_half_max){
             /* if(linesToDraw1.size()>0){
              ofPolyline p;
              p.addVertex(linesToDraw1.back().getPointAtPercent(100));
@@ -657,7 +607,6 @@ void ofApp::makePolylines(){
              }*/
             half_linesToDraw1.push_back(polyline_half);
         }
-        if(poly2){
 
         if(polyline2.getPerimeter()>1 && polyline2.getPerimeter()>area2min && ABS(polyline2.getPerimeter())<area2max){
             
@@ -671,9 +620,8 @@ void ofApp::makePolylines(){
             linesToDraw2.push_back(polyline2);
 
         }
-        }
         
-        if(poly3){
+        
        
         
         if(ABS(polyline3.getPerimeter())>1&& polyline3.getPerimeter()>area3min && ABS(polyline3.getPerimeter())<area3max){
@@ -683,26 +631,41 @@ void ofApp::makePolylines(){
             p.addVertex(polyline3.getPointAtPercent(0));
             linesToDraw3.push_back(p);
             }*/
-        linesToDraw3.push_back(polyline3);
+            linesToDraw3.push_back(polyline3);
         }
-        }
+        
         
     }
     
     
    ofSort(linesToDraw1, sortByArea);
    ofSort(linesToDraw2, sortByArea);
+    ofSort(linesToDraw3, sortByArea);
     ofSort(half_linesToDraw1, sortByArea);
 
     
     //linesToPrint=linesToDraw1;
-    linesToPrint=half_linesToDraw1;
-    
-    for(int i=0;i<linesToDraw2.size();i++){
-        linesToPrint.push_back(linesToDraw2[i]);
+    //linesToPrint=half_linesToDraw1;
+    if(poly){
+        for(int i=0;i<linesToDraw1.size();i++){
+            linesToPrint.push_back(linesToDraw1[i]);
+        }
     }
-    for(int i=0;i<linesToDraw3.size();i++){
-        linesToPrint.push_back(linesToDraw3[i]);
+    if(poly2){
+        for(int i=0;i<linesToDraw2.size();i++){
+            linesToPrint.push_back(linesToDraw2[i]);
+        }
+    }
+    if(poly3){
+        for(int i=0;i<linesToDraw3.size();i++){
+            linesToPrint.push_back(linesToDraw3[i]);
+        }
+    }
+    
+    if(polyhalf){
+        for(int i=0;i<half_linesToDraw1.size();i++){
+            linesToPrint.push_back(half_linesToDraw1[i]);
+        }
     }
     
    // ofSort(linesToPrint, sortByDistance);
@@ -720,17 +683,7 @@ void ofApp::makePolylines(){
 
     if(record){
 
-       /* linesToAnimate=linesToDraw1;
-        
-        for(int i=0;i<linesToDraw2.size();i++){
-            linesToAnimate.push_back(linesToDraw2[i]);
-        }
-        for(int i=0;i<linesToDraw3.size();i++){
-            linesToAnimate.push_back(linesToDraw3[i]);
-        }
-        */
-        
-        
+/*
         linesToPrint=linesToDraw1;
         for(int i=0;i<linesToDraw2.size();i++){
             linesToPrint.push_back(linesToDraw2[i]);
@@ -738,7 +691,7 @@ void ofApp::makePolylines(){
         for(int i=0;i<linesToDraw3.size();i++){
             linesToPrint.push_back(linesToDraw3[i]);
         }
-        
+    */
         record=false;
         makeFeed();
     }
@@ -800,20 +753,6 @@ void ofApp::draw(){
     for(int i = 0; i < (int)contourFinder.getPolylines().size(); i++) {
          ofSetColor(255);
         
-       /* if (contourFinder.getContourArea(i)>arclength4&& contourFinder.getContourArea(i)<arclength3){
-            ofSetColor(0,0,255);
-        }
-        if (contourFinder.getContourArea(i)>arclength3 && contourFinder.getContourArea(i)<arclength2){
-            ofSetColor(0,255,255);
-        }
-        if (contourFinder.getContourArea(i)>arclength2 && contourFinder.getContourArea(i)<arclength1){
-            ofSetColor(0,255,0);
-        }
-        if (contourFinder.getContourArea(i)>arclength1){
-            ofSetColor(255,0,0);
-        }
-        */
-        
         if (contourFinder.getContourArea(i)>30){
             ofSetColor(255,0,0);
         }
@@ -848,7 +787,7 @@ void ofApp::draw(){
     ofScale(scaleScreen,scaleScreen);
 
     ofPushStyle();
-    for(int i = 0; i < linesToAnimate.size(); i++) {
+  /*  for(int i = 0; i < linesToAnimate.size(); i++) {
      //   linesToAnimate[i].draw();
         for (int p=0; p<100; p+=10) {
             ofVec3f point =  linesToAnimate[i].getPointAtPercent(p/100.0);  // Returns a point at a percentage along the polyline
@@ -866,7 +805,7 @@ void ofApp::draw(){
             
         }*/
         
-    }
+  //  }
     
     /*
     if(linesToAnimate.size()>0){
@@ -903,7 +842,6 @@ void ofApp::draw(){
     ofPushMatrix();
     ofTranslate(500, 0);
     ofScale(scaleScreen,scaleScreen);
-
     ofPushStyle();
     ofSetColor(255, 255, 255);
     if(drawcounter<linesToPrint.size()){
@@ -911,26 +849,21 @@ void ofApp::draw(){
     }else{
         drawcounter=0;
     }
-
     ofTranslate(0, 0);
     for(int i = 0; i < drawcounter; i++) {
         linesToPrint[i].draw();
     }
-    
     ofNoFill();
     ofSetColor(255,0,0);
-
     ofDrawRectangle(0,0,faceBoundingBox.getWidth(),faceBoundingBox.getHeight());
     ofSetColor(0,255,0);
     ofDrawRectangle(faceBoundingBox.x,faceBoundingBox.y,faceBoundingBox.getWidth(),faceBoundingBox.getHeight());
-
     ofDrawRectangle(eyeBoundingBox.x,eyeBoundingBox.y,eyeBoundingBox.getWidth(),eyeBoundingBox.getHeight());
     
     ofSetColor(255,0,255);
     ofDrawRectangle(eyeBoundingBox.x-faceBoundingBoxOriginal.x,eyeBoundingBox.y-faceBoundingBoxOriginal.y,eyeBoundingBox.getWidth(),eyeBoundingBox.getHeight());
 
     ofSetColor(0,0,255);
-
     ofDrawRectangle(faceBoundingBoxOriginal.x,faceBoundingBoxOriginal.y,faceBoundingBoxOriginal.getWidth(),faceBoundingBoxOriginal.getHeight());
 
     
@@ -938,8 +871,7 @@ void ofApp::draw(){
     ofPopMatrix();
     
     
-    
-    
+    int gutter=100;
     
     ofPushMatrix();
     ofTranslate(0, 500);
@@ -953,7 +885,7 @@ void ofApp::draw(){
     ofPopMatrix();
 
     
-    ofTranslate(500, 0);
+    ofTranslate(faceBoundingBox.getWidth()*scaleScreen+gutter, 0);
     ofPushMatrix();
     ofScale(scaleScreen,scaleScreen);
     ofSetColor(0, 255, 255);
@@ -970,22 +902,29 @@ void ofApp::draw(){
     ofPopMatrix();
     
     ofSetColor(255, 255, 0);
-    ofTranslate(500, 0);
+    ofTranslate(faceBoundingBox.getWidth()*scaleScreen+gutter, 0);
     ofPushMatrix();
     ofScale(scaleScreen,scaleScreen);
-    /*for(int i = 0; i < linesToDraw3.size(); i++) {
+        for(int i = 0; i < linesToDraw2.size(); i++) {
+            linesToDraw2[i].draw();
+        }
+      /*  for(int i = 0; i < medianlines.size(); i++) {
+            medianlines[i].draw();
+        }*/
+    ofPopMatrix();
+    
+    ofTranslate(faceBoundingBox.getWidth()*scaleScreen+gutter, 0);
+    ofPushMatrix();
+    ofScale(scaleScreen,scaleScreen);
+    for(int i = 0; i < linesToDraw3.size(); i++) {
         linesToDraw3[i].draw();
     }
-    */
-    
-        for(int i = 0; i < medianlines.size(); i++) {
-            medianlines[i].draw();
-        }
-    
-    
+    /*  for(int i = 0; i < medianlines.size(); i++) {
+     medianlines[i].draw();
+     }*/
     ofPopMatrix();
-   // polyline.draw();
-   // m_triangulation.drawWireframe();
+    
+    
     ofPopStyle();
     ofPopMatrix();
     
@@ -996,25 +935,10 @@ void ofApp::draw(){
     ofTranslate(1000, 0);
     ofScale(scaleScreen,scaleScreen);
 
-    if(poly){
-        for(int i = 0; i < linesToDraw1.size(); i++) {
-            linesToDraw1[i].draw();
+        for(int i = 0; i < linesToPrint.size(); i++) {
+            linesToPrint[i].draw();
         }
-    }
-    if(poly2){
-        for(int i = 0; i < linesToDraw2.size(); i++) {
-            linesToDraw2[i].draw();
-        }
-    }
-    if(poly3){
-        for(int i = 0; i < linesToDraw3.size(); i++) {
-            linesToDraw3[i].draw();
-        }
-    }
-    
-  
-    
-    
+   
     for(int i = 0; i < eyes.size(); i++) {
         eyes[i].draw();
     }
@@ -1026,8 +950,7 @@ void ofApp::draw(){
     ofPushMatrix();
     ofTranslate(0, 900);
 
-    
-    ofPushMatrix();
+    /*ofPushMatrix();
     ofPushStyle();
     ofSetColor(255, 255, 0);
     ofTranslate(500, 0);
@@ -1037,6 +960,7 @@ void ofApp::draw(){
     }
     ofPopStyle();
     ofPopMatrix();
+     */
     
     ofPushStyle();
     contourFinder2.draw();

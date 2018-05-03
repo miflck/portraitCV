@@ -16,7 +16,7 @@ int baud = 115200;
 char myByte = 0;
 string cmd;
 
-bool bUseArduino=true;
+bool bUseArduino=false;
 
 //--------------------------------------------------------------
 void ofApp::setup(){
@@ -378,8 +378,9 @@ void ofApp::makeContours(){
     if(finder.blobs.size()>0){
         ofRectangle cur =finder.blobs[0].boundingRect;
         faceBoundingBox = finder.blobs[0].boundingRect;
-        
         faceBoundingBoxOriginal=finder.blobs[0].boundingRect;
+        
+        
         int diffx,diffy,dx,dy,hy;
         int offsetty=100;
         diffx=cur.x+cur.width;
@@ -398,13 +399,13 @@ void ofApp::makeContours(){
         }
         
         faceBoundingBox.y-=dy;
+        faceBoundingBoxOriginal.y-=dy;
         cout<<"hy"<<hy<<endl;
        faceBoundingBox.height=hy;
-        faceBoundingBoxOriginal.y+=dy   ;
         
        //canny.setROI(cur.x-200, cur.y-400, cur.width+200, cur.height+400);
 
-        cam_mat = toCv(canny);
+        cam_mat = toCv(canny2);
         cv::Rect crop_roi = cv::Rect(cur.x, dy, cur.width, hy);
         crop = cam_mat(crop_roi).clone();
         
@@ -674,7 +675,7 @@ void ofApp::draw(){
 
         }
     }
-        
+    finder.blobs[0].draw();
         
    //
 
@@ -820,7 +821,17 @@ void ofApp::draw(){
     ofSetColor(255,0,0);
 
     ofDrawRectangle(0,0,faceBoundingBox.getWidth(),faceBoundingBox.getHeight());
+    ofSetColor(0,255,0);
+    ofDrawRectangle(faceBoundingBox.x,faceBoundingBox.y,faceBoundingBox.getWidth(),faceBoundingBox.getHeight());
+
+    ofDrawRectangle(eyeBoundingBox.x,eyeBoundingBox.y,eyeBoundingBox.getWidth(),eyeBoundingBox.getHeight());
+    
+    ofSetColor(255,0,255);
     ofDrawRectangle(eyeBoundingBox.x-faceBoundingBoxOriginal.x,eyeBoundingBox.y-faceBoundingBoxOriginal.y,eyeBoundingBox.getWidth(),eyeBoundingBox.getHeight());
+
+    ofSetColor(0,0,255);
+
+    ofDrawRectangle(faceBoundingBoxOriginal.x,faceBoundingBoxOriginal.y,faceBoundingBoxOriginal.getWidth(),faceBoundingBoxOriginal.getHeight());
 
     
     ofPopStyle();

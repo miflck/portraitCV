@@ -87,6 +87,8 @@ void ofApp::setup(){
     display.add(bShowCanny.set("bShowCanny",false));
     display.add(bShowCanny2.set("bShowCanny2",false));
     display.add(bShowDebug.set("bShowDebug",false));
+    display.add(bUseCanny1.set("bUseCanny1",false));
+
 
     gui.add(display);
 
@@ -309,7 +311,7 @@ void ofApp::makeContours(){
 
 
     cvCanny(zoom.getCvImage(), canny.getCvImage(), mincanny, maxcanny,3);
-    //canny.blur(cannyblur);
+    canny.blur(cannyblur);
     canny.threshold(threshold);
 
     //cvCornerHarris(zoom.getCvImage(), canny.getCvImage(),10,10);
@@ -405,7 +407,15 @@ void ofApp::makeContours(){
         
        //canny.setROI(cur.x-200, cur.y-400, cur.width+200, cur.height+400);
 
-        cam_mat = toCv(canny2);
+        //cam_mat = toCv(canny2);
+
+        if(bUseCanny1){
+            cam_mat = toCv(canny);
+
+        }else{
+            cam_mat = toCv(canny2);
+        }
+        
         cv::Rect crop_roi = cv::Rect(cur.x, dy, cur.width, hy);
         crop = cam_mat(crop_roi).clone();
         
@@ -504,7 +514,9 @@ void ofApp::makePolylines(){
     linesToDraw2.clear();
     linesToDraw3.clear();
     
-    
+    medianlines.clear();
+    half_linesToDraw1.clear();
+
     
     for(int k=0;k<n;k++){
         
@@ -521,12 +533,50 @@ void ofApp::makePolylines(){
         ofSetColor(255);
         
         ofPolyline polyline;
+        ofPolyline polyline_half;
+
         ofPolyline polyline2;
         ofPolyline polyline3;
+        
+        
+        ofPolyline polyline_line;
+        ofPolyline polyline_median;
+
+        vector <ofVec2f> points;
+        
+        for(int i = 0; i < contourFinder.getContour(k).size(); i++) {
+            polyline_line.addVertex(contourFinder.getContour(k)[i].x, contourFinder.getContour(k)[i].y);
+        }
+        
+        
+        for (int p=0; p<100; p+=10) {
+            ofVec2f point =  polyline_line.getPointAtPercent(p/100.0);  // Returns a point at a percentage along the polyline
+            points.push_back(point);
+        }
+        
+        vector <ofVec2f> middlepoints;
+
+        for(int i = 0; i < points.size()/2; i++) {
+           ofVec2f p= points[i]-points[points.size()-1];
+            ofVec2f m= points[i]+p/2;
+            middlepoints.push_back(m);
+        }
+        
+        for(int i = 0; i < middlepoints.size(); i++) {
+            polyline_median.addVertex(middlepoints[i].x, middlepoints[i].y);
+        }
+        medianlines.push_back(polyline_median);
         
         for(int i = 0; i < quad.size(); i++) {
             polyline.addVertex(quad[i].x, quad[i].y);
         }
+        
+        for(int i = 0; i < quad.size()/2; i++) {
+            polyline_half.addVertex(quad[i].x, quad[i].y);
+        }
+        
+        
+        
         for(int i = 0; i < quad2.size(); i++) {
             polyline2.addVertex(quad2[i].x, quad2[i].y);
         }
@@ -541,6 +591,11 @@ void ofApp::makePolylines(){
         polyline = polyline.getResampledBySpacing(resample);
         polyline = polyline.getSmoothed(smooth);
         polyline.simplify(simplify);
+        
+        
+        polyline_half = polyline_half.getResampledBySpacing(resample);
+        polyline_half = polyline_half.getSmoothed(smooth);
+        polyline_half.simplify(simplify);
 
         
         polyline2 = polyline2.getResampledBySpacing(resample2);
@@ -565,6 +620,16 @@ void ofApp::makePolylines(){
                 linesToDraw1.push_back(p);
             }*/
             linesToDraw1.push_back(polyline);
+        }
+        
+        if(polyline_half.getPerimeter()>1&& polyline_half.getPerimeter()>area1min && ABS(polyline_half.getPerimeter())<area1max){
+            /* if(linesToDraw1.size()>0){
+             ofPolyline p;
+             p.addVertex(linesToDraw1.back().getPointAtPercent(100));
+             p.addVertex(polyline.getPointAtPercent(0));
+             linesToDraw1.push_back(p);
+             }*/
+            half_linesToDraw1.push_back(polyline_half);
         }
         
         if(polyline2.getPerimeter()>1 && polyline2.getPerimeter()>area2min && ABS(polyline2.getPerimeter())<area2max){
@@ -596,7 +661,8 @@ void ofApp::makePolylines(){
    ofSort(linesToDraw1, sortByArea);
    ofSort(linesToDraw2, sortByArea);
     
-    linesToPrint=linesToDraw1;
+    //linesToPrint=linesToDraw1;
+    linesToPrint=half_linesToDraw1;
     
     for(int i=0;i<linesToDraw2.size();i++){
         linesToPrint.push_back(linesToDraw2[i]);
@@ -857,18 +923,32 @@ void ofApp::draw(){
     ofPushMatrix();
     ofScale(scaleScreen,scaleScreen);
     ofSetColor(0, 255, 255);
-    for(int i = 0; i < linesToDraw2.size(); i++) {
+   /* for(int i = 0; i < linesToDraw2.size(); i++) {
         linesToDraw2[i].draw();
+    }*/
+    
+    for(int i = 0; i < half_linesToDraw1.size(); i++) {
+        half_linesToDraw1[i].draw();
     }
+    
+    
+    
     ofPopMatrix();
     
     ofSetColor(255, 255, 0);
     ofTranslate(500, 0);
     ofPushMatrix();
     ofScale(scaleScreen,scaleScreen);
-    for(int i = 0; i < linesToDraw3.size(); i++) {
+    /*for(int i = 0; i < linesToDraw3.size(); i++) {
         linesToDraw3[i].draw();
     }
+    */
+    
+        for(int i = 0; i < medianlines.size(); i++) {
+            medianlines[i].draw();
+        }
+    
+    
     ofPopMatrix();
    // polyline.draw();
    // m_triangulation.drawWireframe();
@@ -897,6 +977,8 @@ void ofApp::draw(){
             linesToDraw3[i].draw();
         }
     }
+    
+  
     
     
     for(int i = 0; i < eyes.size(); i++) {

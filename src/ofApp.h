@@ -91,6 +91,9 @@ class ofApp : public ofBaseApp{
 
     ofParameter<bool> bShowImage;
     ofParameter<bool> bShowDebug;
+    
+    ofParameter<bool> bUseCanny1;
+
 
 
     ofParameterGroup imageparameters;
@@ -241,8 +244,16 @@ class ofApp : public ofBaseApp{
     vector<ofPolyline> mouth;
     
     vector<ofPolyline> linesToDraw1;
+    
+    vector<ofPolyline> half_linesToDraw1;
+
+    
+    
     vector<ofPolyline> linesToDraw2;
     vector<ofPolyline> linesToDraw3;
+    
+    vector<ofPolyline> medianlines;
+
     
     vector<ofPolyline> linesToPrint;
 

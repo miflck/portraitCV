@@ -571,8 +571,15 @@ void ofApp::makePolylines(){
             polyline.addVertex(quad[i].x, quad[i].y);
         }
         
-        for(int i = 0; i < quad.size()/2; i++) {
+        
+        
+       /* for(int i = 0; i < quad.size()/2; i++) {
             polyline_half.addVertex(quad[i].x, quad[i].y);
+        }*/
+        
+        for (int p=0; p<50; p+=5) {
+            ofVec2f point =  polyline_line.getPointAtPercent(p/100.0);  // Returns a point at a percentage along the polyline
+            polyline_half.addVertex(point);
         }
         
         
@@ -612,14 +619,18 @@ void ofApp::makePolylines(){
 
         
         //cout<<"n "<<k<<" arc length "<<contourFinder.getArcLength(k)<<endl;
-        if(polyline.getPerimeter()>1&& polyline.getPerimeter()>area1min && ABS(polyline.getPerimeter())<area1max){
+        if(poly){
+
+            if(polyline.getPerimeter()>1&& polyline.getPerimeter()>area1min && ABS(polyline.getPerimeter())<area1max){
            /* if(linesToDraw1.size()>0){
                 ofPolyline p;
                 p.addVertex(linesToDraw1.back().getPointAtPercent(100));
                 p.addVertex(polyline.getPointAtPercent(0));
                 linesToDraw1.push_back(p);
             }*/
-            linesToDraw1.push_back(polyline);
+                linesToDraw1.push_back(polyline);
+            }
+            
         }
         
         if(polyline_half.getPerimeter()>1&& polyline_half.getPerimeter()>area1min && ABS(polyline_half.getPerimeter())<area1max){
@@ -631,7 +642,8 @@ void ofApp::makePolylines(){
              }*/
             half_linesToDraw1.push_back(polyline_half);
         }
-        
+        if(poly2){
+
         if(polyline2.getPerimeter()>1 && polyline2.getPerimeter()>area2min && ABS(polyline2.getPerimeter())<area2max){
             
            /* if(linesToDraw2.size()>0){
@@ -644,6 +656,10 @@ void ofApp::makePolylines(){
             linesToDraw2.push_back(polyline2);
 
         }
+        }
+        
+        if(poly3){
+       
         
         if(ABS(polyline3.getPerimeter())>1&& polyline3.getPerimeter()>area3min && ABS(polyline3.getPerimeter())<area3max){
            /* if(linesToDraw3.size()>0){
@@ -654,12 +670,15 @@ void ofApp::makePolylines(){
             }*/
         linesToDraw3.push_back(polyline3);
         }
+        }
         
     }
     
     
    ofSort(linesToDraw1, sortByArea);
    ofSort(linesToDraw2, sortByArea);
+    ofSort(half_linesToDraw1, sortByArea);
+
     
     //linesToPrint=linesToDraw1;
     linesToPrint=half_linesToDraw1;

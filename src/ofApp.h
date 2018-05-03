@@ -140,6 +140,9 @@ class ofApp : public ofBaseApp{
     ofParameter<bool> poly;
     ofParameter<bool> poly2;
     ofParameter<bool> poly3;
+    ofParameter<bool> polymedian;
+    ofParameter<bool> polyhalf;
+
 
     
     

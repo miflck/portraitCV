@@ -34,9 +34,9 @@
 	<quadsmooth>3</quadsmooth>
 <dilateErode>0</dilateErode>
 <Dispaly>
-		<bShowCanny>1</bShowCanny>
+		<bShowCanny>0</bShowCanny>
 	<bShowImage>0</bShowImage>
-	<bShowDebug>1</bShowDebug>
+	<bShowDebug>0</bShowDebug>
 	<bShowCanny2>1</bShowCanny2>
 	<bUseCanny1>0</bUseCanny1>
 	</Dispaly>
@@ -128,5 +128,5 @@
 	<dipPosX>0</dipPosX>
 		<dipPosY>-125</dipPosY>
 	</Robot>
-<scaleScreen>0.845</scaleScreen>
+<scaleScreen>0.76</scaleScreen>
 </group>

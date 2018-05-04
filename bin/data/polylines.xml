@@ -25,12 +25,12 @@
 		<area_half_max>3</area_half_max>
 		</Polyline_1>
 		<Polyline_2>
-			<quadsmooth>9</quadsmooth>
+			<quadsmooth>6</quadsmooth>
 			<resample2>10.4457</resample2>
 			<smooth2>0.548732</smooth2>
 			<simplify2>5.31863</simplify2>
-			<area2_min>50</area2_min>
-			<area2_max>241</area2_max>
+			<area2_min>37</area2_min>
+			<area2_max>657</area2_max>
 		</Polyline_2>
 		<Polyline_3>
 			<quadfine>10</quadfine>
@@ -46,7 +46,7 @@
 		<poly3>1</poly3>
 	<Polyline_Half>
 			<resample_half>0</resample_half>
-			<polyhalf_percent>14.0306</polyhalf_percent>
+			<polyhalf_percent>4.59186</polyhalf_percent>
 			<simplify_half>0.112461</simplify_half>
 			<area_half_min>34</area_half_min>
 			<area_half_max>837</area_half_max>

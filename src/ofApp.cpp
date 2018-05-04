@@ -38,9 +38,13 @@ void ofApp::setup(){
     
     
     img.load("michaelflueckiger.jpeg");
-    img.crop(0, 0, 1000, 788);
-    colorImg.allocate(1000,788);
-    grayImage.allocate(1000,788);
+    //img.load("Brad_Pitt_Fury_2014.jpg");
+
+    
+    
+   // img.crop(0, 0, 1000, 788);
+   // colorImg.allocate(1000,788);
+   // grayImage.allocate(1000,788);
     meanCanny.allocate(grayImage.getWidth(), grayImage.getHeight());
     
     
@@ -274,7 +278,7 @@ static bool sortByCriteriaX(const ofPolyline &a, const ofPolyline &b){
 }
 
 static bool sortByArea(const ofPolyline &a, const ofPolyline &b){
-  if(a.getPerimeter() > 100 || b.getPerimeter()>100){
+  if(a.getPerimeter() > 70 || b.getPerimeter()>70){
         return a.getPerimeter() > b.getPerimeter();
     }else{
         return a.getBoundingBox().x < b.getBoundingBox().x;
@@ -668,7 +672,7 @@ void ofApp::makePolylines(){
         }
     }
     
-    ofSort(linesToPrint, sortByDistance);
+    ofSort(linesToPrint, sortByArea);
     
     linesToAnimate=linesToDraw1;
     

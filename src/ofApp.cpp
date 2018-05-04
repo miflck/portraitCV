@@ -1,5 +1,4 @@
 #include "ofApp.h"
-#include "ofxDelaunay2D.h"
 
 using namespace ofxCv;
 using namespace cv;
@@ -33,6 +32,12 @@ void ofApp::setup(){
     bool        bSendSerialMessage=false;            // a flag for sending serial
     message = "";
     remember = false;
+    
+    
+    
+    dmx.connect("tty.usbserial-EN210513"); // use the name
+    dmxValue=0;
+    
     
     //0ofSetLogLevel(OF_LOG_VERBOSE);
     
@@ -235,6 +240,11 @@ void ofApp::setup(){
 //--------------------------------------------------------------
 void ofApp::update(){
     
+    // DMX
+    dmx.setLevel(1, dmxValue);
+    dmx.update();
+    
+    
     if(bUseArduino){
         if(message != "" && remember == false)
     {
@@ -242,6 +252,10 @@ void ofApp::update(){
         serial.writeString(message);
         message = "";
     }
+        
+        
+        
+        
     
     if (done && bSendFeed &&!bGoHome)sendFeed();
     if(done && bGoHome){
@@ -1286,6 +1300,9 @@ void ofApp::keyPressed(int key){
         goDip();
     }
  
+    if(key=='1'){
+        dmxValue < 127 ? dmxValue =255 : dmxValue=0;
+    }
     
 }
 

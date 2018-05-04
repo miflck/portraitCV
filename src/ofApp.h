@@ -5,6 +5,7 @@
 #include "ofxGui.h"
 #include "ofxOpenCv.h"
 #include "ofxSimpleSerial.h"
+#include "ofxDmx.h"
 
 
 using namespace ofxCv;
@@ -309,7 +310,9 @@ class ofApp : public ofBaseApp{
     float scaleRatio;
     
 
-
+// DMX
+    ofxDmx dmx;
+    int dmxValue;
 
     
 };

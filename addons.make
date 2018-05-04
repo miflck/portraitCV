@@ -1,4 +1,5 @@
 ofxCv
-ofxDelaunay2D
+ofxDmx
 ofxGui
 ofxOpenCv
+ofxSimpleSerial

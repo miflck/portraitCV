@@ -22,7 +22,6 @@
 			<simplify>3.65265</simplify>
 			<area1_min>2</area1_min>
 			<area1_max>2378</area1_max>
-		<area_half_max>3</area_half_max>
 		</Polyline_1>
 		<Polyline_2>
 			<quadsmooth>9</quadsmooth>
@@ -44,14 +43,25 @@
 		<poly>1</poly>
 		<poly2>1</poly2>
 		<poly3>1</poly3>
-	<Polyline_Half>
-			<resample_half>3</resample_half>
-			<polyhalf_percent>5</polyhalf_percent>
-			<simplify_half>0</simplify_half>
-			<area_half_min>3</area_half_min>
-			<area_half_max>3</area_half_max>
-		</Polyline_Half>
-		<polyhalf>0</polyhalf>
 	</Contourfinder_1>
 <group/>
+<Canny_1>
+		<dilateErode>0</dilateErode>
+		<mincanny>80</mincanny>
+		<maxcanny>100</maxcanny>
+		<cannyblur>0</cannyblur>
+		<cannycontrast>0</cannycontrast>
+		<brightness>0</brightness>
+	<Threshold>128</Threshold>
+	</Canny_1>
+<Canny_2>
+		<dilateErode2>0</dilateErode2>
+		<mincanny2>435.714</mincanny2>
+		<maxcanny2>864.286</maxcanny2>
+		<cannyblur2>2.55102</cannyblur2>
+		<cannycontrast2>-0.142857</cannycontrast2>
+		<brightness2>0.27551</brightness2>
+	<Threshold_2>67.6531</Threshold_2>
+	</Canny_2>
+	<bUseCanny1>0</bUseCanny1>
 </group>

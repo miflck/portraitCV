@@ -36,12 +36,13 @@
 <Dispaly>
 		<bShowCanny>0</bShowCanny>
 	<bShowImage>0</bShowImage>
-	<bShowDebug>1</bShowDebug>
+	<bShowDebug>0</bShowDebug>
+	<bShowCanny2>0</bShowCanny2>
 	</Dispaly>
 	<Image>
 		<contrast>0.326531</contrast>
-		<brightness>-0.510204</brightness>
-		<blur>0</blur>
+		<brightness>0.285714</brightness>
+		<blur>5.40816</blur>
 		<zoom>1.14286</zoom>
 	</Image>
 	<Contourfinder_1>
@@ -104,10 +105,10 @@
 		<poly3>1</poly3>
 	</Contourfinder_1>
 	<Contourfinder_2>
-		<Min_area2>1</Min_area2>
-		<Max_area2>200</Max_area2>
-		<mincanny2>80</mincanny2>
-		<maxcanny2>100</maxcanny2>
+		<Min_area2>5.57653</Min_area2>
+		<Max_area2>500</Max_area2>
+		<mincanny2>725</mincanny2>
+		<maxcanny2>837.245</maxcanny2>
 		<Holes2>1</Holes2>
 	</Contourfinder_2>
 	<Robot>

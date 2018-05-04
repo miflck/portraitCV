@@ -34,11 +34,10 @@
 	<quadsmooth>3</quadsmooth>
 <dilateErode>0</dilateErode>
 <Dispaly>
-		<bShowCanny>1</bShowCanny>
+		<bShowCanny>0</bShowCanny>
 	<bShowImage>0</bShowImage>
 	<bShowDebug>0</bShowDebug>
-	<bShowCanny2>1</bShowCanny2>
-	<bUseCanny1>0</bUseCanny1>
+	<bShowCanny2>0</bShowCanny2>
 	</Dispaly>
 	<Image>
 		<contrast>-0.234694</contrast>

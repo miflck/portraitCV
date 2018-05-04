@@ -44,7 +44,6 @@ class ofApp : public ofBaseApp{
     int inittime;
     
     
-    
     // Serial
     ofxSimpleSerial    serial;
     string        message;
@@ -52,6 +51,8 @@ class ofApp : public ofBaseApp{
     void        onNewMessage(string & message);
     
     void sendFeed();
+    void sendFinalFeed();
+    void clearCommands();
     void makeFeed();
     
     void makeBoundingRectFeed();
@@ -61,6 +62,9 @@ class ofApp : public ofBaseApp{
     void penUp();
     void penDown();
     void goHome();
+    
+    void waitPos();
+    
     bool bGoHome;
     vector<string> commands;
     bool done=true;
@@ -80,26 +84,16 @@ class ofApp : public ofBaseApp{
     ofxCv::ObjectFinder haarfinder;
 
     
-    
-  
-    
-    
     ofxPanel gui;
     ofxPanel polylinesPanel;
-    
     ofxPanel cannyPanel;
 
-
-    
     ofParameter<bool> bShowCanny;
     ofParameter<bool> bShowCanny2;
     ofParameter<bool> bShowImage;
     ofParameter<bool> bShowDebug;
     
-    
     ofParameter<bool> bUseCanny1;
-
-
 
     ofParameterGroup imageparameters;
     ofParameter<float>          contrast;
@@ -216,6 +210,10 @@ class ofApp : public ofBaseApp{
     ofParameter<int>          penDrawPos;
     ofParameter<int>            dipPosX;
     ofParameter<int>            dipPosY;
+    
+    ofParameter<int>            waitPosX;
+    ofParameter<int>            waitPosY;
+
 
     ofParameter<int>            eyeAreamin;
     ofParameter<int>            eyeAreamax;
@@ -248,29 +246,20 @@ class ofApp : public ofBaseApp{
     
     ofMesh m_triangulation;
     vector<ofVec2f> m_points;
-    
     vector<ofPolyline> allContours;
     vector<ofPolyline> eyes;
     vector<ofPolyline> mouth;
-    
     vector<ofPolyline> linesToDraw1;
-    
     vector<ofPolyline> half_linesToDraw1;
 
-    
-    
     vector<ofPolyline> linesToDraw2;
     vector<ofPolyline> linesToDraw3;
-    
     vector<ofPolyline> medianlines;
-
-    
     vector<ofPolyline> linesToPrint;
 
     
     
 
-    
     
     vector<ofPolyline> linesToAnimate;
     int animationPolylineIndex=0;
@@ -280,11 +269,7 @@ class ofApp : public ofBaseApp{
     
     ofRectangle faceBoundingBox;
     ofRectangle faceBoundingBoxOriginal;
-
     ofRectangle eyeBoundingBox;
-
-
-
 
     int drawcounter=0;
     

@@ -127,6 +127,8 @@
 		<penDrawPos>180</penDrawPos>
 	<dipPosX>0</dipPosX>
 		<dipPosY>-125</dipPosY>
+	<waitPosX>561</waitPosX>
+	<waitPosY>1000</waitPosY>
 	</Robot>
 <scaleScreen>0.76</scaleScreen>
 </group>

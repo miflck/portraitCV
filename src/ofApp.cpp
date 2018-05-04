@@ -222,6 +222,10 @@ void ofApp::setup(){
     
     robot.add(dipPosX.set("dipPosX", 0, 0, -300));
     robot.add(dipPosY.set("dipPosY", 0, 0, -300));
+    
+    
+    robot.add(waitPosX.set("waitPosX", 0, -1000, 1000));
+    robot.add(waitPosY.set("waitPosY", 1000, 0, 1000));
 
     
     gui.add(robot);
@@ -1041,6 +1045,27 @@ void ofApp::sendFeed(){
     
 }
 
+
+void ofApp::sendFinalFeed(){
+    if (commands.size()>0) {
+        cout<<commands.size()<<" commands in buffer"<<endl;
+        string cmd;
+
+        for(int i=0;i<commands.size();i++){
+            cmd += commands[i];
+            cout<<"command " <<cmd<<endl;
+            cmd+='\n';
+        }
+        done=false;
+        message = cmd;
+        remember = false;
+    }
+}
+
+void ofApp::clearCommands(){
+    commands.clear();
+}
+
 void ofApp::waitPen(int mil){
     string cmd = "M12 "+ofToString(mil)+"d";
     commands.push_back(cmd);
@@ -1087,13 +1112,24 @@ void ofApp::penDown(){
 }
 
 void ofApp::goHome(){
-    penUp();
+    penHighUp();
     string cmd = "G1 X"+ofToString(int(0))+" Y"+ofToString(int(0));
     commands.push_back(cmd);
     remember = false;
     bSendFeed=true;
     done=true;
 }
+
+
+void ofApp::waitPos(){
+    penUp();
+    string cmd = "G1 X"+ofToString(waitPosX)+" Y"+ofToString(waitPosY);
+    commands.push_back(cmd);
+    remember = false;
+    bSendFeed=true;
+    done=true;
+}
+
 
 void ofApp::goDip(){
     turnIdle();
@@ -1304,6 +1340,13 @@ void ofApp::keyPressed(int key){
         dmxValue < 127 ? dmxValue =255 : dmxValue=0;
     }
     
+    
+    if(key=='w'){
+        turnDraw();
+        waitPos();
+        turnIdle();
+    }
+    
 }
 
 //--------------------------------------------------------------
@@ -1361,5 +1404,13 @@ void ofApp::exit(){
     dmxValue=0;
     dmx.setLevel(1, dmxValue);
     dmx.update();
+    clearCommands();
+    goHome();
+    sendFinalFeed();
+    serial.writeString(message);
+    ofSleepMillis(2000);
+    turnDraw();
+    sendFinalFeed();
+    serial.writeString(message);
+    ofSleepMillis(2000);
 }
-

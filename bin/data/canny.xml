@@ -58,7 +58,7 @@
 		<dilateErode2>0</dilateErode2>
 		<mincanny2>435.714</mincanny2>
 		<maxcanny2>864.286</maxcanny2>
-		<cannyblur2>2.55102</cannyblur2>
+		<cannyblur2>3.57143</cannyblur2>
 		<cannycontrast2>-0.142857</cannycontrast2>
 		<brightness2>0.27551</brightness2>
 	<Threshold_2>67.6531</Threshold_2>

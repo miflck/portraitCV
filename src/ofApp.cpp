@@ -15,7 +15,7 @@ int baud = 115200;
 char myByte = 0;
 string cmd;
 
-bool bUseArduino=false;
+bool bUseArduino=true;
 
 //--------------------------------------------------------------
 void ofApp::setup(){
@@ -1355,3 +1355,11 @@ void ofApp::gotMessage(ofMessage msg){
 void ofApp::dragEvent(ofDragInfo dragInfo){ 
 
 }
+
+//--------------------------------------------------------------
+void ofApp::exit(){
+    dmxValue=0;
+    dmx.setLevel(1, dmxValue);
+    dmx.update();
+}
+

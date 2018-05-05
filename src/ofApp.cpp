@@ -23,9 +23,19 @@ void ofApp::setup(){
   serial.listDevices();
     if(bUseArduino) {
         vector <ofSerialDeviceInfo> deviceList = serial.getDeviceList();
-        serial.setup(0, baud); //open the first device
+        serial.setup("tty.wchusbserial1420", baud); //open the first device
         serial.startContinuousRead(false);
         ofAddListener(serial.NEW_MESSAGE,this,&ofApp::onNewMessage);
+        
+        
+        
+       button.setup("tty.usbmodem4013231", 9600); //open the first device
+        
+        // serial.setup("/dev/tty.usbserial-A70060V8", 9600);
+        button.startContinuousRead();
+        ofAddListener(button.NEW_MESSAGE,this,&ofApp::onNewButtonMessage);
+        
+        
     }
     
     
@@ -243,6 +253,18 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
+    switch (state) {
+        case IDLE:
+            turnLightsOn();
+            break;
+            
+        case DRAWING:
+            turnLightsOff();
+            break;
+            
+        default:
+            break;
+    }
     
     // DMX
     dmx.setLevel(1, dmxValue);
@@ -270,6 +292,7 @@ void ofApp::update(){
     }
     
     cam.update();
+    
     if(continousDraw){
         if(ofGetElapsedTimeMillis()-inittime>timerduration){
         makeNewPortrait();
@@ -277,12 +300,19 @@ void ofApp::update(){
         inittime=ofGetElapsedTimeMillis();
         }
     }
-  if(record) makeContours();
     
     if(bMakeContours)  {
         makeContours();
         bMakeContours=false;
     }
+    
+    if(record){
+       // makeContours();
+        record=false;
+        state=DRAWING;
+        makeFeed();
+    }
+    
     
 }
 
@@ -703,20 +733,7 @@ void ofApp::makePolylines(){
     
     
 
-    if(record){
 
-/*
-        linesToPrint=linesToDraw1;
-        for(int i=0;i<linesToDraw2.size();i++){
-            linesToPrint.push_back(linesToDraw2[i]);
-        }
-        for(int i=0;i<linesToDraw3.size();i++){
-            linesToPrint.push_back(linesToDraw3[i]);
-        }
-    */
-        record=false;
-        makeFeed();
-    }
     
 }
 
@@ -1248,6 +1265,15 @@ void ofApp::onNewMessage(string & message)
     
 }
 
+void ofApp::onNewButtonMessage(string & message)
+{
+    cout << "onNewButtonMessage, message: " << message << "\n";
+    if(message=="1"){
+        makeNewPortrait();
+        makeContours();
+    }
+}
+
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
     if(key == ' '){
@@ -1413,4 +1439,11 @@ void ofApp::exit(){
     sendFinalFeed();
     serial.writeString(message);
     ofSleepMillis(2000);
+}
+
+void ofApp::turnLightsOn(){
+    dmxValue =255;
+}
+void ofApp:: turnLightsOff(){
+     dmxValue=0;
 }

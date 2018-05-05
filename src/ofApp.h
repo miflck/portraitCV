@@ -7,6 +7,8 @@
 #include "ofxSimpleSerial.h"
 #include "ofxDmx.h"
 
+#define IDLE 100
+#define DRAWING 200
 
 using namespace ofxCv;
 using namespace cv;
@@ -32,7 +34,7 @@ class ofApp : public ofBaseApp{
 		void gotMessage(ofMessage msg);
     
     
-    
+    int state=IDLE;
     
     void makeNewPortrait();
     void makeContours();
@@ -49,6 +51,13 @@ class ofApp : public ofBaseApp{
     string        message;
     bool        remember;
     void        onNewMessage(string & message);
+    
+    
+    ofxSimpleSerial    button;
+    void        onNewButtonMessage(string & message);
+
+    
+    
     
     void sendFeed();
     void sendFinalFeed();
@@ -299,6 +308,7 @@ class ofApp : public ofBaseApp{
 // DMX
     ofxDmx dmx;
     int dmxValue;
-
+    void turnLightsOn();
+    void turnLightsOff();
     
 };

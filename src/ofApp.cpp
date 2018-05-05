@@ -45,7 +45,6 @@ void ofApp::setup(){
     
     bool        bSendSerialMessage=false;            // a flag for sending serial
     message = "";
-    remember = false;
     
     
     
@@ -265,7 +264,7 @@ void ofApp::update(){
     
     
     if(bUseArduino){
-        if(message != "" && remember == false)
+        if(message != "")
     {
         cout << "sending message: " << message << "\n";
         serial.writeString(message);
@@ -276,7 +275,7 @@ void ofApp::update(){
         
         
     
-        if (done && bSendFeed &&!bGoHome){
+        if (done &&!bGoHome){
             sendFeed();
         }
         
@@ -933,7 +932,6 @@ void ofApp::sendFeed(){
         commands.erase(commands.begin());
         done=false;
         message = cmd;
-        remember = false;
     }
 }
 
@@ -950,7 +948,6 @@ void ofApp::sendFinalFeed(){
         }
         done=false;
         message = cmd;
-        remember = false;
     }
 }
 
@@ -1007,8 +1004,6 @@ void ofApp::goHome(){
     penHighUp();
     string cmd = "G1 X"+ofToString(int(0))+" Y"+ofToString(int(0));
     commands.push_back(cmd);
-    remember = false;
-    bSendFeed=true;
     done=true;
 }
 
@@ -1017,8 +1012,6 @@ void ofApp::waitPos(){
     penUp();
     string cmd = "G1 X"+ofToString(waitPosX)+" Y"+ofToString(waitPosY);
     commands.push_back(cmd);
-    remember = false;
-    bSendFeed=true;
     done=true;
 }
 
@@ -1042,8 +1035,6 @@ void ofApp::goDip(){
     turnIdle();
     turnDraw();
     goHome();
-    remember = false;
-    bSendFeed=true;
     done=true;
 }
 
@@ -1078,7 +1069,6 @@ void ofApp::makeFeed(){
         //cout<<commands[i]<<endl;
     }
     
-    bSendFeed=true;
     done=true;
     
 }
@@ -1124,7 +1114,6 @@ void ofApp::makeBoundingRectFeed(){
     commands.push_back(cmd);
     
     cout<<commands.size()<<endl;
-    bSendFeed=true;
     done=true;
 }
 
@@ -1182,16 +1171,12 @@ void ofApp::keyPressed(int key){
     
     if(key=='u'){
         penUp();
-        remember = false;
-        bSendFeed=true;
         done=true;
 
     }
     
     if(key=='d'){
         penDown();
-        remember = false;
-        bSendFeed=true;
         done=true;
 
     }
@@ -1205,15 +1190,11 @@ void ofApp::keyPressed(int key){
     
     if(key=='i'){
         turnIdle();
-        remember = false;
-        bSendFeed=true;
         done=true;
     }
     
     if(key=='I'){
         turnDraw();
-        remember = false;
-        bSendFeed=true;
         done=true;
     }
     

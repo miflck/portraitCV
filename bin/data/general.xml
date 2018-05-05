@@ -39,6 +39,7 @@
 	<bShowDebug>0</bShowDebug>
 	<bShowCanny2>1</bShowCanny2>
 	<bUseCanny1>0</bUseCanny1>
+	<bShowDebugLines>0</bShowDebugLines>
 	</Dispaly>
 	<Image>
 		<contrast>-0.234694</contrast>
@@ -123,7 +124,7 @@
 		<penHighUpPos>41</penHighUpPos>
 		<penHighDownPos>30</penHighDownPos>
 		<penDownPos>164</penDownPos>
-		<penIdlePos>11</penIdlePos>
+		<penIdlePos>4</penIdlePos>
 		<penDrawPos>180</penDrawPos>
 	<dipPosX>0</dipPosX>
 		<dipPosY>-125</dipPosY>

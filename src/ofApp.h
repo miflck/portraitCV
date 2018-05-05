@@ -49,7 +49,6 @@ class ofApp : public ofBaseApp{
     // Serial
     ofxSimpleSerial    serial;
     string        message;
-    bool        remember;
     void        onNewMessage(string & message);
     
     
@@ -77,7 +76,7 @@ class ofApp : public ofBaseApp{
     bool bGoHome;
     vector<string> commands;
     bool done=true;
-    bool bSendFeed=false;
+    //bool bSendFeed=false;
 
 		
     ofVideoGrabber cam;

@@ -244,8 +244,13 @@ void ofApp::update(){
         case DRAWING:
             turnLightsOff();
             if(commands.size()<=0){
-                goHome();
+                
+                turnDraw();
+                waitPos();
                 turnIdle();
+                
+              //  goHome();
+              //  turnIdle();
                 state=IDLE;
             }
             break;

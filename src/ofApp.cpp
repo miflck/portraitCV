@@ -20,6 +20,10 @@ bool bUseArduino=true;
 //--------------------------------------------------------------
 void ofApp::setup(){
     
+    font.load("frabk.ttf", 30);
+
+    
+    
   serial.listDevices();
     if(bUseArduino) {
         vector <ofSerialDeviceInfo> deviceList = serial.getDeviceList();
@@ -55,45 +59,22 @@ void ofApp::setup(){
     img.load("michaelflueckiger.jpeg");
     //img.load("Brad_Pitt_Fury_2014.jpg");
 
-    
-    
-   // img.crop(0, 0, 1000, 788);
-   // colorImg.allocate(1000,788);
-   // grayImage.allocate(1000,788);
-    meanCanny.allocate(grayImage.getWidth(), grayImage.getHeight());
-    
+ 
     
     colorImg.setFromPixels(img.getPixels());
     grayImage=colorImg;
-    //grayImage.threshold(200);
-    //grayImage.erode();
-    //grayImage.dilate();
-    
-    
-    /*
-    img.load("michaelflueckiger.jpeg");
-    //img.crop(0, 0, 1000, 788);
-    colorImg.allocate(img.getWidth(),img.getHeight());
-    grayImage.allocate(img.getWidth(),img.getHeight());
-    meanCanny.allocate(grayImage.getWidth(), grayImage.getHeight());
-
-
-    colorImg.setFromPixels(img.getPixels());
-    grayImage=colorImg;*/
-    //grayImage.threshold(200);
-    //grayImage.erode();
-    //grayImage.dilate();
-    
-    
    
     
-   
     cam.listDevices();
     cam.setDeviceID(1);
 
    // cam.setup(1920,1080);
     cam.setup( 1600, 896);
    
+    
+    face.allocate(1600, 896);
+
+    
     
     gui.setup("General","general.xml",300,10);
     polylinesPanel.setup("Polylines","polylines.xml",10,10);
@@ -104,6 +85,7 @@ void ofApp::setup(){
     display.add(bShowCanny.set("bShowCanny",false));
     display.add(bShowCanny2.set("bShowCanny2",false));
     display.add(bShowDebug.set("bShowDebug",false));
+    display.add(bShowDebugLines.set("bShowDebugLines",false));
     gui.add(display);
 
     imageparameters.setName("Image");
@@ -247,6 +229,7 @@ void ofApp::setup(){
     cannyPanel.loadFromFile("canny.xml");
     
     ofBackground(0);
+    //makeNewPortrait();
     makeContours();
     inittime=ofGetElapsedTimeMillis();
 }
@@ -260,6 +243,11 @@ void ofApp::update(){
             
         case DRAWING:
             turnLightsOff();
+            if(commands.size()<=0){
+                goHome();
+                turnIdle();
+                state=IDLE;
+            }
             break;
             
         default:
@@ -283,15 +271,30 @@ void ofApp::update(){
         
         
     
-    if (done && bSendFeed &&!bGoHome)sendFeed();
-    if(done && bGoHome){
-        goHome();
-        bGoHome=false;
-    }
+        if (done && bSendFeed &&!bGoHome){
+            sendFeed();
+        }
+        
+        
+        if(done && bGoHome){
+            goHome();
+            bGoHome=false;
+        }
         
     }
     
     cam.update();
+    if(cam.isFrameNew()){
+        ofxCvColorImage  c;
+        c.allocate(cam.getWidth(),cam.getHeight());
+        c.setFromPixels(cam.getPixels());
+        face=c;
+        face.mirror(false,true);
+        face.transform(0, face.getWidth()/2, face.getHeight()/2, zoomfact, zoomfact, 0, 0);
+
+        
+    }
+
     
     if(continousDraw){
         if(ofGetElapsedTimeMillis()-inittime>timerduration){
@@ -352,18 +355,10 @@ void ofApp::makeContours(){
     if(canny.getWidth()!=grayImage.getWidth()){
     canny.allocate(grayImage.getWidth(), grayImage.getHeight());
     }
-      //  canny2.allocate(grayImage.getWidth(), grayImage.getHeight());
-   
-    if(meanCanny.getWidth()!=grayImage.getWidth()){
-        meanCanny.allocate(grayImage.getWidth(), grayImage.getHeight());
-    }
-    
     if(canny2.getWidth()!=grayImage.getWidth()){
         canny2.allocate(grayImage.getWidth(), grayImage.getHeight());
     }
-    
-    //}
-    
+
     cvCanny(zoom.getCvImage(), canny.getCvImage(), mincanny, maxcanny,3);
     canny.blur(cannyblur);
     canny.threshold(threshold);
@@ -377,8 +372,6 @@ void ofApp::makeContours(){
         canny.erode();
     }
     canny.brightnessContrast(cannybrightness,cannycontrast);
-
-
     canny.flagImageChanged();
     zoom.blur(blur);
     
@@ -391,20 +384,13 @@ void ofApp::makeContours(){
         canny2.erode();
     }
     
-     canny2.blur(cannyblur2);
+    canny2.blur(cannyblur2);
     canny2.brightnessContrast(cannybrightness2,cannycontrast2);
-     canny2.threshold(threshold2);
-    
+    canny2.threshold(threshold2);
     canny2.flagImageChanged();
-
-  //  meanCanny-=canny2;
-   // meanCanny.absDiff(canny,canny2);
-
     
     finder.setup("haarcascade_frontalface_default.xml");
-    finder.findHaarObjects(zoom,100,100);
-    
-
+    finder.findHaarObjects(zoom,150,150);
     if(finder.blobs.size()>0){
         ofRectangle cur =finder.blobs[0].boundingRect;
         faceBoundingBox = finder.blobs[0].boundingRect;
@@ -430,12 +416,7 @@ void ofApp::makeContours(){
         
         faceBoundingBox.y-=dy;
         faceBoundingBoxOriginal.y-=dy;
-        cout<<"hy"<<hy<<endl;
        faceBoundingBox.height=hy;
-        
-       //canny.setROI(cur.x-200, cur.y-400, cur.width+200, cur.height+400);
-
-        //cam_mat = toCv(canny2);
 
         if(bUseCanny1){
             cam_mat = toCv(canny);
@@ -450,7 +431,6 @@ void ofApp::makeContours(){
 
         contourFinder.setMinAreaRadius(minArea);
         contourFinder.setMaxAreaRadius(maxArea);
-        //contourFinder.setThreshold(threshold);
         contourFinder.setSimplify(simply);
         contourFinder.setFindHoles(holes);
         contourFinder.findContours(crop);
@@ -493,7 +473,7 @@ void ofApp::makeContours(){
 
     }
     makePolylines();
-    makeEyePolylines();
+  //  makeEyePolylines();
 }
 
 
@@ -505,38 +485,24 @@ void ofApp::makeEyePolylines(){
     for(int k=0;k<n;k++){
         vector<cv::Point> quad;
         approxPolyDP(contourFinder2.getContour(k),quad, eyequad ,true);
-
         ofPolyline polyline;
         for(int i = 0; i < quad.size(); i++) {
             polyline.addVertex(quad[i].x, quad[i].y);
         }
-        
         polyline = polyline.getResampledBySpacing(eyeresample);
         polyline = polyline.getSmoothed(eyesmooth);
         polyline.simplify(eyesimplify);
-        
-        //cout<<"n "<<k<<" arc length "<<contourFinder.getArcLength(k)<<endl;
         if(polyline.getPerimeter()>1&& polyline.getPerimeter()>eyeAreamin && ABS(polyline.getPerimeter())<eyeAreamax){
             eyes.push_back(polyline);
         }
-        
     }
     cout<<"Eyes poly"<<eyes.size()<<endl;
-    
-    
 }
 
 
 void ofApp::makePolylines(){
   
-    
-    
     int n = contourFinder.size();
-    int n2 = contourFinder2.size();
-    
-    //ofPolyline polyline;
-   // vector<ofPoint> points;
-   // vector<ofPolyline> polylines;
     
     //clear all lines
     linesToDraw1.clear();
@@ -741,6 +707,35 @@ void ofApp::makePolylines(){
 //--------------------------------------------------------------
 void ofApp::draw(){
     
+    
+    
+    switch (state) {
+        case IDLE:
+            face.draw(0,0,face.getWidth(),face.getHeight());
+            ofPushStyle();
+            ofNoFill();
+            ofSetColor(255,0,0);
+            ofDrawEllipse(face.getWidth()/2,face.getHeight()/2,600,face.getHeight()-50);
+            ofPopStyle();
+
+            break;
+        
+          case DRAWING:
+            ofPushStyle();
+            ofSetColor(0, 0, 0);
+            ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
+            ofSetColor(255);
+            font.drawString("Busy", ofGetWidth()/2-500, ofGetHeight()/2-100);
+            font.drawString(ofToString(commands.size())+" commands to go", ofGetWidth()/2-500, ofGetHeight()/2);
+            ofPopStyle();
+
+            break;
+            
+        default:
+            break;
+    }
+    
+    
     if(bShowDebug){
     zoom.draw(ofGetWidth()-grayImage.getWidth()/3,0,grayImage.getWidth()/3,grayImage.getHeight()/3);
 
@@ -753,7 +748,7 @@ void ofApp::draw(){
     ofPushStyle();
     ofSetColor(255);
     
-        if(!bShowCanny){
+    if(!bShowCanny){
          canny.draw(ofGetWidth()-canny.getWidth()/3, canny.getHeight()/3*2,canny.getWidth()/3,canny.getHeight()/3);
     }else{
        canny.draw(0,0);
@@ -766,247 +761,144 @@ void ofApp::draw(){
             canny2.draw(0,0);
 
         }
+        ofPopStyle();
     }
-    //finder.blobs[0].draw();
-        
-   //
-
-   // meanCanny.draw(ofGetWidth()-canny.getWidth()/3, canny.getHeight()/3*3,canny.getWidth()/3,canny.getHeight()/3);
-
-    // canny.draw(0,0);
-    ofPopStyle();
-    //zoom.draw(ofGetWidth()-grayImage.getWidth()/3,0,grayImage.getWidth()/3,grayImage.getHeight()/3);
     
-    //zoom.draw(ofGetWidth()-zoom.getWidth()/3,zoom.getHeight()/3*3,zoom.getWidth()/3,zoom.getHeight()/3);
 
-    
-    ofPushMatrix();
-    ofScale(scaleScreen,scaleScreen);
+    if(bShowDebugLines){
 
-   // ofScale(2,2);
-   //contourFinder.draw();
-    //ofTranslate(faceBoundingBox.getPosition().x,faceBoundingBox.getPosition().y);
-    ofPushStyle();
-    ofNoFill();
-    ofSetLineWidth(2);
-    for(int i = 0; i < (int)contourFinder.getPolylines().size(); i++) {
-         ofSetColor(255);
-        
-        if (contourFinder.getContourArea(i)>30){
-            ofSetColor(255,0,0);
-        }
-        if (contourFinder.getContourArea(i)>80){
-            ofSetColor(0,255,0);
-        }
-        if (contourFinder.getContourArea(i)>100){
-            ofSetColor(0,0,255);
-        }
-        if (contourFinder.getContourArea(i)>300){
-            ofSetColor(255,255,0);
-        }
-        
-        if (contourFinder.getContourArea(i)>800){
-            ofSetColor(0,255,255);
-        }
-        
-        if (contourFinder.getContourArea(i)>5000){
-            ofSetColor(255,0,255);
-        }
-        contourFinder.getPolylines()[i].draw();
-    }
-    ofPopStyle();
-    ofPopMatrix();
-    
-   // haarfinder.draw();
-  
-    
-    ofPushMatrix();
-    //ofScale(0.7,0.7);
-    ofTranslate(1400, 0);
-    ofScale(scaleScreen,scaleScreen);
-
-    ofPushStyle();
-  /*  for(int i = 0; i < linesToAnimate.size(); i++) {
-     //   linesToAnimate[i].draw();
-        for (int p=0; p<100; p+=10) {
-            ofVec3f point =  linesToAnimate[i].getPointAtPercent(p/100.0);  // Returns a point at a percentage along the polyline
-            ofDrawCircle(point, 2);
-        }
-        
-       /* if(linesToAnimate[i].getPerimeter()>100){
-        vector<ofVec3f> vertices = linesToAnimate[i].getVertices();
-        float normalLength = 10;
-        for (int vertexIndex=0; vertexIndex<vertices.size(); vertexIndex++) {
-            ofVec3f vertex = vertices[vertexIndex];  // Get the vertex
-            ofVec3f normal = linesToAnimate[i].getNormalAtIndex(vertexIndex) * normalLength;  // Scale the normal
-            ofDrawLine(vertex-normal/2, vertex+normal/2);  // Center the scaled normal around the vertex
-        }
+        ofPushMatrix();
+        ofScale(scaleScreen,scaleScreen);
+        ofPushStyle();
+        ofNoFill();
+        ofSetLineWidth(2);
+        for(int i = 0; i < (int)contourFinder.getPolylines().size(); i++) {
+             ofSetColor(255);
             
-        }*/
-        
-  //  }
-    
-    /*
-    if(linesToAnimate.size()>0){
-        linesToAnimate[animationPolylineIndex].simplify();
-        vector<ofVec3f> vertices = linesToAnimate[animationPolylineIndex].getVertices();
-        for (int vertexIndex=1; vertexIndex<animationVerexIndex; vertexIndex++) {
-            ofVec3f vertex = vertices[vertexIndex];  // Get the vertex
-            ofVec3f vertex2 = vertices[vertexIndex-1];  // Get the vertex
-            ofDrawLine(vertex, vertex2);  // Center the scaled normal around the vertex
-
-        }
-        animationVerexIndex++;
-        if(animationVerexIndex>vertices.size()-1){
-            animationVerexIndex=1;
-            animationPolylineIndex++;
-            if(animationPolylineIndex>linesToAnimate.size()-1){
-                animationPolylineIndex=0;
+            if (contourFinder.getContourArea(i)>30){
+                ofSetColor(255,0,0);
             }
+            if (contourFinder.getContourArea(i)>80){
+                ofSetColor(0,255,0);
+            }
+            if (contourFinder.getContourArea(i)>100){
+                ofSetColor(0,0,255);
+            }
+            if (contourFinder.getContourArea(i)>300){
+                ofSetColor(255,255,0);
+            }
+            
+            if (contourFinder.getContourArea(i)>800){
+                ofSetColor(0,255,255);
+            }
+            
+            if (contourFinder.getContourArea(i)>5000){
+                ofSetColor(255,0,255);
+            }
+            contourFinder.getPolylines()[i].draw();
         }
-    }
+        ofPopStyle();
+        ofPopMatrix();
     
-    for(int i = 0; i < animationPolylineIndex; i++) {
-        linesToAnimate[i].draw();
-    }
+        ofPushMatrix();
+        ofTranslate(500, 0);
+        ofScale(scaleScreen,scaleScreen);
+        ofPushStyle();
+        ofSetColor(255, 255, 255);
+        if(drawcounter<linesToPrint.size()){
+            drawcounter++;
+        }else{
+            drawcounter=0;
+        }
+        ofTranslate(0, 0);
+        for(int i = 0; i < drawcounter; i++) {
+            linesToPrint[i].draw();
+        }
+        ofNoFill();
+        ofSetColor(255,0,0);
+        ofDrawRectangle(0,0,faceBoundingBox.getWidth(),faceBoundingBox.getHeight());
+        ofSetColor(0,255,0);
+        ofDrawRectangle(faceBoundingBox.x,faceBoundingBox.y,faceBoundingBox.getWidth(),faceBoundingBox.getHeight());
+        ofDrawRectangle(eyeBoundingBox.x,eyeBoundingBox.y,eyeBoundingBox.getWidth(),eyeBoundingBox.getHeight());
         
- */
-   // for(int i = 0; i < linesToAnimate.size(); i++) {
-    
-    ofPopStyle();
-    ofPopMatrix();
-    
-   
-    
-    ofPushMatrix();
-    ofTranslate(500, 0);
-    ofScale(scaleScreen,scaleScreen);
-    ofPushStyle();
-    ofSetColor(255, 255, 255);
-    if(drawcounter<linesToPrint.size()){
-        drawcounter++;
-    }else{
-        drawcounter=0;
-    }
-    ofTranslate(0, 0);
-    for(int i = 0; i < drawcounter; i++) {
-        linesToPrint[i].draw();
-    }
-    ofNoFill();
-    ofSetColor(255,0,0);
-    ofDrawRectangle(0,0,faceBoundingBox.getWidth(),faceBoundingBox.getHeight());
-    ofSetColor(0,255,0);
-    ofDrawRectangle(faceBoundingBox.x,faceBoundingBox.y,faceBoundingBox.getWidth(),faceBoundingBox.getHeight());
-    ofDrawRectangle(eyeBoundingBox.x,eyeBoundingBox.y,eyeBoundingBox.getWidth(),eyeBoundingBox.getHeight());
-    
-    ofSetColor(255,0,255);
-    ofDrawRectangle(eyeBoundingBox.x-faceBoundingBoxOriginal.x,eyeBoundingBox.y-faceBoundingBoxOriginal.y,eyeBoundingBox.getWidth(),eyeBoundingBox.getHeight());
+        ofSetColor(255,0,255);
+        ofDrawRectangle(eyeBoundingBox.x-faceBoundingBoxOriginal.x,eyeBoundingBox.y-faceBoundingBoxOriginal.y,eyeBoundingBox.getWidth(),eyeBoundingBox.getHeight());
 
-    ofSetColor(0,0,255);
-    ofDrawRectangle(faceBoundingBoxOriginal.x,faceBoundingBoxOriginal.y,faceBoundingBoxOriginal.getWidth(),faceBoundingBoxOriginal.getHeight());
+        ofSetColor(0,0,255);
+        ofDrawRectangle(faceBoundingBoxOriginal.x,faceBoundingBoxOriginal.y,faceBoundingBoxOriginal.getWidth(),faceBoundingBoxOriginal.getHeight());
 
-    
-    ofPopStyle();
-    ofPopMatrix();
+        
+        ofPopStyle();
+        ofPopMatrix();
     
     
     int gutter=100;
-    
-    ofPushMatrix();
-    ofTranslate(0, 500);
-    ofPushMatrix();
-    ofScale(scaleScreen,scaleScreen);
-    ofPushStyle();
-    ofSetColor(255, 0, 255);
-    for(int i = 0; i < linesToDraw1.size(); i++) {
-        linesToDraw1[i].draw();
-    }
-    ofPopMatrix();
-
-    
-    ofTranslate(faceBoundingBox.getWidth()*scaleScreen+gutter, 0);
-    ofPushMatrix();
-    ofScale(scaleScreen,scaleScreen);
-    ofSetColor(0, 255, 255);
-   /* for(int i = 0; i < linesToDraw2.size(); i++) {
-        linesToDraw2[i].draw();
-    }*/
-    
-    for(int i = 0; i < half_linesToDraw1.size(); i++) {
-        half_linesToDraw1[i].draw();
-    }
-    
-    
-    
-    ofPopMatrix();
-    
-    ofSetColor(255, 255, 0);
-    ofTranslate(faceBoundingBox.getWidth()*scaleScreen+gutter, 0);
-    ofPushMatrix();
-    ofScale(scaleScreen,scaleScreen);
-        for(int i = 0; i < linesToDraw2.size(); i++) {
-            linesToDraw2[i].draw();
+        ofPushMatrix();
+        ofTranslate(0, 500);
+        ofPushMatrix();
+        ofScale(scaleScreen,scaleScreen);
+        ofPushStyle();
+        ofSetColor(255, 0, 255);
+        for(int i = 0; i < linesToDraw1.size(); i++) {
+            linesToDraw1[i].draw();
         }
-      /*  for(int i = 0; i < medianlines.size(); i++) {
-            medianlines[i].draw();
-        }*/
-    ofPopMatrix();
+        ofPopMatrix();
+        ofTranslate(faceBoundingBox.getWidth()*scaleScreen+gutter, 0);
+        ofPushMatrix();
+        ofScale(scaleScreen,scaleScreen);
+        ofSetColor(0, 255, 255);
+        for(int i = 0; i < half_linesToDraw1.size(); i++) {
+            half_linesToDraw1[i].draw();
+        }
+        ofPopMatrix();
+        
+        ofSetColor(255, 255, 0);
+        ofTranslate(faceBoundingBox.getWidth()*scaleScreen+gutter, 0);
+        ofPushMatrix();
+        ofScale(scaleScreen,scaleScreen);
+            for(int i = 0; i < linesToDraw2.size(); i++) {
+                linesToDraw2[i].draw();
+            }
+        ofPopMatrix();
     
-    ofTranslate(faceBoundingBox.getWidth()*scaleScreen+gutter, 0);
-    ofPushMatrix();
-    ofScale(scaleScreen,scaleScreen);
-    for(int i = 0; i < linesToDraw3.size(); i++) {
-        linesToDraw3[i].draw();
-    }
-    /*  for(int i = 0; i < medianlines.size(); i++) {
-     medianlines[i].draw();
-     }*/
-    ofPopMatrix();
+        ofTranslate(faceBoundingBox.getWidth()*scaleScreen+gutter, 0);
+        ofPushMatrix();
+        ofScale(scaleScreen,scaleScreen);
+        for(int i = 0; i < linesToDraw3.size(); i++) {
+            linesToDraw3[i].draw();
+        }
+        ofPopMatrix();
+        
+    
+        ofPopStyle();
+        ofPopMatrix();
     
     
-    ofPopStyle();
-    ofPopMatrix();
-    
-    
-    ofPushMatrix();
-    ofPushStyle();
-    ofSetColor(255, 255, 0);
-    ofTranslate(1000, 0);
-    ofScale(scaleScreen,scaleScreen);
-
+        ofPushMatrix();
+        ofPushStyle();
+        ofSetColor(255, 255, 0);
+        ofTranslate(1000, 0);
+        ofScale(scaleScreen,scaleScreen);
         for(int i = 0; i < linesToPrint.size(); i++) {
             linesToPrint[i].draw();
         }
-   
-    for(int i = 0; i < eyes.size(); i++) {
-        eyes[i].draw();
-    }
+        for(int i = 0; i < eyes.size(); i++) {
+            eyes[i].draw();
+        }
+        
+        ofPopStyle();
+        ofPopMatrix();
     
-    ofPopStyle();
-    ofPopMatrix();
     
-    
-    ofPushMatrix();
-    ofTranslate(0, 900);
+        ofPushMatrix();
+        ofTranslate(0, 900);
 
-    /*ofPushMatrix();
-    ofPushStyle();
-    ofSetColor(255, 255, 0);
-    ofTranslate(500, 0);
-    ofScale(scaleScreen,scaleScreen);
-    for(int i = 0; i < eyes.size(); i++) {
-        eyes[i].draw();
+        ofPushStyle();
+        contourFinder2.draw();
+        ofPopStyle();
+        ofPopMatrix();
+    
     }
-    ofPopStyle();
-    ofPopMatrix();
-     */
-    
-    ofPushStyle();
-    contourFinder2.draw();
-    ofPopStyle();
-    ofPopMatrix();
-    
-  
     gui.draw();
     polylinesPanel.draw();
     cannyPanel.draw();
@@ -1019,28 +911,10 @@ void ofApp::makeNewPortrait(){
     colorImg.allocate(cam.getWidth(),cam.getHeight());
     grayImage.allocate(cam.getWidth(),cam.getHeight());
     zoom.allocate(cam.getWidth(),cam.getHeight());
-    grayImageBlur.allocate(cam.getWidth(),cam.getHeight());
     }
-    
     colorImg.setFromPixels(cam.getPixels());
-
     grayImage=colorImg;
     grayImage.brightnessContrast(brightness, contrast);
-    grayImageBlur=colorImg;
-    
-   // grayImage.blur(blur);
-
-   // grayImage.contrastStretch();
-   // grayImage.dilate();
-   // grayImage.erode();
-    
-    
-  //  grayImageBlur.blur(blur);
-    //grayImageBlur.contrastStretch();
-    grayImageBlur.dilate();
-    grayImageBlur.erode();
-    
-    
 }
 
 
@@ -1053,13 +927,9 @@ void ofApp::sendFeed(){
         //myPort.write(cmd);
         commands.erase(commands.begin());
         done=false;
-        
-        
         message = cmd;
         remember = false;
-        
     }
-    
 }
 
 
@@ -1196,8 +1066,8 @@ void ofApp::makeFeed(){
             commands.push_back(cmd);
         }
     }
-    goHome();
-    turnIdle();
+//    goHome();
+//    turnIdle();
     cout<<commands.size()<<endl;
     for (int i=0; i<commands.size(); i++) {
         //cout<<commands[i]<<endl;
@@ -1268,10 +1138,17 @@ void ofApp::onNewMessage(string & message)
 void ofApp::onNewButtonMessage(string & message)
 {
     cout << "onNewButtonMessage, message: " << message << "\n";
-    if(message=="1"){
+    if(message=="1" && state == IDLE){
         makeNewPortrait();
         makeContours();
+        record=true;
     }
+    
+    if(message=="-1"){
+        commands.clear();
+        bGoHome=true;
+    }
+    
 }
 
 //--------------------------------------------------------------

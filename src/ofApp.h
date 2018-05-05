@@ -101,7 +101,8 @@ class ofApp : public ofBaseApp{
     ofParameter<bool> bShowCanny2;
     ofParameter<bool> bShowImage;
     ofParameter<bool> bShowDebug;
-    
+    ofParameter<bool> bShowDebugLines;
+
     ofParameter<bool> bUseCanny1;
 
     ofParameterGroup imageparameters;
@@ -237,21 +238,14 @@ class ofApp : public ofBaseApp{
     
     
     ofxCvGrayscaleImage     grayImage;
-    ofxCvGrayscaleImage     grayImageBlur;
-
-    
-    
+    ofxCvColorImage         colorImg;
     ofxCvGrayscaleImage     canny;
-    ofxCvGrayscaleImage     meanCanny;
-
-    
-    
-    ofxCvColorImage            colorImg;
-
     ofxCvGrayscaleImage     canny2;
-
     ofxCvGrayscaleImage     zoom;
+    ofxCvGrayscaleImage     face;
 
+    
+    
     
     ofMesh m_triangulation;
     vector<ofVec2f> m_points;
@@ -310,5 +304,10 @@ class ofApp : public ofBaseApp{
     int dmxValue;
     void turnLightsOn();
     void turnLightsOff();
+    
+    
+    
+    ofTrueTypeFont  font;
+
     
 };

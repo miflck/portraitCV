@@ -35,6 +35,8 @@ class ofApp : public ofBaseApp{
     
     
     int state=IDLE;
+    int stateBefore=IDLE;
+
     
     void makeNewPortrait();
     void makeContours();
@@ -44,6 +46,12 @@ class ofApp : public ofBaseApp{
     
     int timerduration=10;
     int inittime;
+    
+    
+    
+    
+    int idleTimerDuration=60000;
+    int initIdletime;
     
     
     // Serial

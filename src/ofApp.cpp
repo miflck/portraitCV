@@ -231,13 +231,37 @@ void ofApp::setup(){
     //makeNewPortrait();
     makeContours();
     inittime=ofGetElapsedTimeMillis();
+    initIdletime=ofGetElapsedTimeMillis();
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
+    
+    if (stateBefore!=state){
+        switch (state) {
+            case IDLE:
+                turnLightsOn();
+                initIdletime=ofGetElapsedTimeMillis();
+                break;
+                
+            default:
+                break;
+        }
+        
+        
+    }
+    
+    
+    
+    if(ofGetElapsedTimeMillis()-initIdletime>idleTimerDuration){
+        goDip();
+        initIdletime=ofGetElapsedTimeMillis();
+    }
+    
+    
     switch (state) {
         case IDLE:
-            turnLightsOn();
+            //turnLightsOn();
             break;
             
         case DRAWING:
@@ -320,7 +344,7 @@ void ofApp::update(){
         makeFeed();
     }
     
-    
+    stateBefore=state;
 }
 
 
@@ -738,6 +762,9 @@ void ofApp::draw(){
         default:
             break;
     }
+    
+    font.drawString(ofToString(idleTimerDuration-ofGetElapsedTimeMillis()-initIdletime)+" "+ofToString(idleTimerDuration), ofGetWidth()/2-500, ofGetHeight()/2);
+
     
     
     if(bShowDebug){

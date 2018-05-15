@@ -117,6 +117,8 @@ class ofApp : public ofBaseApp{
     ofParameter<float>          brightness;
     ofParameter<float>          blur;
     ofParameter<float>          zoomfact;
+    ofParameter<float>          facezoomfact;
+
 
     
     ofParameter<float>          scaleScreen;
@@ -320,5 +322,6 @@ class ofApp : public ofBaseApp{
 
     ofImage mask;
 
+    bool bDrawGui=false;
     
 };

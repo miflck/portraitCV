@@ -65,7 +65,7 @@ void ofApp::setup(){
     if(bUseArduino) {
         vector <ofSerialDeviceInfo> deviceList = serial.getDeviceList();
        // serial.setup("tty.wchusbserial1420", baud); //open the first device
-        serial.setup("tty.wchusbserial1410", baud); //open the first device
+        serial.setup("tty.wchusbserial1420", baud); //open the first device
 
         serial.startContinuousRead(false);
         ofAddListener(serial.NEW_MESSAGE,this,&ofApp::onNewMessage);
@@ -73,7 +73,7 @@ void ofApp::setup(){
         
         
        //button.setup("tty.usbmodem141221", 9600); //open the first device
-        button.setup("tty.usbmodem148211", 9600);//mac mini
+        button.setup("tty.usbmodem1471", 9600);//mac mini
         
         // serial.setup("/dev/tty.usbserial-A70060V8", 9600);
         button.startContinuousRead();
@@ -135,6 +135,8 @@ void ofApp::setup(){
     imageparameters.add(brightness.set("brightness", 0, -1, 1));
     imageparameters.add(blur.set("blur", 0, 0, 10));
     imageparameters.add(zoomfact.set("zoom", 1, 0, 2));
+    imageparameters.add(facezoomfact.set("zoom", 1, 0, 2));
+
     gui.add(imageparameters);
     gui.getGroup("Image").minimize();
   
@@ -259,7 +261,7 @@ void ofApp::setup(){
     
     
     robot.add(waitPosX.set("waitPosX", 0, -1000, 1000));
-    robot.add(waitPosY.set("waitPosY", 1000, 0, 1000));
+    robot.add(waitPosY.set("waitPosY", 1000, 0, 1600));
     
     
     robot.add(dimAmmount.set("dimAmmount", 0, 0, 255));
@@ -279,6 +281,7 @@ void ofApp::setup(){
     makeContours();
     inittime=ofGetElapsedTimeMillis();
     initIdletime=ofGetElapsedTimeMillis();
+    turnLightsOn();
 }
 
 //--------------------------------------------------------------
@@ -360,7 +363,7 @@ void ofApp::update(){
         }
         face=c;
         face.mirror(false,true);
-        face.transform(0, face.getWidth()/2, face.getHeight()/2, zoomfact, zoomfact, 0, 0);
+        face.transform(0, face.getWidth()/2, face.getHeight()/2, facezoomfact, facezoomfact, 0, 0);
     }
 
     
@@ -442,7 +445,7 @@ void ofApp::makeContours(){
         
         // Find ROI
         int diffx,diffy,dx,dy,hy;
-        int offsetty=100;
+        int offsetty=150;
         diffx=cur.x+cur.width;
         diffy=cur.y-offsetty/2;
         if(cur.y-offsetty/2<=0){
@@ -748,9 +751,6 @@ void ofApp::makePolylines(){
 //--------------------------------------------------------------
 void ofApp::draw(){
     
-    face.draw(0,0,face.getWidth(),face.getHeight());
-    //mask.draw(0,0, mask.getWidth(), mask.getHeight());
-    
     switch (state) {
         case IDLE:
             face.draw(ofGetWidth()/2-face.getWidth()/2,ofGetHeight()/2-face.getHeight()/2,face.getWidth(),face.getHeight());
@@ -768,20 +768,23 @@ void ofApp::draw(){
             ofSetColor(0, 0, 0);
             ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
             ofSetColor(255);
-            font.drawString("Busy", ofGetWidth()/2-500, ofGetHeight()/2-100);
-            font.drawString(ofToString(commands.size())+" commands to go", ofGetWidth()/2-500, ofGetHeight()/2);
+            font.drawString("Bitte warten", ofGetWidth()/2-200, ofGetHeight()/2);
+           // font.drawString(ofToString(commands.size())+" commands to go", ofGetWidth()/2-500, ofGetHeight()/2);
             ofPopStyle();
 
             break;
             
         default:
             
-            face.draw(0,0,face.getWidth(),face.getHeight());
-            mask.draw(0,0, mask.getWidth(), mask.getHeight());
+           // face.draw(0,0,face.getWidth(),face.getHeight());
+           // mask.draw(0,0, mask.getWidth(), mask.getHeight());
             break;
+            
+            font.drawString("Bitte warten", ofGetWidth()/2-200, ofGetHeight()/2);
+
     }
     
-    font.drawString(ofToString(idleTimerDuration-ofGetElapsedTimeMillis()-initIdletime)+" "+ofToString(idleTimerDuration), ofGetWidth()/2-500, ofGetHeight()/2);
+   // font.drawString(ofToString(idleTimerDuration-ofGetElapsedTimeMillis()-initIdletime)+" "+ofToString(idleTimerDuration), ofGetWidth()/2-500, ofGetHeight()/2);
 
     
     
@@ -883,7 +886,7 @@ void ofApp::draw(){
     
     int gutter=100;
         ofPushMatrix();
-        ofTranslate(0, 500);
+        ofTranslate(0, faceBoundingBox.getHeight()*scaleScreen);
         ofPushMatrix();
         ofScale(scaleScreen,scaleScreen);
         ofPushStyle();
@@ -948,9 +951,11 @@ void ofApp::draw(){
         ofPopMatrix();
     
     }
-    gui.draw();
-    polylinesPanel.draw();
-    cannyPanel.draw();
+    if(bDrawGui) {
+        gui.draw();
+        polylinesPanel.draw();
+        cannyPanel.draw();
+    }
 
 }
 
@@ -1201,6 +1206,7 @@ void ofApp::keyPressed(int key){
     if(key == 'h'){
         commands.clear();
         bGoHome=true;
+        turnLightsOn();
     
     }
     
@@ -1284,6 +1290,10 @@ void ofApp::keyPressed(int key){
         
     }
     
+    if(key=='9'){
+        bDrawGui=!bDrawGui;
+    }
+    
     
     if(key=='w'){
         turnDraw();
@@ -1355,7 +1365,7 @@ void ofApp::exit(){
     goHome();
     sendFinalFeed();
     serial.writeString(message);
-    ofSleepMillis(2000);
+    ofSleepMillis(4000);
     turnDraw();
     sendFinalFeed();
     serial.writeString(message);

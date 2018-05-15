@@ -2,18 +2,18 @@
     <Dispaly>
         <bShowCanny>0</bShowCanny>
         <bShowImage>0</bShowImage>
-        <bShowDebug>1</bShowDebug>
+        <bShowDebug>0</bShowDebug>
         <bShowCanny2>0</bShowCanny2>
         <bUseCanny1>0</bUseCanny1>
-        <bShowDebugLines>1</bShowDebugLines>
+        <bShowDebugLines>0</bShowDebugLines>
     </Dispaly>
     <Image>
         <contrast>-0.0306122</contrast>
         <brightness>0.326531</brightness>
         <blur>6.53061</blur>
-        <zoom>0.673469</zoom>
+        <zoom>0.734694</zoom>
     </Image>
-    <scaleScreen>0.51</scaleScreen>
+    <scaleScreen>0.515</scaleScreen>
     <Contourfinder_2>
         <Min_area2>1</Min_area2>
         <Max_area2>199.582</Max_area2>
@@ -37,8 +37,8 @@
         <dipPosX>0</dipPosX>
         <dipPosY>-125</dipPosY>
         <waitPosX>561</waitPosX>
-        <waitPosY>1000</waitPosY>
-        <dimAmmount>84.5663</dimAmmount>
+        <waitPosY>1461</waitPosY>
+        <dimAmmount>92.3725</dimAmmount>
     </Robot>
 <General/>
 </General>

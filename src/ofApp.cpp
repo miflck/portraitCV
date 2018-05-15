@@ -15,7 +15,7 @@ int baud = 115200;
 char myByte = 0;
 string cmd;
 
-bool bUseArduino=true;
+bool bUseArduino=false;
 
 //--------------------------------------------------------------
 void ofApp::setup(){
@@ -58,7 +58,10 @@ void ofApp::setup(){
     img.load("michaelflueckiger.jpeg");
     //img.load("Brad_Pitt_Fury_2014.jpg");
 
- 
+    mask.load("mask.png");
+    
+    
+    
     
     colorImg.setFromPixels(img.getPixels());
     grayImage=colorImg;
@@ -320,11 +323,12 @@ void ofApp::update(){
         ofxCvColorImage  c;
         c.allocate(cam.getWidth(),cam.getHeight());
         c.setFromPixels(cam.getPixels());
+        if(face.getWidth()!=c.getWidth()){
+            face.allocate(c.getWidth(), c.getHeight());
+        }
         face=c;
         face.mirror(false,true);
         face.transform(0, face.getWidth()/2, face.getHeight()/2, zoomfact, zoomfact, 0, 0);
-
-        
     }
 
     
@@ -739,16 +743,18 @@ void ofApp::makePolylines(){
 //--------------------------------------------------------------
 void ofApp::draw(){
     
-    
+    face.draw(0,0,face.getWidth(),face.getHeight());
+    //mask.draw(0,0, mask.getWidth(), mask.getHeight());
     
     switch (state) {
         case IDLE:
-            face.draw(0,0,face.getWidth(),face.getHeight());
-            ofPushStyle();
-            ofNoFill();
-            ofSetColor(255,0,0);
-            ofDrawEllipse(face.getWidth()/2,face.getHeight()/2,600,face.getHeight()-50);
-            ofPopStyle();
+            face.draw(ofGetWidth()/2-face.getWidth()/2,ofGetHeight()/2-face.getHeight()/2,face.getWidth(),face.getHeight());
+            mask.draw(0,0, mask.getWidth(), mask.getHeight());
+            //ofPushStyle();
+            //ofNoFill();
+            //ofSetColor(255,0,0);
+            //ofDrawEllipse(face.getWidth()/2,face.getHeight()/2,600,face.getHeight()-50);
+            //ofPopStyle();
 
             break;
         
@@ -764,6 +770,9 @@ void ofApp::draw(){
             break;
             
         default:
+            
+            face.draw(0,0,face.getWidth(),face.getHeight());
+            mask.draw(0,0, mask.getWidth(), mask.getHeight());
             break;
     }
     

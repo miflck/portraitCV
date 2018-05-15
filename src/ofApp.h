@@ -41,14 +41,14 @@ class ofApp : public ofBaseApp{
     void makeNewPortrait();
     void makeContours();
     void makePolylines();
+
     
     void makeEyePolylines();
     
+    
+    // TImers
     int timerduration=10;
     int inittime;
-    
-    
-    
     
     int idleTimerDuration=60000;
     int initIdletime;
@@ -317,6 +317,8 @@ class ofApp : public ofBaseApp{
     
     
     ofTrueTypeFont  font;
+
+    ofImage mask;
 
     
 };

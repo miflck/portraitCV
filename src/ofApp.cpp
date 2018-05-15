@@ -18,10 +18,6 @@ string cmd;
 bool bUseArduino=true;
 
 
-
-
-
-
 static bool sortByCriteria(const ofPoint &a, const ofPoint &b){
     return a.x < b.x;
 }
@@ -39,15 +35,12 @@ static bool sortByArea(const ofPolyline &a, const ofPolyline &b){
 }
 
 static bool sortByDistance(const ofPolyline &a, const ofPolyline &b){
-    
     ofVec2f n=ofVec2f(0,0);
     ofVec2f aV=a.getPointAtPercent(0);
     ofVec2f bV=b.getPointAtPercent(0);
-    
     float d1=ofDist(aV.x,aV.y,n.x, n.y);
     float d2=ofDist(bV.x,bV.y,n.x, n.y);
     return d1>d2;
-    
 }
 
 
@@ -135,13 +128,11 @@ void ofApp::setup(){
     imageparameters.add(brightness.set("brightness", 0, -1, 1));
     imageparameters.add(blur.set("blur", 0, 0, 10));
     imageparameters.add(zoomfact.set("zoom", 1, 0, 2));
-    imageparameters.add(facezoomfact.set("zoom", 1, 0, 2));
+    imageparameters.add(facezoomfact.set("facezoom", 1, 0, 2));
 
     gui.add(imageparameters);
     gui.getGroup("Image").minimize();
   
-    
-    
     canny1.setName("Canny 1");
     canny1.add(dilateErode.set("dilateErode", 2, 0, 5));
     canny1.add(mincanny.set("mincanny", 80, 10, 500));
@@ -152,7 +143,6 @@ void ofApp::setup(){
     canny1.add(threshold.set("Threshold", 128, 0, 255));
 
     cannyPanel.add(canny1);
-    
     canny2group.setName("Canny 2");
     canny2group.add(dilateErode2.set("dilateErode2", 2, 0, 5));
     canny2group.add(mincanny2.set("mincanny2", 80, -100,2000));
@@ -163,10 +153,8 @@ void ofApp::setup(){
     canny2group.add(threshold2.set("Threshold 2", 128, 0, 255));
 
     cannyPanel.add(canny2group);
-    
     cannyPanel.add(bUseCanny1.set("bUseCanny1",false));
 
-    
     finder1.setName("Contourfinder 1");
     finder1.add(minArea.set("Min area", 1, 1, 100));
     finder1.add(maxArea.set("Max area", 200, 1, 8000));
@@ -255,19 +243,11 @@ void ofApp::setup(){
     robot.add(penDownPos.set("penDownPos", 162, 0, 180));
     robot.add(penIdlePos.set("penIdlePos", 142, 0, 180));
     robot.add(penDrawPos.set("penDrawPos", 118, 0, 180));
-    
     robot.add(dipPosX.set("dipPosX", 0, 0, -300));
     robot.add(dipPosY.set("dipPosY", 0, 0, -300));
-    
-    
     robot.add(waitPosX.set("waitPosX", 0, -1000, 1000));
     robot.add(waitPosY.set("waitPosY", 1000, 0, 1600));
-    
-    
     robot.add(dimAmmount.set("dimAmmount", 0, 0, 255));
-
-
-    
     gui.add(robot);
     gui.getGroup("Robot").minimize();
 
@@ -306,18 +286,14 @@ void ofApp::update(){
     
     switch (state) {
         case IDLE:
-            //turnLightsOn();
             break;
             
         case DRAWING:
             turnLightsOff();
-            if(commands.size()<=0){
+            if(commands.size()<=0 &! bGoHome){
                 turnDraw();
                 waitPos();
                 turnIdle();
-                
-              //  goHome();
-              //  turnIdle();
                 state=IDLE;
             }
             break;
@@ -1191,6 +1167,8 @@ void ofApp::onNewButtonMessage(string & message)
     if(message=="-1"){
         commands.clear();
         bGoHome=true;
+        turnLightsOn();
+        state=IDLE;
     }
     
 }
@@ -1207,7 +1185,7 @@ void ofApp::keyPressed(int key){
         commands.clear();
         bGoHome=true;
         turnLightsOn();
-    
+        state=IDLE;
     }
     
     if(key == 'C'){
@@ -1216,7 +1194,6 @@ void ofApp::keyPressed(int key){
     }
 
     if(key=='r'){
-        
         record=true;
     }
     

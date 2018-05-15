@@ -65,7 +65,7 @@ void ofApp::setup(){
    
     
     cam.listDevices();
-    cam.setDeviceID(1);
+    cam.setDeviceID(0);
 
    // cam.setup(1920,1080);
     cam.setup( 1600, 896);
@@ -217,6 +217,10 @@ void ofApp::setup(){
     
     robot.add(waitPosX.set("waitPosX", 0, -1000, 1000));
     robot.add(waitPosY.set("waitPosY", 1000, 0, 1000));
+    
+    
+    robot.add(dimAmmount.set("dimAmmount", 0, 0, 255));
+
 
     
     gui.add(robot);
@@ -254,7 +258,7 @@ void ofApp::update(){
     
     
     if(ofGetElapsedTimeMillis()-initIdletime>idleTimerDuration){
-        goDip();
+        //goDip();
         initIdletime=ofGetElapsedTimeMillis();
     }
     
@@ -1253,7 +1257,17 @@ void ofApp::keyPressed(int key){
     }
  
     if(key=='1'){
-        dmxValue < 127 ? dmxValue =255 : dmxValue=0;
+        //dmxValue < 127 ? dmxValue =255 : dmxValue=0;
+        
+        dmxValue  =dimAmmount;
+
+    }
+    
+    if(key=='2'){
+        //dmxValue < 127 ? dmxValue =255 : dmxValue=0;
+        
+        dmxValue  =0;
+        
     }
     
     

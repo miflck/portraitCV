@@ -43,7 +43,7 @@
 		<sortthreshold>1.83673</sortthreshold>
 		<poly>1</poly>
 		<poly2>0</poly2>
-		<poly3>0</poly3>
+		<poly3>1</poly3>
 	<Polyline_Half>
 			<resample_half>0</resample_half>
 			<polyhalf_percent>6.63267</polyhalf_percent>

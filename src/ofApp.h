@@ -301,8 +301,8 @@ class ofApp : public ofBaseApp{
     
     void goDip();
     
-    int xInMM=1000;
-    int yInMM=1000;
+    int xInMM=1400;
+    int yInMM=1400;
     float scaleRatio;
     
 
@@ -312,6 +312,8 @@ class ofApp : public ofBaseApp{
     void turnLightsOn();
     void turnLightsOff();
     
+    ofParameter<float> dimAmmount;
+
     
     
     ofTrueTypeFont  font;

@@ -15,7 +15,44 @@ int baud = 115200;
 char myByte = 0;
 string cmd;
 
-bool bUseArduino=false;
+bool bUseArduino=true;
+
+
+
+
+
+
+static bool sortByCriteria(const ofPoint &a, const ofPoint &b){
+    return a.x < b.x;
+}
+
+static bool sortByCriteriaX(const ofPolyline &a, const ofPolyline &b){
+    return a.getBoundingBox().x < b.getBoundingBox().x;
+}
+
+static bool sortByArea(const ofPolyline &a, const ofPolyline &b){
+    if(a.getPerimeter() > 70 || b.getPerimeter()>70){
+        return a.getPerimeter() > b.getPerimeter();
+    }else{
+        return a.getBoundingBox().x < b.getBoundingBox().x;
+    }
+}
+
+static bool sortByDistance(const ofPolyline &a, const ofPolyline &b){
+    
+    ofVec2f n=ofVec2f(0,0);
+    ofVec2f aV=a.getPointAtPercent(0);
+    ofVec2f bV=b.getPointAtPercent(0);
+    
+    float d1=ofDist(aV.x,aV.y,n.x, n.y);
+    float d2=ofDist(bV.x,bV.y,n.x, n.y);
+    return d1>d2;
+    
+}
+
+
+
+
 
 //--------------------------------------------------------------
 void ofApp::setup(){
@@ -33,7 +70,7 @@ void ofApp::setup(){
         
         
         
-       button.setup("tty.usbmodem4013231", 9600); //open the first device
+       button.setup("tty.usbmodem141221", 9600); //open the first device
         
         // serial.setup("/dev/tty.usbserial-A70060V8", 9600);
         button.startContinuousRead();
@@ -250,15 +287,10 @@ void ofApp::update(){
                 turnLightsOn();
                 initIdletime=ofGetElapsedTimeMillis();
                 break;
-                
             default:
                 break;
         }
-        
-        
     }
-    
-    
     
     if(ofGetElapsedTimeMillis()-initIdletime>idleTimerDuration){
         //goDip();
@@ -274,7 +306,6 @@ void ofApp::update(){
         case DRAWING:
             turnLightsOff();
             if(commands.size()<=0){
-                
                 turnDraw();
                 waitPos();
                 turnIdle();
@@ -291,31 +322,29 @@ void ofApp::update(){
     
     // DMX
     dmx.setLevel(1, dmxValue);
+    dmx.setLevel(2, dmxValue);
+    dmx.setLevel(3, dmxValue);
+
+
     dmx.update();
     
     
     if(bUseArduino){
         if(message != "")
-    {
+        {
         cout << "sending message: " << message << "\n";
         serial.writeString(message);
         message = "";
-    }
+        }
         
-        
-        
-        
-    
         if (done &&!bGoHome){
             sendFeed();
         }
-        
         
         if(done && bGoHome){
             goHome();
             bGoHome=false;
         }
-        
     }
     
     cam.update();
@@ -351,45 +380,19 @@ void ofApp::update(){
         state=DRAWING;
         makeFeed();
     }
-    
     stateBefore=state;
 }
 
 
-static bool sortByCriteria(const ofPoint &a, const ofPoint &b){
-    return a.x < b.x;
-}
 
-static bool sortByCriteriaX(const ofPolyline &a, const ofPolyline &b){
-    return a.getBoundingBox().x < b.getBoundingBox().x;
-}
-
-static bool sortByArea(const ofPolyline &a, const ofPolyline &b){
-  if(a.getPerimeter() > 70 || b.getPerimeter()>70){
-        return a.getPerimeter() > b.getPerimeter();
-    }else{
-        return a.getBoundingBox().x < b.getBoundingBox().x;
-   }
-}
-
-static bool sortByDistance(const ofPolyline &a, const ofPolyline &b){
- 
-    ofVec2f n=ofVec2f(0,0);
-    ofVec2f aV=a.getPointAtPercent(0);
-    ofVec2f bV=b.getPointAtPercent(0);
-    
-    float d1=ofDist(aV.x,aV.y,n.x, n.y);
-    float d2=ofDist(bV.x,bV.y,n.x, n.y);
-    return d1>d2;
- 
-}
 
 void ofApp::makeContours(){
     grayImage.contrastStretch();
     zoom=grayImage;
     zoom.transform(0, zoom.getWidth()/2, zoom.getHeight()/2, zoomfact, zoomfact, 0, 0);
+   
     if(canny.getWidth()!=grayImage.getWidth()){
-    canny.allocate(grayImage.getWidth(), grayImage.getHeight());
+        canny.allocate(grayImage.getWidth(), grayImage.getHeight());
     }
     if(canny2.getWidth()!=grayImage.getWidth()){
         canny2.allocate(grayImage.getWidth(), grayImage.getHeight());
@@ -399,7 +402,6 @@ void ofApp::makeContours(){
     canny.blur(cannyblur);
     canny.threshold(threshold);
 
-    //cvCornerHarris(zoom.getCvImage(), canny.getCvImage(),10,10);
     for(int i=0;i<dilateErode;i++){
         canny.dilate();
     }
@@ -409,13 +411,13 @@ void ofApp::makeContours(){
     }
     canny.brightnessContrast(cannybrightness,cannycontrast);
     canny.flagImageChanged();
+   
     zoom.blur(blur);
-    
     cvCanny(zoom.getCvImage(), canny2.getCvImage(), mincanny2, maxcanny2,5);
+    
     for(int i=0;i<dilateErode2;i++){
         canny2.dilate();
     }
-    
     for(int i=0;i<dilateErode2;i++){
         canny2.erode();
     }
@@ -427,32 +429,32 @@ void ofApp::makeContours(){
     
     finder.setup("haarcascade_frontalface_default.xml");
     finder.findHaarObjects(zoom,150,150);
+   
     if(finder.blobs.size()>0){
         ofRectangle cur =finder.blobs[0].boundingRect;
         faceBoundingBox = finder.blobs[0].boundingRect;
         faceBoundingBoxOriginal=finder.blobs[0].boundingRect;
         
+       
         
+        // Find ROI
         int diffx,diffy,dx,dy,hy;
         int offsetty=100;
         diffx=cur.x+cur.width;
         diffy=cur.y-offsetty/2;
-       
         if(cur.y-offsetty/2<=0){
             dy=cur.y;
         }else{
             dy=cur.y-offsetty/2;
         }
-        
         if(cur.y+cur.height+offsetty>=canny.getHeight()){
             hy=canny.getHeight()-dy;
         }else{
             hy=cur.height+offsetty;
         }
-        
         faceBoundingBox.y-=dy;
         faceBoundingBoxOriginal.y-=dy;
-       faceBoundingBox.height=hy;
+        faceBoundingBox.height=hy;
 
         if(bUseCanny1){
             cam_mat = toCv(canny);
@@ -464,7 +466,6 @@ void ofApp::makeContours(){
         cv::Rect crop_roi = cv::Rect(cur.x, dy, cur.width, hy);
         crop = cam_mat(crop_roi).clone();
         
-
         contourFinder.setMinAreaRadius(minArea);
         contourFinder.setMaxAreaRadius(maxArea);
         contourFinder.setSimplify(simply);
@@ -550,6 +551,7 @@ void ofApp::makePolylines(){
     linesToPrint.clear();
     linesToAnimate.clear();
 
+    
     
     for(int k=0;k<n;k++){
         
@@ -1355,8 +1357,14 @@ void ofApp::exit(){
 }
 
 void ofApp::turnLightsOn(){
-    dmxValue =255;
+    dmxValue =dimAmmount;
 }
 void ofApp:: turnLightsOff(){
      dmxValue=0;
 }
+
+
+
+
+
+

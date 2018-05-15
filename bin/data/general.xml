@@ -34,7 +34,7 @@
 	<quadsmooth>3</quadsmooth>
 <dilateErode>0</dilateErode>
 <Dispaly>
-		<bShowCanny>1</bShowCanny>
+		<bShowCanny>0</bShowCanny>
 	<bShowImage>1</bShowImage>
 	<bShowDebug>1</bShowDebug>
 	<bShowCanny2>1</bShowCanny2>
@@ -45,7 +45,7 @@
 		<contrast>-0.234694</contrast>
 		<brightness>0.183674</brightness>
 		<blur>8.26531</blur>
-		<zoom>1.45918</zoom>
+		<zoom>1.13265</zoom>
 	</Image>
 	<Contourfinder_1>
 		<dilateErode>1</dilateErode>
@@ -108,7 +108,7 @@
 	</Contourfinder_1>
 	<Contourfinder_2>
 		<Min_area2>1</Min_area2>
-		<Max_area2>200</Max_area2>
+		<Max_area2>199.582</Max_area2>
 		<mincanny2>45.9184</mincanny2>
 		<maxcanny2>977.551</maxcanny2>
 		<Holes2>1</Holes2>
@@ -130,7 +130,7 @@
 		<dipPosY>-125</dipPosY>
 	<waitPosX>561</waitPosX>
 	<waitPosY>1000</waitPosY>
-	<dimAmmount>118.393</dimAmmount>
+	<dimAmmount>80.6633</dimAmmount>
 	</Robot>
-<scaleScreen>0.76</scaleScreen>
+<scaleScreen>0.445</scaleScreen>
 </group>

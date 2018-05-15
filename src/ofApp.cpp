@@ -362,6 +362,15 @@ void ofApp::update(){
         state=DRAWING;
         makeFeed();
     }
+    
+    if(bMakeNewPortraitwidthTimer && ofGetElapsedTimeMillis()-portraitinittime>portraitTimerDuration){
+        makeNewPortraitWithTimerFinished();
+    }
+
+    
+    
+    
+    
     stateBefore=state;
 }
 
@@ -744,7 +753,7 @@ void ofApp::draw(){
             ofSetColor(0, 0, 0);
             ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
             ofSetColor(255);
-            font.drawString("Bitte warten", ofGetWidth()/2-200, ofGetHeight()/2);
+            font.drawString("Bin beschäftigt…", ofGetWidth()/2-200, ofGetHeight()/2);
            // font.drawString(ofToString(commands.size())+" commands to go", ofGetWidth()/2-500, ofGetHeight()/2);
             ofPopStyle();
 
@@ -756,9 +765,18 @@ void ofApp::draw(){
            // mask.draw(0,0, mask.getWidth(), mask.getHeight());
             break;
             
-            font.drawString("Bitte warten", ofGetWidth()/2-200, ofGetHeight()/2);
 
     }
+    
+  //  font.drawString("Bin beschäftigt…", ofGetWidth()/2-200, ofGetHeight()/2);
+    
+    if(bMakeNewPortraitwidthTimer){
+      //  ofGetElapsedTimeMillis()-portraitinittime;
+        font.drawString(ofToString(((portraitTimerDuration-(ofGetElapsedTimeMillis()-portraitinittime))/1000)+1), ofGetWidth()/2-200, ofGetHeight()/2);
+
+    }
+    
+
     
    // font.drawString(ofToString(idleTimerDuration-ofGetElapsedTimeMillis()-initIdletime)+" "+ofToString(idleTimerDuration), ofGetWidth()/2-500, ofGetHeight()/2);
 
@@ -934,6 +952,23 @@ void ofApp::draw(){
     }
 
 }
+
+void ofApp::makeNewPortraitWithTimer(){
+    bMakeNewPortraitwidthTimer=true;
+    portraitinittime=ofGetElapsedTimeMillis();
+    
+    
+}
+
+
+void ofApp::makeNewPortraitWithTimerFinished(){
+    makeNewPortrait();
+    makeContours();
+    record=true;
+    bMakeNewPortraitwidthTimer=false;
+
+}
+
 
 //--------------------------------------------------------------
 void ofApp::makeNewPortrait(){
@@ -1276,6 +1311,11 @@ void ofApp::keyPressed(int key){
         turnDraw();
         waitPos();
         turnIdle();
+    }
+    
+    
+    if(key=='p'){
+        makeNewPortraitWithTimer();
     }
     
 }

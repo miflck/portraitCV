@@ -53,6 +53,14 @@ class ofApp : public ofBaseApp{
     int idleTimerDuration=60000;
     int initIdletime;
     
+    int portraitTimerDuration=3000;
+    int portraitinittime;
+    bool bMakeNewPortraitwidthTimer=false;
+    
+    void makeNewPortraitWithTimer();
+   void makeNewPortraitWithTimerFinished();
+    
+    
     
     // Serial
     ofxSimpleSerial    serial;

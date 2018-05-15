@@ -1,57 +1,46 @@
-<group>
+<Polylines>
 	<Contourfinder_1>
-		<dilateErode>0</dilateErode>
-		<arclength1>399.235</arclength1>
-		<arclength2>200</arclength2>
-		<arclength3>50</arclength3>
-		<arclength4>6.27551</arclength4>
-		<mincanny>265</mincanny>
-		<maxcanny>192.398</maxcanny>
-		<cannyblur>2.34694</cannyblur>
-		<cannycontrast>0.0816326</cannycontrast>
-		<brightness>-0.0204082</brightness>
-		<Min_area>1</Min_area>
-		<Max_area>3469.95</Max_area>
-		<Threshold>78.0612</Threshold>
-		<Holes>1</Holes>
-		<Simple>0</Simple>
-		<Polyline_1>
-			<quadhard>24</quadhard>
-			<resample>7.94672</resample>
-			<smooth>2.00646</smooth>
-			<simplify>12.6073</simplify>
-			<area1_min>55</area1_min>
-			<area1_max>2794</area1_max>
-		<area_half_max>3</area_half_max>
-		</Polyline_1>
-		<Polyline_2>
-			<quadsmooth>11</quadsmooth>
-			<resample2>10.4457</resample2>
-			<smooth2>0.548732</smooth2>
-			<simplify2>5.31863</simplify2>
-			<area2_min>146</area2_min>
-			<area2_max>293</area2_max>
-		</Polyline_2>
-		<Polyline_3>
-			<quadfine>10</quadfine>
-			<resample3>23.357</resample3>
-			<smooth3>0.887133</smooth3>
-			<simplify3>18.0217</simplify3>
-			<area3_min>5</area3_min>
-			<area3_max>47</area3_max>
-		</Polyline_3>
-		<sortthreshold>1.83673</sortthreshold>
-		<poly>1</poly>
+        <Min_area>1</Min_area>
+        <Max_area>3469.95</Max_area>
+        <Threshold>78.0612</Threshold>
+        <Holes>1</Holes>
+        <Simple>0</Simple>
+        <Polyline_1>
+            <quadhard>24</quadhard>
+            <resample>7.94672</resample>
+            <smooth>2.00646</smooth>
+            <simplify>12.6073</simplify>
+            <area1_min>55</area1_min>
+            <area1_max>2794</area1_max>
+            <area_half_max>3</area_half_max>
+        </Polyline_1>
+        <Polyline_Half>
+            <resample_half>12.1117</resample_half>
+            <polyhalf_percent>4.59186</polyhalf_percent>
+            <simplify_half>4.38152</simplify_half>
+            <area_half_min>21</area_half_min>
+            <area_half_max>2627</area_half_max>
+        </Polyline_Half>
+        <Polyline_2>
+            <quadsmooth>11</quadsmooth>
+            <resample2>10.4457</resample2>
+            <smooth2>0.548732</smooth2>
+            <simplify2>5.31863</simplify2>
+            <area2_min>146</area2_min>
+            <area2_max>293</area2_max>
+        </Polyline_2>
+        <Polyline_3>
+            <quadfine>10</quadfine>
+            <resample3>23.357</resample3>
+            <smooth3>0.887133</smooth3>
+            <simplify3>18.0217</simplify3>
+            <area3_min>5</area3_min>
+            <area3_max>47</area3_max>
+        </Polyline_3>
+        <poly>1</poly>
 		<poly2>0</poly2>
 		<poly3>0</poly3>
-	<Polyline_Half>
-			<resample_half>12.1117</resample_half>
-			<polyhalf_percent>4.59186</polyhalf_percent>
-			<simplify_half>4.38152</simplify_half>
-			<area_half_min>21</area_half_min>
-			<area_half_max>2627</area_half_max>
-		</Polyline_Half>
 		<polyhalf>1</polyhalf>
 	</Contourfinder_1>
-<group/>
-</group>
+<Polylines/>
+</Polylines>

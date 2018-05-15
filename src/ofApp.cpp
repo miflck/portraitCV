@@ -64,13 +64,16 @@ void ofApp::setup(){
   serial.listDevices();
     if(bUseArduino) {
         vector <ofSerialDeviceInfo> deviceList = serial.getDeviceList();
-        serial.setup("tty.wchusbserial1420", baud); //open the first device
+       // serial.setup("tty.wchusbserial1420", baud); //open the first device
+        serial.setup("tty.wchusbserial1410", baud); //open the first device
+
         serial.startContinuousRead(false);
         ofAddListener(serial.NEW_MESSAGE,this,&ofApp::onNewMessage);
         
         
         
-       button.setup("tty.usbmodem141221", 9600); //open the first device
+       //button.setup("tty.usbmodem141221", 9600); //open the first device
+        button.setup("tty.usbmodem148211", 9600);//mac mini
         
         // serial.setup("/dev/tty.usbserial-A70060V8", 9600);
         button.startContinuousRead();
@@ -1344,6 +1347,9 @@ void ofApp::dragEvent(ofDragInfo dragInfo){
 void ofApp::exit(){
     dmxValue=0;
     dmx.setLevel(1, dmxValue);
+    dmx.setLevel(2, dmxValue);
+    dmx.setLevel(3, dmxValue);
+
     dmx.update();
     clearCommands();
     goHome();

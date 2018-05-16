@@ -494,7 +494,6 @@ void setup() {
   servoTilt.writeMicroseconds(800); //set initial servo position if desired
   delay(100);
 
-
   servoPen.attach(servopin2);
   delay(100);
 

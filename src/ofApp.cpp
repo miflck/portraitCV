@@ -50,7 +50,8 @@ static bool sortByDistance(const ofPolyline &a, const ofPolyline &b){
 //--------------------------------------------------------------
 void ofApp::setup(){
     
-font.load("frabk.ttf", 50);
+font.load("frabk.ttf", 60);
+    ofHideCursor();
 
   serial.listDevices();
     if(bUseArduino) {
@@ -235,7 +236,7 @@ font.load("frabk.ttf", 50);
 
     robot.setName("Robot");
 
-    robot.add(penUpPos.set("penUpPos", 145, 0, 180));
+    robot.add(penUpPos.set("penUpPos", 145, -100, 180));
     robot.add(penHighUpPos.set("penHighUpPos", 147, 0, 180));
     robot.add(penHighDownPos.set("penHighDownPos", 30, 0, 180));
     robot.add(penDownPos.set("penDownPos", 162, 0, 180));
@@ -713,7 +714,7 @@ void ofApp::makePolylines(){
         }
     }
     
-    ofSort(linesToPrint, sortByArea);
+    //ofSort(linesToPrint, sortByArea);
     
     linesToAnimate=linesToDraw1;
     
@@ -1194,9 +1195,12 @@ void ofApp::onNewButtonMessage(string & message)
 {
     cout << "onNewButtonMessage, message: " << message << "\n";
     if(message=="1" && state == IDLE){
-        makeNewPortrait();
+       /* makeNewPortrait();
         makeContours();
-        record=true;
+        record=true;*/
+        
+        makeNewPortraitWithTimer();
+
     }
     
     if(message=="-1"){
@@ -1306,6 +1310,13 @@ void ofApp::keyPressed(int key){
         bDrawGui=!bDrawGui;
     }
     
+    if(key=='8'){
+        ofHideCursor();
+    }
+    if (key=='7'){
+        ofShowCursor();
+    }
+    
     
     if(key=='w'){
         turnDraw();
@@ -1379,10 +1390,10 @@ void ofApp::exit(){
 
     dmx.update();
     clearCommands();
-    goHome();
-    sendFinalFeed();
-    serial.writeString(message);
-    ofSleepMillis(4000);
+    //goHome();
+    //sendFinalFeed();
+   // serial.writeString(message);
+   // ofSleepMillis(4000);
     turnDraw();
     sendFinalFeed();
     serial.writeString(message);

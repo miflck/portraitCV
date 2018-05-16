@@ -10,12 +10,12 @@
     </Canny_1>
     <Canny_2>
         <dilateErode2>0</dilateErode2>
-        <mincanny2>1453.57</mincanny2>
-        <maxcanny2>1603.57</maxcanny2>
-        <cannyblur2>3.72449</cannyblur2>
-        <cannycontrast2>-0.142857</cannycontrast2>
+        <mincanny2>725</mincanny2>
+        <maxcanny2>1646.43</maxcanny2>
+        <cannyblur2>1.68367</cannyblur2>
+        <cannycontrast2>-0.142347</cannycontrast2>
         <brightness2>0.27551</brightness2>
-        <Threshold_2>78.0612</Threshold_2>
+        <Threshold_2>110.587</Threshold_2>
     </Canny_2>
     <bUseCanny1>0</bUseCanny1>
 		<Canny_1>
@@ -58,4 +58,5 @@
 		</Canny_2>
 		<bUseCanny1>0</bUseCanny1>
 	</group>
+<Canny/>
 </Canny>

@@ -18,10 +18,6 @@ string cmd;
 bool bUseArduino=true;
 
 
-
-
-
-
 static bool sortByCriteria(const ofPoint &a, const ofPoint &b){
     return a.x < b.x;
 }
@@ -39,15 +35,12 @@ static bool sortByArea(const ofPolyline &a, const ofPolyline &b){
 }
 
 static bool sortByDistance(const ofPolyline &a, const ofPolyline &b){
-    
     ofVec2f n=ofVec2f(0,0);
     ofVec2f aV=a.getPointAtPercent(0);
     ofVec2f bV=b.getPointAtPercent(0);
-    
     float d1=ofDist(aV.x,aV.y,n.x, n.y);
     float d2=ofDist(bV.x,bV.y,n.x, n.y);
     return d1>d2;
-    
 }
 
 
@@ -57,10 +50,8 @@ static bool sortByDistance(const ofPolyline &a, const ofPolyline &b){
 //--------------------------------------------------------------
 void ofApp::setup(){
     
-    font.load("frabk.ttf", 30);
+font.load("frabk.ttf", 50);
 
-    
-    
   serial.listDevices();
     if(bUseArduino) {
         vector <ofSerialDeviceInfo> deviceList = serial.getDeviceList();
@@ -135,13 +126,11 @@ void ofApp::setup(){
     imageparameters.add(brightness.set("brightness", 0, -1, 1));
     imageparameters.add(blur.set("blur", 0, 0, 10));
     imageparameters.add(zoomfact.set("zoom", 1, 0, 2));
-    imageparameters.add(facezoomfact.set("zoom", 1, 0, 2));
+    imageparameters.add(facezoomfact.set("facezoom", 1, 0, 2));
 
     gui.add(imageparameters);
     gui.getGroup("Image").minimize();
   
-    
-    
     canny1.setName("Canny 1");
     canny1.add(dilateErode.set("dilateErode", 2, 0, 5));
     canny1.add(mincanny.set("mincanny", 80, 10, 500));
@@ -152,7 +141,6 @@ void ofApp::setup(){
     canny1.add(threshold.set("Threshold", 128, 0, 255));
 
     cannyPanel.add(canny1);
-    
     canny2group.setName("Canny 2");
     canny2group.add(dilateErode2.set("dilateErode2", 2, 0, 5));
     canny2group.add(mincanny2.set("mincanny2", 80, -100,2000));
@@ -163,10 +151,8 @@ void ofApp::setup(){
     canny2group.add(threshold2.set("Threshold 2", 128, 0, 255));
 
     cannyPanel.add(canny2group);
-    
     cannyPanel.add(bUseCanny1.set("bUseCanny1",false));
 
-    
     finder1.setName("Contourfinder 1");
     finder1.add(minArea.set("Min area", 1, 1, 100));
     finder1.add(maxArea.set("Max area", 200, 1, 8000));
@@ -255,19 +241,11 @@ void ofApp::setup(){
     robot.add(penDownPos.set("penDownPos", 162, 0, 180));
     robot.add(penIdlePos.set("penIdlePos", 142, 0, 180));
     robot.add(penDrawPos.set("penDrawPos", 118, 0, 180));
-    
     robot.add(dipPosX.set("dipPosX", 0, 0, -300));
     robot.add(dipPosY.set("dipPosY", 0, 0, -300));
-    
-    
     robot.add(waitPosX.set("waitPosX", 0, -1000, 1000));
     robot.add(waitPosY.set("waitPosY", 1000, 0, 1600));
-    
-    
     robot.add(dimAmmount.set("dimAmmount", 0, 0, 255));
-
-
-    
     gui.add(robot);
     gui.getGroup("Robot").minimize();
 
@@ -306,18 +284,14 @@ void ofApp::update(){
     
     switch (state) {
         case IDLE:
-            //turnLightsOn();
             break;
             
         case DRAWING:
             turnLightsOff();
-            if(commands.size()<=0){
+            if(commands.size()<=0 &! bGoHome){
                 turnDraw();
                 waitPos();
                 turnIdle();
-                
-              //  goHome();
-              //  turnIdle();
                 state=IDLE;
             }
             break;
@@ -386,6 +360,15 @@ void ofApp::update(){
         state=DRAWING;
         makeFeed();
     }
+    
+    if(bMakeNewPortraitwidthTimer && ofGetElapsedTimeMillis()-portraitinittime>portraitTimerDuration){
+        makeNewPortraitWithTimerFinished();
+    }
+
+    
+    
+    
+    
     stateBefore=state;
 }
 
@@ -751,6 +734,10 @@ void ofApp::makePolylines(){
 //--------------------------------------------------------------
 void ofApp::draw(){
     
+    
+    string s="beschäftigt...";
+    ofRectangle bb;
+
     switch (state) {
         case IDLE:
             face.draw(ofGetWidth()/2-face.getWidth()/2,ofGetHeight()/2-face.getHeight()/2,face.getWidth(),face.getHeight());
@@ -768,7 +755,9 @@ void ofApp::draw(){
             ofSetColor(0, 0, 0);
             ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
             ofSetColor(255);
-            font.drawString("Bitte warten", ofGetWidth()/2-200, ofGetHeight()/2);
+            
+            bb=font.getStringBoundingBox(s, 0, 0);
+            font.drawString(s, ofGetWidth()/2-bb.getWidth()/2, ofGetHeight()/2);
            // font.drawString(ofToString(commands.size())+" commands to go", ofGetWidth()/2-500, ofGetHeight()/2);
             ofPopStyle();
 
@@ -780,22 +769,30 @@ void ofApp::draw(){
            // mask.draw(0,0, mask.getWidth(), mask.getHeight());
             break;
             
-            font.drawString("Bitte warten", ofGetWidth()/2-200, ofGetHeight()/2);
 
     }
+    
+    
+    if(bMakeNewPortraitwidthTimer){
+        ofPushStyle();
+        ofSetColor(255, 0, 0);
+        font.drawString(ofToString(((portraitTimerDuration-(ofGetElapsedTimeMillis()-portraitinittime))/1000)+1), ofGetWidth()/2-20, ofGetHeight()/2);
+        ofPopStyle();
+    }
+    
+
     
    // font.drawString(ofToString(idleTimerDuration-ofGetElapsedTimeMillis()-initIdletime)+" "+ofToString(idleTimerDuration), ofGetWidth()/2-500, ofGetHeight()/2);
 
     
     
     if(bShowDebug){
-    zoom.draw(ofGetWidth()-grayImage.getWidth()/3,0,grayImage.getWidth()/3,grayImage.getHeight()/3);
+    zoom.draw(ofGetWidth()-zoom.getWidth()/3,0,zoom.getWidth()/3,zoom.getHeight()/3);
 
     if(bShowImage){
         grayImage.draw(0,0);
-        ofDrawRectangle(eyeBoundingBox.x,eyeBoundingBox.y,eyeBoundingBox.getWidth(),eyeBoundingBox.getHeight());
-
     }
+        
     cam.draw(ofGetWidth()-cam.getWidth()/3, grayImage.getHeight()/3,cam.getWidth()/3,cam.getHeight()/3);
     ofPushStyle();
     ofSetColor(255);
@@ -818,7 +815,12 @@ void ofApp::draw(){
     
 
     if(bShowDebugLines){
-
+        
+        int gutter=100;
+        ofPushStyle();
+        ofSetColor(0);
+        ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
+        ofPopStyle();
         ofPushMatrix();
         ofScale(scaleScreen,scaleScreen);
         ofPushStyle();
@@ -852,8 +854,12 @@ void ofApp::draw(){
         ofPopStyle();
         ofPopMatrix();
     
+        
+        
         ofPushMatrix();
-        ofTranslate(500, 0);
+        ofTranslate(faceBoundingBox.getWidth()*scaleScreen+gutter*scaleScreen, 0);
+
+        ofPushMatrix();
         ofScale(scaleScreen,scaleScreen);
         ofPushStyle();
         ofSetColor(255, 255, 255);
@@ -869,24 +875,29 @@ void ofApp::draw(){
         ofNoFill();
         ofSetColor(255,0,0);
         ofDrawRectangle(0,0,faceBoundingBox.getWidth(),faceBoundingBox.getHeight());
-        ofSetColor(0,255,0);
-        ofDrawRectangle(faceBoundingBox.x,faceBoundingBox.y,faceBoundingBox.getWidth(),faceBoundingBox.getHeight());
-        ofDrawRectangle(eyeBoundingBox.x,eyeBoundingBox.y,eyeBoundingBox.getWidth(),eyeBoundingBox.getHeight());
-        
-        ofSetColor(255,0,255);
-        ofDrawRectangle(eyeBoundingBox.x-faceBoundingBoxOriginal.x,eyeBoundingBox.y-faceBoundingBoxOriginal.y,eyeBoundingBox.getWidth(),eyeBoundingBox.getHeight());
-
-        ofSetColor(0,0,255);
-        ofDrawRectangle(faceBoundingBoxOriginal.x,faceBoundingBoxOriginal.y,faceBoundingBoxOriginal.getWidth(),faceBoundingBoxOriginal.getHeight());
-
-        
         ofPopStyle();
         ofPopMatrix();
+        
+        ofTranslate(faceBoundingBox.getWidth()*scaleScreen+gutter*scaleScreen, 0);
+
+        ofPushMatrix();
+        ofPushStyle();
+        ofSetColor(255, 255, 0);
+        ofScale(scaleScreen,scaleScreen);
+        for(int i = 0; i < linesToPrint.size(); i++) {
+            linesToPrint[i].draw();
+        }
+        ofPopStyle();
+        ofPopMatrix();
+        
     
-    
-    int gutter=100;
+        ofPopMatrix();
+        
+        
+        
         ofPushMatrix();
         ofTranslate(0, faceBoundingBox.getHeight()*scaleScreen);
+        
         ofPushMatrix();
         ofScale(scaleScreen,scaleScreen);
         ofPushStyle();
@@ -895,7 +906,9 @@ void ofApp::draw(){
             linesToDraw1[i].draw();
         }
         ofPopMatrix();
-        ofTranslate(faceBoundingBox.getWidth()*scaleScreen+gutter, 0);
+        
+        ofTranslate(faceBoundingBox.getWidth()*scaleScreen+gutter*scaleScreen, 0);
+        
         ofPushMatrix();
         ofScale(scaleScreen,scaleScreen);
         ofSetColor(0, 255, 255);
@@ -905,7 +918,7 @@ void ofApp::draw(){
         ofPopMatrix();
         
         ofSetColor(255, 255, 0);
-        ofTranslate(faceBoundingBox.getWidth()*scaleScreen+gutter, 0);
+        ofTranslate(faceBoundingBox.getWidth()*scaleScreen+gutter*scaleScreen, 0);
         ofPushMatrix();
         ofScale(scaleScreen,scaleScreen);
             for(int i = 0; i < linesToDraw2.size(); i++) {
@@ -913,7 +926,7 @@ void ofApp::draw(){
             }
         ofPopMatrix();
     
-        ofTranslate(faceBoundingBox.getWidth()*scaleScreen+gutter, 0);
+        ofTranslate(faceBoundingBox.getWidth()*scaleScreen+gutter*scaleScreen, 0);
         ofPushMatrix();
         ofScale(scaleScreen,scaleScreen);
         for(int i = 0; i < linesToDraw3.size(); i++) {
@@ -926,29 +939,10 @@ void ofApp::draw(){
         ofPopMatrix();
     
     
-        ofPushMatrix();
-        ofPushStyle();
-        ofSetColor(255, 255, 0);
-        ofTranslate(1000, 0);
-        ofScale(scaleScreen,scaleScreen);
-        for(int i = 0; i < linesToPrint.size(); i++) {
-            linesToPrint[i].draw();
-        }
-        for(int i = 0; i < eyes.size(); i++) {
-            eyes[i].draw();
-        }
-        
-        ofPopStyle();
-        ofPopMatrix();
+       
     
     
-        ofPushMatrix();
-        ofTranslate(0, 900);
-
-        ofPushStyle();
-        contourFinder2.draw();
-        ofPopStyle();
-        ofPopMatrix();
+       
     
     }
     if(bDrawGui) {
@@ -958,6 +952,23 @@ void ofApp::draw(){
     }
 
 }
+
+void ofApp::makeNewPortraitWithTimer(){
+    bMakeNewPortraitwidthTimer=true;
+    portraitinittime=ofGetElapsedTimeMillis();
+    
+    
+}
+
+
+void ofApp::makeNewPortraitWithTimerFinished(){
+    makeNewPortrait();
+    makeContours();
+    record=true;
+    bMakeNewPortraitwidthTimer=false;
+
+}
+
 
 //--------------------------------------------------------------
 void ofApp::makeNewPortrait(){
@@ -1191,6 +1202,8 @@ void ofApp::onNewButtonMessage(string & message)
     if(message=="-1"){
         commands.clear();
         bGoHome=true;
+        turnLightsOn();
+        state=IDLE;
     }
     
 }
@@ -1207,7 +1220,7 @@ void ofApp::keyPressed(int key){
         commands.clear();
         bGoHome=true;
         turnLightsOn();
-    
+        state=IDLE;
     }
     
     if(key == 'C'){
@@ -1216,7 +1229,6 @@ void ofApp::keyPressed(int key){
     }
 
     if(key=='r'){
-        
         record=true;
     }
     
@@ -1299,6 +1311,11 @@ void ofApp::keyPressed(int key){
         turnDraw();
         waitPos();
         turnIdle();
+    }
+    
+    
+    if(key=='p'){
+        makeNewPortraitWithTimer();
     }
     
 }

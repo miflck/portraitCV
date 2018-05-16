@@ -774,7 +774,10 @@ void ofApp::draw(){
     
     
     if(bMakeNewPortraitwidthTimer){
+        ofPushStyle();
+        ofSetColor(255, 0, 0);
         font.drawString(ofToString(((portraitTimerDuration-(ofGetElapsedTimeMillis()-portraitinittime))/1000)+1), ofGetWidth()/2-20, ofGetHeight()/2);
+        ofPopStyle();
     }
     
 
@@ -784,13 +787,12 @@ void ofApp::draw(){
     
     
     if(bShowDebug){
-    zoom.draw(ofGetWidth()-grayImage.getWidth()/3,0,grayImage.getWidth()/3,grayImage.getHeight()/3);
+    zoom.draw(ofGetWidth()-zoom.getWidth()/3,0,zoom.getWidth()/3,zoom.getHeight()/3);
 
     if(bShowImage){
         grayImage.draw(0,0);
-        ofDrawRectangle(eyeBoundingBox.x,eyeBoundingBox.y,eyeBoundingBox.getWidth(),eyeBoundingBox.getHeight());
-
     }
+        
     cam.draw(ofGetWidth()-cam.getWidth()/3, grayImage.getHeight()/3,cam.getWidth()/3,cam.getHeight()/3);
     ofPushStyle();
     ofSetColor(255);
@@ -813,7 +815,12 @@ void ofApp::draw(){
     
 
     if(bShowDebugLines){
-
+        
+        int gutter=100;
+        ofPushStyle();
+        ofSetColor(0);
+        ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
+        ofPopStyle();
         ofPushMatrix();
         ofScale(scaleScreen,scaleScreen);
         ofPushStyle();
@@ -847,8 +854,12 @@ void ofApp::draw(){
         ofPopStyle();
         ofPopMatrix();
     
+        
+        
         ofPushMatrix();
-        ofTranslate(500, 0);
+        ofTranslate(faceBoundingBox.getWidth()*scaleScreen+gutter*scaleScreen, 0);
+
+        ofPushMatrix();
         ofScale(scaleScreen,scaleScreen);
         ofPushStyle();
         ofSetColor(255, 255, 255);
@@ -864,24 +875,29 @@ void ofApp::draw(){
         ofNoFill();
         ofSetColor(255,0,0);
         ofDrawRectangle(0,0,faceBoundingBox.getWidth(),faceBoundingBox.getHeight());
-        ofSetColor(0,255,0);
-        ofDrawRectangle(faceBoundingBox.x,faceBoundingBox.y,faceBoundingBox.getWidth(),faceBoundingBox.getHeight());
-        ofDrawRectangle(eyeBoundingBox.x,eyeBoundingBox.y,eyeBoundingBox.getWidth(),eyeBoundingBox.getHeight());
-        
-        ofSetColor(255,0,255);
-        ofDrawRectangle(eyeBoundingBox.x-faceBoundingBoxOriginal.x,eyeBoundingBox.y-faceBoundingBoxOriginal.y,eyeBoundingBox.getWidth(),eyeBoundingBox.getHeight());
-
-        ofSetColor(0,0,255);
-        ofDrawRectangle(faceBoundingBoxOriginal.x,faceBoundingBoxOriginal.y,faceBoundingBoxOriginal.getWidth(),faceBoundingBoxOriginal.getHeight());
-
-        
         ofPopStyle();
         ofPopMatrix();
+        
+        ofTranslate(faceBoundingBox.getWidth()*scaleScreen+gutter*scaleScreen, 0);
+
+        ofPushMatrix();
+        ofPushStyle();
+        ofSetColor(255, 255, 0);
+        ofScale(scaleScreen,scaleScreen);
+        for(int i = 0; i < linesToPrint.size(); i++) {
+            linesToPrint[i].draw();
+        }
+        ofPopStyle();
+        ofPopMatrix();
+        
     
-    
-    int gutter=100;
+        ofPopMatrix();
+        
+        
+        
         ofPushMatrix();
         ofTranslate(0, faceBoundingBox.getHeight()*scaleScreen);
+        
         ofPushMatrix();
         ofScale(scaleScreen,scaleScreen);
         ofPushStyle();
@@ -890,7 +906,9 @@ void ofApp::draw(){
             linesToDraw1[i].draw();
         }
         ofPopMatrix();
-        ofTranslate(faceBoundingBox.getWidth()*scaleScreen+gutter, 0);
+        
+        ofTranslate(faceBoundingBox.getWidth()*scaleScreen+gutter*scaleScreen, 0);
+        
         ofPushMatrix();
         ofScale(scaleScreen,scaleScreen);
         ofSetColor(0, 255, 255);
@@ -900,7 +918,7 @@ void ofApp::draw(){
         ofPopMatrix();
         
         ofSetColor(255, 255, 0);
-        ofTranslate(faceBoundingBox.getWidth()*scaleScreen+gutter, 0);
+        ofTranslate(faceBoundingBox.getWidth()*scaleScreen+gutter*scaleScreen, 0);
         ofPushMatrix();
         ofScale(scaleScreen,scaleScreen);
             for(int i = 0; i < linesToDraw2.size(); i++) {
@@ -908,7 +926,7 @@ void ofApp::draw(){
             }
         ofPopMatrix();
     
-        ofTranslate(faceBoundingBox.getWidth()*scaleScreen+gutter, 0);
+        ofTranslate(faceBoundingBox.getWidth()*scaleScreen+gutter*scaleScreen, 0);
         ofPushMatrix();
         ofScale(scaleScreen,scaleScreen);
         for(int i = 0; i < linesToDraw3.size(); i++) {
@@ -921,29 +939,10 @@ void ofApp::draw(){
         ofPopMatrix();
     
     
-        ofPushMatrix();
-        ofPushStyle();
-        ofSetColor(255, 255, 0);
-        ofTranslate(1000, 0);
-        ofScale(scaleScreen,scaleScreen);
-        for(int i = 0; i < linesToPrint.size(); i++) {
-            linesToPrint[i].draw();
-        }
-        for(int i = 0; i < eyes.size(); i++) {
-            eyes[i].draw();
-        }
-        
-        ofPopStyle();
-        ofPopMatrix();
+       
     
     
-        ofPushMatrix();
-        ofTranslate(0, 900);
-
-        ofPushStyle();
-        contourFinder2.draw();
-        ofPopStyle();
-        ofPopMatrix();
+       
     
     }
     if(bDrawGui) {

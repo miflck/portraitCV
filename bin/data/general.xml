@@ -40,5 +40,45 @@
         <waitPosY>1461</waitPosY>
         <dimAmmount>92.3725</dimAmmount>
     </Robot>
-<General/>
+<group>
+		<Dispaly>
+			<bShowImage>0</bShowImage>
+			<bShowCanny>0</bShowCanny>
+			<bShowCanny2>1</bShowCanny2>
+			<bShowDebug>1</bShowDebug>
+			<bShowDebugLines>1</bShowDebugLines>
+		</Dispaly>
+		<Image>
+			<contrast>0</contrast>
+			<brightness>0</brightness>
+			<blur>0</blur>
+			<zoom>1</zoom>
+		<facezoom>1</facezoom>
+		</Image>
+		<scaleScreen>0.915</scaleScreen>
+		<Contourfinder_2>
+			<Min_area2>1</Min_area2>
+			<Max_area2>200</Max_area2>
+			<Holes2>1</Holes2>
+			<eyeAreamin2>1</eyeAreamin2>
+			<eyeAreamax>200</eyeAreamax>
+			<eyeresample>0</eyeresample>
+			<eyesmooth>0</eyesmooth>
+			<eyesimplify>0</eyesimplify>
+			<eyequad>0</eyequad>
+		</Contourfinder_2>
+		<Robot>
+			<penUpPos>145</penUpPos>
+			<penHighUpPos>147</penHighUpPos>
+			<penHighDownPos>30</penHighDownPos>
+			<penDownPos>162</penDownPos>
+			<penIdlePos>142</penIdlePos>
+			<penDrawPos>118</penDrawPos>
+			<dipPosX>0</dipPosX>
+			<dipPosY>0</dipPosY>
+			<waitPosX>0</waitPosX>
+			<waitPosY>1000</waitPosY>
+			<dimAmmount>0</dimAmmount>
+		</Robot>
+	</group>
 </General>

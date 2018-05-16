@@ -50,10 +50,8 @@ static bool sortByDistance(const ofPolyline &a, const ofPolyline &b){
 //--------------------------------------------------------------
 void ofApp::setup(){
     
-    font.load("frabk.ttf", 30);
+font.load("frabk.ttf", 50);
 
-    
-    
   serial.listDevices();
     if(bUseArduino) {
         vector <ofSerialDeviceInfo> deviceList = serial.getDeviceList();
@@ -736,6 +734,10 @@ void ofApp::makePolylines(){
 //--------------------------------------------------------------
 void ofApp::draw(){
     
+    
+    string s="beschäftigt...";
+    ofRectangle bb;
+
     switch (state) {
         case IDLE:
             face.draw(ofGetWidth()/2-face.getWidth()/2,ofGetHeight()/2-face.getHeight()/2,face.getWidth(),face.getHeight());
@@ -753,7 +755,9 @@ void ofApp::draw(){
             ofSetColor(0, 0, 0);
             ofDrawRectangle(0, 0, ofGetWidth(), ofGetHeight());
             ofSetColor(255);
-            font.drawString("Bin beschäftigt…", ofGetWidth()/2-200, ofGetHeight()/2);
+            
+            bb=font.getStringBoundingBox(s, 0, 0);
+            font.drawString(s, ofGetWidth()/2-bb.getWidth()/2, ofGetHeight()/2);
            // font.drawString(ofToString(commands.size())+" commands to go", ofGetWidth()/2-500, ofGetHeight()/2);
             ofPopStyle();
 
@@ -768,12 +772,9 @@ void ofApp::draw(){
 
     }
     
-  //  font.drawString("Bin beschäftigt…", ofGetWidth()/2-200, ofGetHeight()/2);
     
     if(bMakeNewPortraitwidthTimer){
-      //  ofGetElapsedTimeMillis()-portraitinittime;
-        font.drawString(ofToString(((portraitTimerDuration-(ofGetElapsedTimeMillis()-portraitinittime))/1000)+1), ofGetWidth()/2-200, ofGetHeight()/2);
-
+        font.drawString(ofToString(((portraitTimerDuration-(ofGetElapsedTimeMillis()-portraitinittime))/1000)+1), ofGetWidth()/2-20, ofGetHeight()/2);
     }
     
 

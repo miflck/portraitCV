@@ -235,7 +235,7 @@ font.load("frabk.ttf", 50);
 
     robot.setName("Robot");
 
-    robot.add(penUpPos.set("penUpPos", 145, 0, 180));
+    robot.add(penUpPos.set("penUpPos", 145, -100, 180));
     robot.add(penHighUpPos.set("penHighUpPos", 147, 0, 180));
     robot.add(penHighDownPos.set("penHighDownPos", 30, 0, 180));
     robot.add(penDownPos.set("penDownPos", 162, 0, 180));

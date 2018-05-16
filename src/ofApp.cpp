@@ -50,7 +50,8 @@ static bool sortByDistance(const ofPolyline &a, const ofPolyline &b){
 //--------------------------------------------------------------
 void ofApp::setup(){
     
-font.load("frabk.ttf", 50);
+font.load("frabk.ttf", 60);
+    ofHideCursor();
 
   serial.listDevices();
     if(bUseArduino) {
@@ -713,7 +714,7 @@ void ofApp::makePolylines(){
         }
     }
     
-    ofSort(linesToPrint, sortByArea);
+    //ofSort(linesToPrint, sortByArea);
     
     linesToAnimate=linesToDraw1;
     
@@ -1307,6 +1308,13 @@ void ofApp::keyPressed(int key){
     
     if(key=='9'){
         bDrawGui=!bDrawGui;
+    }
+    
+    if(key=='8'){
+        ofHideCursor();
+    }
+    if (key=='7'){
+        ofShowCursor();
     }
     
     

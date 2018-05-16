@@ -5,7 +5,7 @@
         <bShowDebug>0</bShowDebug>
         <bShowCanny2>0</bShowCanny2>
         <bUseCanny1>0</bUseCanny1>
-        <bShowDebugLines>1</bShowDebugLines>
+        <bShowDebugLines>0</bShowDebugLines>
     </Dispaly>
     <Image>
         <contrast>-0.0306122</contrast>

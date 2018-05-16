@@ -8,17 +8,17 @@
         <Polyline_1>
             <quadhard>39</quadhard>
             <resample>28.7714</resample>
-            <smooth>1.30362</smooth>
-            <simplify>16.9804</simplify>
-            <area1_min>70</area1_min>
+            <smooth>3.09975</smooth>
+            <simplify>9.17119</simplify>
+            <area1_min>25</area1_min>
             <area1_max>7416</area1_max>
             <area_half_max>3</area_half_max>
         </Polyline_1>
         <Polyline_Half>
-            <resample_half>8.77968</resample_half>
-            <polyhalf_percent>11.7347</polyhalf_percent>
-            <simplify_half>4.06914</simplify_half>
-            <area_half_min>41</area_half_min>
+            <resample_half>7.9467</resample_half>
+            <polyhalf_percent>10.9694</polyhalf_percent>
+            <simplify_half>2.71554</simplify_half>
+            <area_half_min>39</area_half_min>
             <area_half_max>3835</area_half_max>
         </Polyline_Half>
         <Polyline_2>
@@ -38,7 +38,7 @@
             <area3_max>47</area3_max>
         </Polyline_3>
         <poly>1</poly>
-		<poly2>0</poly2>
+		<poly2>1</poly2>
 		<poly3>0</poly3>
 		<polyhalf>1</polyhalf>
 	</Contourfinder_1>

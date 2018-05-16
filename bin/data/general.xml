@@ -5,16 +5,16 @@
         <bShowDebug>0</bShowDebug>
         <bShowCanny2>0</bShowCanny2>
         <bUseCanny1>0</bUseCanny1>
-        <bShowDebugLines>0</bShowDebugLines>
+        <bShowDebugLines>1</bShowDebugLines>
     </Dispaly>
     <Image>
         <contrast>-0.0306122</contrast>
         <brightness>0.326531</brightness>
         <blur>6.53061</blur>
-        <zoom>1</zoom>
-    <facezoom>1.04082</facezoom>
+        <zoom>0.928571</zoom>
+    <facezoom>0.704082</facezoom>
 	</Image>
-    <scaleScreen>0.585</scaleScreen>
+    <scaleScreen>0.525</scaleScreen>
     <Contourfinder_2>
         <Min_area2>1</Min_area2>
         <Max_area2>268.321</Max_area2>

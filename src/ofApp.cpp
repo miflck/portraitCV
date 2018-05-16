@@ -1194,9 +1194,12 @@ void ofApp::onNewButtonMessage(string & message)
 {
     cout << "onNewButtonMessage, message: " << message << "\n";
     if(message=="1" && state == IDLE){
-        makeNewPortrait();
+       /* makeNewPortrait();
         makeContours();
-        record=true;
+        record=true;*/
+        
+        makeNewPortraitWithTimer();
+
     }
     
     if(message=="-1"){
@@ -1379,10 +1382,10 @@ void ofApp::exit(){
 
     dmx.update();
     clearCommands();
-    goHome();
-    sendFinalFeed();
-    serial.writeString(message);
-    ofSleepMillis(4000);
+    //goHome();
+    //sendFinalFeed();
+   // serial.writeString(message);
+   // ofSleepMillis(4000);
     turnDraw();
     sendFinalFeed();
     serial.writeString(message);

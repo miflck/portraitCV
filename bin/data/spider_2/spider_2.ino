@@ -490,8 +490,8 @@ void setup() {
   initRobotSetup();
   //servoPen.write(roboSetup.data.penUpPos);
   //servoTilt.write(roboSetup.data.penDrawPos);
-  servoPen.writeMicroseconds(2000); //set initial servo position if desired
-  servoTilt.writeMicroseconds(2500); //set initial servo position if desired
+  servoPen.writeMicroseconds(1950); //set initial servo position if desired
+  servoTilt.writeMicroseconds(800); //set initial servo position if desired
   delay(100);
 
 

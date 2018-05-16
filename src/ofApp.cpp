@@ -99,7 +99,7 @@ font.load("frabk.ttf", 50);
    
     
     cam.listDevices();
-    cam.setDeviceID(0);
+    cam.setDeviceID(1);
 
    // cam.setup(1920,1080);
     cam.setup( 1600, 896);

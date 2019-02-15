@@ -291,6 +291,7 @@ void ofApp::update(){
     
     switch (state) {
         case IDLE:
+            turnLightsOn();
             break;
             
         case DRAWING:

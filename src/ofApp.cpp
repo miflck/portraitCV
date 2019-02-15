@@ -87,8 +87,14 @@ font.load("frabk.ttf", 60);
     //0ofSetLogLevel(OF_LOG_VERBOSE);
     
     
-    img.load("michaelflueckiger.jpeg");
+    img.load("Frankenstein_2.jpg");
+    //img.load("deluxe-frankenstein-mask_small.jpg");
+
     //img.load("Brad_Pitt_Fury_2014.jpg");
+//    img.load("michaelflueckiger.jpeg");
+
+  
+    
 
     mask.load("mask.png");
     
@@ -257,7 +263,7 @@ font.load("frabk.ttf", 60);
     
     ofBackground(0);
     //makeNewPortrait();
-    makeContours();
+   makeContours();
     inittime=ofGetElapsedTimeMillis();
     initIdletime=ofGetElapsedTimeMillis();
     turnLightsOn();

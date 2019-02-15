@@ -23,7 +23,7 @@ void setup() {
   Serial.begin(9600);
   // initialize the LED pin as an output:
   // initialize the pushbutton pin as an input:
-  pinMode(buttonPin, INPUT);
+  pinMode(buttonPin, INPUT_PULLUP);
 
   
 
@@ -72,6 +72,10 @@ void loop() {
 
   // save the current state as the last state, for next time through the loop
   lastButtonState = buttonState;
+        Serial.print(buttonState);
+        Serial.print(" ");
+
+      Serial.println(lastButtonState);
 
 }
 

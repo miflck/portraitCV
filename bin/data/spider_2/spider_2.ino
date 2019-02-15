@@ -144,8 +144,8 @@ void doMove()
 #define STEPS_PER_CIRCLE 3200.0f
 //#define STEPS_PER_CIRCLE 300.0f
 
-#define WIDTH 700 // width between stepper axis
-#define HANGPOS 500 // the init hang position
+#define WIDTH 1320 // width between stepper axis
+#define HANGPOS 1630 // the init hang position
 #define DIAMETER 58 // the diameter of stepper wheel
 #define STEPS_PER_MM (STEPS_PER_CIRCLE/PI/DIAMETER)
 float initString;

@@ -43,7 +43,7 @@
     </Robot>
 <group>
 		<Dispaly>
-			<bShowImage>1</bShowImage>
+			<bShowImage>0</bShowImage>
 			<bShowCanny>0</bShowCanny>
 			<bShowCanny2>1</bShowCanny2>
 			<bShowDebug>1</bShowDebug>
@@ -56,7 +56,7 @@
 			<zoom>1</zoom>
 		<facezoom>1</facezoom>
 		</Image>
-		<scaleScreen>0.945</scaleScreen>
+		<scaleScreen>0.915</scaleScreen>
 		<Contourfinder_2>
 			<Min_area2>1</Min_area2>
 			<Max_area2>200</Max_area2>

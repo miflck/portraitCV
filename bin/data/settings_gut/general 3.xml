@@ -45,7 +45,7 @@
 		<Dispaly>
 			<bShowImage>1</bShowImage>
 			<bShowCanny>0</bShowCanny>
-			<bShowCanny2>1</bShowCanny2>
+			<bShowCanny2>0</bShowCanny2>
 			<bShowDebug>1</bShowDebug>
 			<bShowDebugLines>1</bShowDebugLines>
 		</Dispaly>

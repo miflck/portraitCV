@@ -62,24 +62,18 @@ font.load("frabk.ttf", 60);
         serial.startContinuousRead(false);
         ofAddListener(serial.NEW_MESSAGE,this,&ofApp::onNewMessage);
         
-        
-        
        //button.setup("tty.usbmodem141221", 9600); //open the first device
         button.setup("tty.usbmodem1471", 9600);//mac mini
         
         // serial.setup("/dev/tty.usbserial-A70060V8", 9600);
         button.startContinuousRead();
         ofAddListener(button.NEW_MESSAGE,this,&ofApp::onNewButtonMessage);
-        
-        
     }
     
     
     bool        bSendSerialMessage=false;            // a flag for sending serial
     message = "";
-    
-    
-    
+
     dmx.connect("tty.usbserial-EN210513"); // use the name
     dmxValue=0;
     
@@ -436,7 +430,9 @@ void ofApp::makeContours(){
         
         // Find ROI
         int diffx,diffy,dx,dy,hy;
-        int offsetty=150;
+        //int offsetty=150;
+        int offsetty=250;
+
         diffx=cur.x+cur.width;
         diffy=cur.y-offsetty/2;
         if(cur.y-offsetty/2<=0){
@@ -733,7 +729,53 @@ void ofApp::makePolylines(){
     }
     
     
+    
+    saveFrame.allocate(faceBoundingBox.getWidth()*2,faceBoundingBox.getHeight()*2);
+    //saveFrame.allocate(faceBoundingBox.getWidth(),faceBoundingBox.getHeight());
+    
+    saveFrame.begin();
+    ofEnableAlphaBlending();
+    ofClear(255,255,255,0);
+    glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    
+    ofSetColor(255);
+    ofDrawRectangle(0, 0, saveFrame.getWidth(), saveFrame.getHeight());
+    ofSetColor(0);
+    ofScale(2,2);
+    for(int i = 0; i < linesToPrint.size(); i++) {
+        ofSetColor(0);
+        
+        ofSetLineWidth(5);
 
+        linesToPrint[i].draw();
+        
+        for(int l = 0; l < linesToPrint[i].size(); l++) {
+            ofSetLineWidth(5);
+            
+            ofPolyline pl;
+            ofPoint p= linesToPrint[i].getPointAtIndexInterpolated(0);
+            pl.addVertex(p);
+            
+            for(int k = 1; k < linesToPrint[i].size(); k++) {
+                ofPoint p= linesToPrint[i].getPointAtIndexInterpolated(k);
+                
+                ofPoint v=linesToPrint[i].getNormalAtIndex(k);
+                v*=ofRandom(3);
+                //p+=ofPoint(ofRandom(-5,5),ofRandom(-5,5));
+                p+=v;
+                
+                pl.addVertex(p);
+            }
+            
+            //  p= linesToPrint[i].getPointAtIndexInterpolated(linesToPrint[i].size());
+            //  pl.addVertex(p);
+            
+            ofSetColor(0,50);
+            
+          //  pl.draw();
+        }
+    }
+    saveFrame.end();
 
     
 }
@@ -797,9 +839,9 @@ void ofApp::draw(){
     if(bShowDebug){
     zoom.draw(ofGetWidth()-zoom.getWidth()/3,0,zoom.getWidth()/3,zoom.getHeight()/3);
 
-    if(bShowImage){
-        grayImage.draw(0,0);
-    }
+        if(bShowImage){
+            grayImage.draw(0,0);
+        }
         
     cam.draw(ofGetWidth()-cam.getWidth()/3, grayImage.getHeight()/3,cam.getWidth()/3,cam.getHeight()/3);
     ofPushStyle();
@@ -821,7 +863,19 @@ void ofApp::draw(){
         ofPopStyle();
     }
     
+    drawDebugLines();
 
+    if(bDrawGui) {
+        gui.draw();
+        polylinesPanel.draw();
+        cannyPanel.draw();
+    }
+
+}
+
+
+
+void ofApp::drawDebugLines(){
     if(bShowDebugLines){
         
         int gutter=100;
@@ -835,7 +889,7 @@ void ofApp::draw(){
         ofNoFill();
         ofSetLineWidth(2);
         for(int i = 0; i < (int)contourFinder.getPolylines().size(); i++) {
-             ofSetColor(255);
+            ofSetColor(255);
             
             if (contourFinder.getContourArea(i)>30){
                 ofSetColor(255,0,0);
@@ -861,12 +915,12 @@ void ofApp::draw(){
         }
         ofPopStyle();
         ofPopMatrix();
-    
+        
         
         
         ofPushMatrix();
         ofTranslate(faceBoundingBox.getWidth()*scaleScreen+gutter*scaleScreen, 0);
-
+        
         ofPushMatrix();
         ofScale(scaleScreen,scaleScreen);
         ofPushStyle();
@@ -887,7 +941,7 @@ void ofApp::draw(){
         ofPopMatrix();
         
         ofTranslate(faceBoundingBox.getWidth()*scaleScreen+gutter*scaleScreen, 0);
-
+        
         ofPushMatrix();
         ofPushStyle();
         ofSetColor(255, 255, 0);
@@ -898,9 +952,22 @@ void ofApp::draw(){
         ofPopStyle();
         ofPopMatrix();
         
-    
+        ofTranslate(faceBoundingBox.getWidth()*scaleScreen+gutter*scaleScreen, 0);
+
+        ofPushMatrix();
+        ofPushStyle();
+        ofSetColor(255);
+        ofScale(0.5,0.5);
+        ofScale(scaleScreen,scaleScreen);
+
+        saveFrame.draw(0,0);
+        ofPopStyle();
         ofPopMatrix();
         
+        ofPopMatrix();
+        
+        
+       
         
         
         ofPushMatrix();
@@ -929,11 +996,11 @@ void ofApp::draw(){
         ofTranslate(faceBoundingBox.getWidth()*scaleScreen+gutter*scaleScreen, 0);
         ofPushMatrix();
         ofScale(scaleScreen,scaleScreen);
-            for(int i = 0; i < linesToDraw2.size(); i++) {
-                linesToDraw2[i].draw();
-            }
+        for(int i = 0; i < linesToDraw2.size(); i++) {
+            linesToDraw2[i].draw();
+        }
         ofPopMatrix();
-    
+        
         ofTranslate(faceBoundingBox.getWidth()*scaleScreen+gutter*scaleScreen, 0);
         ofPushMatrix();
         ofScale(scaleScreen,scaleScreen);
@@ -942,24 +1009,21 @@ void ofApp::draw(){
         }
         ofPopMatrix();
         
+        
     
+        
+        
+        
         ofPopStyle();
         ofPopMatrix();
-    
-    
-       
-    
-    
-       
-    
+        
     }
-    if(bDrawGui) {
-        gui.draw();
-        polylinesPanel.draw();
-        cannyPanel.draw();
-    }
+    
 
 }
+
+
+
 
 void ofApp::makeNewPortraitWithTimer(){
     bMakeNewPortraitwidthTimer=true;
@@ -974,16 +1038,15 @@ void ofApp::makeNewPortraitWithTimerFinished(){
     makeContours();
     record=true;
     bMakeNewPortraitwidthTimer=false;
-
 }
 
 
 //--------------------------------------------------------------
 void ofApp::makeNewPortrait(){
     if(colorImg.getWidth()!=cam.getWidth()){
-    colorImg.allocate(cam.getWidth(),cam.getHeight());
-    grayImage.allocate(cam.getWidth(),cam.getHeight());
-    zoom.allocate(cam.getWidth(),cam.getHeight());
+        colorImg.allocate(cam.getWidth(),cam.getHeight());
+        grayImage.allocate(cam.getWidth(),cam.getHeight());
+        zoom.allocate(cam.getWidth(),cam.getHeight());
     }
     colorImg.setFromPixels(cam.getPixels());
     grayImage=colorImg;
@@ -1334,6 +1397,29 @@ void ofApp::keyPressed(int key){
     
     if(key=='p'){
         makeNewPortraitWithTimer();
+    }
+    
+    if(key=='e'){
+        saveFrame.draw(0,0);
+        ofPixels pix;
+        saveFrame.readToPixels(pix);
+        string dir="saves/myFile_" + ofGetTimestampString() + ".png";
+        ofSaveImage(pix, dir);
+        
+        
+       // string sysCommand="lp -d Adafruit -o media=58x105mm -o fit-to-page ../../../data/"+dir;
+        string sysCommand="lp -d Adafruit -o media=58x55mm -o fit-to-page ../../../data/"+dir;
+
+        //string sysCommand="lp -d HP_Officejet_100_Mobile_L411 -o media=A6 -o fit-to-page ../../../data/"+name;
+        
+        //system  (  "lp -d Canon_CP810 -o landscape -o scaling=10 media=CP_L_size ../../../data/myImage.jpg"  );
+        // system ("lp -d Canon_CP810 -o media=Postcard\\(4x6in\\) -o fit-to-page ../../../data/"+name+" ");
+        
+        const char* valChar = (const char*) sysCommand.c_str();
+        system (valChar);
+        
+
+        
     }
     
 }

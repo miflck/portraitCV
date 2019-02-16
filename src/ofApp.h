@@ -332,4 +332,9 @@ class ofApp : public ofBaseApp{
 
     bool bDrawGui=false;
     
+    
+    void drawDebugLines();
+    ofFbo saveFrame;
+    
+    
 };

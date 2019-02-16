@@ -430,8 +430,8 @@ void ofApp::makeContours(){
         
         // Find ROI
         int diffx,diffy,dx,dy,hy;
-        //int offsetty=150;
-        int offsetty=250;
+        int offsetty=150;
+        //int offsetty=250;
 
         diffx=cur.x+cur.width;
         diffy=cur.y-offsetty/2;
@@ -605,6 +605,13 @@ void ofApp::makePolylines(){
             polyline2.addVertex(quad2[i].x, quad2[i].y);
         }
         
+        
+      /*  for (int p=0; p<50; p+=polyhalf_percent) {
+            ofVec2f point =  quad2.getPointAtPercent(p/100.0);
+            polyline2.addVertex(point);
+        }*/
+        
+        
         for(int i = 0; i < quad3.size(); i++) {
             polyline3.addVertex(quad3[i].x, quad3[i].y);
         }
@@ -730,7 +737,7 @@ void ofApp::makePolylines(){
     
     
     
-    saveFrame.allocate(faceBoundingBox.getWidth()*2,faceBoundingBox.getHeight()*2);
+    saveFrame.allocate(faceBoundingBox.getWidth()*2,faceBoundingBox.getHeight()*1.9);
     //saveFrame.allocate(faceBoundingBox.getWidth(),faceBoundingBox.getHeight());
     
     saveFrame.begin();
@@ -741,7 +748,7 @@ void ofApp::makePolylines(){
     ofSetColor(255);
     ofDrawRectangle(0, 0, saveFrame.getWidth(), saveFrame.getHeight());
     ofSetColor(0);
-    ofScale(2,2);
+    ofScale(2,1.9);
     for(int i = 0; i < linesToPrint.size(); i++) {
         ofSetColor(0);
         
@@ -1407,8 +1414,8 @@ void ofApp::keyPressed(int key){
         ofSaveImage(pix, dir);
         
         
-       // string sysCommand="lp -d Adafruit -o media=58x105mm -o fit-to-page ../../../data/"+dir;
-        string sysCommand="lp -d Adafruit -o media=58x55mm -o fit-to-page ../../../data/"+dir;
+        string sysCommand="lp -d Adafruit -o media=58x105mm -o scaling=100 ../../../data/"+dir;
+       // string sysCommand="lp -d Adafruit -o media=58x55mm -o fit-to-page ../../../data/"+dir;
 
         //string sysCommand="lp -d HP_Officejet_100_Mobile_L411 -o media=A6 -o fit-to-page ../../../data/"+name;
         

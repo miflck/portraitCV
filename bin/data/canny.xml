@@ -39,22 +39,22 @@
 		<bUseCanny1>0</bUseCanny1>
 <group>
 		<Canny_1>
-			<dilateErode>3</dilateErode>
-			<mincanny>92.5</mincanny>
-			<maxcanny>241.837</maxcanny>
-			<cannyblur>0.663265</cannyblur>
+			<dilateErode>1</dilateErode>
+			<mincanny>130.125</mincanny>
+			<maxcanny>105.153</maxcanny>
+			<cannyblur>0</cannyblur>
 			<cannycontrast>1</cannycontrast>
-			<brightness>0.22449</brightness>
-			<Threshold>204.26</Threshold>
+			<brightness>0.0918367</brightness>
+			<Threshold>76.7602</Threshold>
 		</Canny_1>
 		<Canny_2>
 			<dilateErode2>0</dilateErode2>
-			<mincanny2>275</mincanny2>
-			<maxcanny2>1410.71</maxcanny2>
-			<cannyblur2>0.102041</cannyblur2>
-			<cannycontrast2>-0.326531</cannycontrast2>
-			<brightness2>-0.244898</brightness2>
-			<Threshold_2>104.082</Threshold_2>
+			<mincanny2>210.714</mincanny2>
+			<maxcanny2>2000</maxcanny2>
+			<cannyblur2>0</cannyblur2>
+			<cannycontrast2>0.0816326</cannycontrast2>
+			<brightness2>-0.112245</brightness2>
+			<Threshold_2>37.7296</Threshold_2>
 		</Canny_2>
 		<bUseCanny1>0</bUseCanny1>
 	</group>

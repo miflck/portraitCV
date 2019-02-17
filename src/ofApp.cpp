@@ -15,7 +15,7 @@ int baud = 115200;
 char myByte = 0;
 string cmd;
 
-bool bUseArduino=true;
+bool bUseArduino=false;
 
 
 static bool sortByCriteria(const ofPoint &a, const ofPoint &b){
@@ -57,13 +57,13 @@ font.load("frabk.ttf", 60);
     if(bUseArduino) {
         vector <ofSerialDeviceInfo> deviceList = serial.getDeviceList();
        // serial.setup("tty.wchusbserial1420", baud); //open the first device
-        serial.setup("tty.wchusbserial1420", baud); //open the first device
+  serial.setup("tty.wchusbserial1420", baud); //open the first device
 
-        serial.startContinuousRead(false);
-        ofAddListener(serial.NEW_MESSAGE,this,&ofApp::onNewMessage);
+      serial.startContinuousRead(false);
+       ofAddListener(serial.NEW_MESSAGE,this,&ofApp::onNewMessage);
         
        //button.setup("tty.usbmodem141221", 9600); //open the first device
-        button.setup("tty.usbmodem1471", 9600);//mac mini
+      button.setup("tty.usbmodem1471", 9600);//mac mini
         
         // serial.setup("/dev/tty.usbserial-A70060V8", 9600);
         button.startContinuousRead();
@@ -100,7 +100,8 @@ font.load("frabk.ttf", 60);
    
     
     cam.listDevices();
-    cam.setDeviceID(1);
+  //  cam.setDeviceID(1);
+    cam.setDeviceID(2);
 
    // cam.setup(1920,1080);
     cam.setup( 1600, 896);
